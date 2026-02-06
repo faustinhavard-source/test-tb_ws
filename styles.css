@@ -1,0 +1,583 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@300;400;500&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --black: #535353;
+    --white: #f7f7f7;
+    --gray: #a0a0a0;
+    --light-gray: #d0d0d0;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--white);
+    color: var(--black);
+}
+
+/* Navigation */
+.nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 3rem;
+}
+
+.nav-logo {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.6rem;
+    color: var(--black);
+}
+
+.nav-links {
+    display: flex;
+    gap: 2.5rem;
+}
+
+.nav-links a {
+    font-family: 'Inter', sans-serif;
+    color: var(--gray);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    transition: color 0.2s ease;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: var(--black);
+}
+
+/* Scroll Hint */
+.scroll-hint {
+    position: fixed;
+    bottom: 2.5rem;
+    right: 3rem;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: var(--gray);
+    font-size: 0.8rem;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+}
+
+.scroll-arrow {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.5rem;
+    color: var(--black);
+    animation: blink 0.6s step-start infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+/* Horizontal Container */
+.horizontal-container {
+    display: flex;
+    width: 500vw;
+    height: 100vh;
+    overflow: visible;
+}
+
+/* Sections */
+.section {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0 8%;
+    padding-bottom: 180px;
+    position: relative;
+    flex-shrink: 0;
+    z-index: 10;
+}
+
+.section-content {
+    max-width: 550px;
+    width: 100%;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background: var(--white);
+    padding: 2rem 2.5rem;
+    border: 2px solid var(--black);
+}
+
+.section-label {
+    font-family: 'Inter', sans-serif;
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(0.9rem, 2.2vw, 1.2rem);
+    margin-bottom: 1.5rem;
+    line-height: 1.8;
+    color: var(--black);
+}
+
+.section-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--gray);
+    font-weight: 300;
+}
+
+/* Hero Title */
+.hero-title {
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(1.2rem, 4vw, 2rem);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    color: var(--black);
+}
+
+.title-line {
+    display: block;
+}
+
+/* Hero Details */
+.hero-details {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    margin-top: 1.8rem;
+    font-size: 0.9rem;
+    color: var(--gray);
+    font-weight: 300;
+}
+
+.detail-separator {
+    color: var(--black);
+    font-size: 0.4rem;
+}
+
+/* Feature List */
+.feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.95rem;
+    color: var(--gray);
+    font-weight: 300;
+}
+
+.feature-icon {
+    font-family: 'Press Start 2P', cursive;
+    color: var(--black);
+    font-size: 0.4rem;
+}
+
+/* Stat Block */
+.stat-block {
+    display: flex;
+    gap: 4rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--light-gray);
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.stat-value {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.9rem;
+    color: var(--black);
+}
+
+.stat-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 400;
+}
+
+/* Investment Details */
+.investment-details {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--light-gray);
+}
+
+.investment-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.investment-amount {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.75rem;
+    color: var(--black);
+}
+
+.investment-type {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.investment-plus {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.5rem;
+    color: var(--gray);
+}
+
+/* CTA Button */
+.cta-button {
+    display: inline-block;
+    margin-top: 1.5rem;
+    padding: 1rem 2rem;
+    background: var(--black);
+    color: var(--white);
+    text-decoration: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.cta-button:hover {
+    background: var(--white);
+    color: var(--black);
+    outline: 2px solid var(--black);
+}
+
+/* ============================================
+   GOLDEN GATE BRIDGE - PIXEL ART 2D
+   ============================================ */
+
+.bridge-structure {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 500vw;
+    height: 200px;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.bridge-deck {
+    display: none;
+}
+
+.bridge-towers {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.bridge-cables {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Pixel Art Tower */
+.pixel-tower {
+    position: absolute;
+    bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Tower top cap */
+.tower-cap {
+    width: 28px;
+    height: 6px;
+    background: var(--black);
+    border: 2px solid var(--black);
+}
+
+/* Tower cross beam top */
+.tower-beam-top {
+    width: 24px;
+    height: 4px;
+    background: var(--black);
+    margin-top: 2px;
+}
+
+/* Tower pillars container */
+.tower-pillars {
+    display: flex;
+    gap: 8px;
+    height: 120px;
+}
+
+/* Individual pillar */
+.tower-pillar {
+    width: 8px;
+    height: 100%;
+    background: var(--black);
+    position: relative;
+}
+
+/* Cross beams on pillars */
+.tower-pillar::before,
+.tower-pillar::after {
+    content: '';
+    position: absolute;
+    left: -4px;
+    width: 24px;
+    height: 4px;
+    background: var(--black);
+}
+
+.tower-pillar:first-child::before {
+    top: 30%;
+}
+
+.tower-pillar:first-child::after {
+    top: 60%;
+}
+
+.tower-pillar:last-child::before,
+.tower-pillar:last-child::after {
+    display: none;
+}
+
+/* Tower base */
+.tower-base {
+    width: 32px;
+    height: 8px;
+    background: var(--black);
+    margin-top: 2px;
+}
+
+/* Road deck */
+.pixel-road {
+    position: absolute;
+    bottom: 40px;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    background: var(--black);
+}
+
+/* Road stripes */
+.pixel-road::before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: repeating-linear-gradient(
+        to right,
+        var(--white) 0px,
+        var(--white) 20px,
+        transparent 20px,
+        transparent 40px
+    );
+}
+
+/* Water */
+.pixel-water {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    background: var(--white);
+    border-top: 2px solid var(--black);
+    overflow: hidden;
+}
+
+/* Water waves */
+.pixel-water::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 0;
+    width: 200%;
+    height: 4px;
+    background: repeating-linear-gradient(
+        to right,
+        transparent 0px,
+        transparent 10px,
+        var(--light-gray) 10px,
+        var(--light-gray) 20px,
+        transparent 20px,
+        transparent 40px
+    );
+    animation: waves 3s linear infinite;
+}
+
+.pixel-water::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 10px;
+    width: 200%;
+    height: 4px;
+    background: repeating-linear-gradient(
+        to right,
+        transparent 0px,
+        transparent 15px,
+        var(--light-gray) 15px,
+        var(--light-gray) 25px,
+        transparent 25px,
+        transparent 50px
+    );
+    animation: waves 4s linear infinite reverse;
+}
+
+@keyframes waves {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+/* Pixel Clouds */
+.clouds {
+    position: fixed;
+    top: 12%;
+    left: 0;
+    width: 500vw;
+    height: 80px;
+    z-index: 3;
+    pointer-events: none;
+}
+
+.pixel-cloud {
+    position: absolute;
+    image-rendering: pixelated;
+}
+
+/* Pixel cloud made of squares */
+.pixel-cloud .c1 { position: absolute; width: 8px; height: 8px; background: var(--light-gray); }
+.pixel-cloud .c2 { position: absolute; width: 8px; height: 8px; background: var(--light-gray); }
+.pixel-cloud .c3 { position: absolute; width: 8px; height: 8px; background: var(--light-gray); }
+.pixel-cloud .c4 { position: absolute; width: 8px; height: 8px; background: var(--light-gray); }
+.pixel-cloud .c5 { position: absolute; width: 8px; height: 8px; background: var(--light-gray); }
+
+/* Progress Bar */
+.progress-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--light-gray);
+    z-index: 100;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--black);
+    transition: width 0.1s ease-out;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .nav {
+        padding: 1rem 2rem;
+    }
+
+    .nav-links {
+        display: none;
+    }
+
+    .section {
+        padding: 0 5%;
+        padding-bottom: 160px;
+    }
+
+    .section-content {
+        max-width: 90%;
+        padding: 1.5rem 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .section {
+        padding-bottom: 140px;
+    }
+
+    .section-content {
+        max-width: 95%;
+        padding: 1.2rem 1.5rem;
+    }
+
+    .hero-title {
+        font-size: 1rem;
+    }
+
+    .section-title {
+        font-size: 0.75rem;
+    }
+
+    .section-text {
+        font-size: 0.85rem;
+    }
+
+    .scroll-hint {
+        right: 1.5rem;
+        bottom: 2rem;
+    }
+
+    .bridge-structure {
+        height: 100px;
+    }
+
+    .tower {
+        height: 70px;
+        width: 6px;
+    }
+}

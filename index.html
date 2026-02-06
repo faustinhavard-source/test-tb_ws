@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Bridge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #EFECD4;
+            overflow: hidden;
+            height: 100vh;
+            font-family: 'Courier New', monospace;
+            color: #1E1E1E;
+        }
+
+        #dots {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        #content {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* Zone de clipping pour le texte */
+        #text-container {
+            position: absolute;
+            overflow: hidden;
+            /* Sera défini dynamiquement */
+        }
+
+        /* Header */
+        #header {
+            position: fixed;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            pointer-events: auto;
+            /* top et padding seront définis en JS */
+        }
+
+        #logo {
+            height: 24px;
+        }
+
+        #apply-btn {
+            font-family: 'Courier New', monospace;
+            font-size: clamp(10px, 1.4vw, 13px);
+            font-weight: bold;
+            color: #FFFFFF !important;
+            background-color: #E43535;
+            text-decoration: none;
+            letter-spacing: 1px;
+            padding: 10px 22px;
+            border-radius: 20px;
+            transition: all 0.2s ease;
+        }
+
+        #apply-btn:hover {
+            background-color: #1E1E1E;
+        }
+
+        #theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #theme-toggle svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Sections de texte */
+        .section {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding-bottom: 10%;
+        }
+
+        .section h1 {
+            font-family: 'Lora', serif;
+            font-size: clamp(18px, 3vw, 36px);
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            line-height: 1.5;
+            text-transform: none;
+            padding: 0 20px;
+        }
+
+        .section h1 em {
+            font-style: italic;
+            font-weight: 600;
+        }
+
+        .section p {
+            font-family: 'Courier New', monospace;
+            font-size: clamp(10px, 1.1vw, 14px);
+            margin-top: clamp(15px, 3vh, 35px);
+            letter-spacing: 0.08em;
+            padding: 0 20px;
+            text-transform: uppercase;
+        }
+
+        .section .small {
+            font-family: 'Courier New', monospace;
+            font-size: clamp(9px, 0.9vw, 12px);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            opacity: 0.6;
+            margin-bottom: 10px;
+        }
+
+        /* Hero section spéciale */
+        .section[data-section="0"] h1 {
+            font-size: clamp(24px, 4vw, 52px);
+            font-weight: 400;
+            line-height: 1.4;
+        }
+
+        .section[data-section="0"] h1 em {
+            color: #E43535;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="dots"></canvas>
+
+<div id="content">
+    <div id="text-container">
+        <!-- Section 0 - Hero -->
+        <div class="section" data-section="0">
+            <h1>
+                The US residency for Europeans<br>
+                who want to build<br>
+                <em>massive</em> companies.
+            </h1>
+            <p>8 weeks in the Bay Area • 40 spots • April 2026</p>
+        </div>
+
+        <!-- Section 1 - How it works -->
+        <div class="section" data-section="1">
+            <p class="small">How it works</p>
+            <h1>
+                Cross the <em>Atlantic</em>
+            </h1>
+            <p>We cover flights, visa and admin<br>to set you up in the Bay.</p>
+        </div>
+
+        <!-- Section 2 - Find cofounder -->
+        <div class="section" data-section="2">
+            <p class="small">How it works</p>
+            <h1>
+                Find your <em>people</em>
+            </h1>
+            <p>The house will be full of builders,<br>hackers, engineers and operators.</p>
+        </div>
+
+        <!-- Section 3 - Mentorship -->
+        <div class="section" data-section="3">
+            <p class="small">How it works</p>
+            <h1>
+                Get <em>mentorship</em>
+            </h1>
+            <p>Eight weeks of guidance, demos,<br>deadlines and full-stack support.</p>
+        </div>
+
+        <!-- Section 4 - Get funded -->
+        <div class="section" data-section="4">
+            <p class="small">How it works</p>
+            <h1>
+                Get <em>funded</em>
+            </h1>
+            <p>$250K pre-seed investment.<br>Then raise from the best US VCs.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Header par-dessus tout -->
+<div id="header">
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <img id="logo" src="logo.png" alt="The Bridge">
+        <button id="theme-toggle" title="Toggle dark mode">
+            <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="#1E1E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+        </button>
+    </div>
+    <a id="apply-btn" href="#">APPLY</a>
+</div>
+
+<script>
+var canvas = document.getElementById('dots');
+var ctx = canvas.getContext('2d');
+var textContainer = document.getElementById('text-container');
+var header = document.getElementById('header');
+var sections = document.querySelectorAll('.section');
+
+var scrollPos = 0;
+var maxScroll;
+var dotSpacing, dotRadius, margin;
+
+// Calculer la zone des points
+var dotZone = { x: 0, y: 0, width: 0, height: 0 };
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Valeurs responsive - mêmes proportions sur tous les écrans
+    var baseSize = Math.min(canvas.width, canvas.height);
+
+    // DotSpacing proportionnel à l'écran (14px sur 1400px = 1%)
+    dotSpacing = Math.max(8, baseSize * 0.01);
+    dotRadius = dotSpacing * 0.13;
+
+    // Marge latérale et bas
+    var marginSide = baseSize * 0.035;
+    // Marge du haut plus grande pour le logo (minimum 50px)
+    var marginTop = Math.max(50, baseSize * 0.06);
+    margin = marginSide; // Pour les côtés et le bas
+
+    maxScroll = canvas.width * (sections.length - 1);
+
+    // Calculer la vraie zone des points
+    var cols = Math.ceil(canvas.width / dotSpacing) + 1;
+    var rows = Math.ceil(canvas.height / dotSpacing) + 1;
+
+    var firstDotX, lastDotX, firstDotY, lastDotY;
+    for (var c = 0; c < cols; c++) {
+        var px = c * dotSpacing + dotSpacing / 2;
+        if (px >= marginSide && firstDotX === undefined) firstDotX = px;
+        if (px <= canvas.width - marginSide) lastDotX = px;
+    }
+    for (var r = 0; r < rows; r++) {
+        var py = r * dotSpacing + dotSpacing / 2;
+        if (py >= marginTop && firstDotY === undefined) firstDotY = py;
+        if (py <= canvas.height - marginSide) lastDotY = py;
+    }
+
+    dotZone.x = firstDotX;
+    dotZone.y = firstDotY;
+    dotZone.width = lastDotX - firstDotX;
+    dotZone.height = lastDotY - firstDotY;
+
+    // Appliquer la zone au container de texte
+    textContainer.style.left = dotZone.x + 'px';
+    textContainer.style.top = dotZone.y + 'px';
+    textContainer.style.width = dotZone.width + 'px';
+    textContainer.style.height = dotZone.height + 'px';
+
+    // Positionner le header juste au-dessus de la zone des points
+    var headerTopMargin = marginSide * 0.5;
+    header.style.top = headerTopMargin + 'px';
+    header.style.height = (dotZone.y - headerTopMargin - 10) + 'px';
+    header.style.paddingLeft = dotZone.x + 'px';
+    header.style.paddingRight = (canvas.width - dotZone.x - dotZone.width) + 'px';
+
+    // Ajuster la taille du logo proportionnellement
+    var logo = document.getElementById('logo');
+    logo.style.height = Math.max(18, baseSize * 0.03) + 'px';
+
+    // Dimensionner les sections
+    sections.forEach(function(section, i) {
+        section.style.width = dotZone.width + 'px';
+        section.style.left = (i * dotZone.width) + 'px';
+    });
+}
+
+// Nuages style Chrome Dino - générés aléatoirement
+var clouds = [];
+var numClouds = 25;
+
+// Générateur de nombres pseudo-aléatoires avec seed pour consistance
+function seededRandom(seed) {
+    var x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+}
+
+// Générer les nuages (positions relatives)
+for (var i = 0; i < numClouds; i++) {
+    clouds.push({
+        x: seededRandom(i * 123.456) * 2.5,
+        yRatio: 0.08 + seededRandom(i * 789.012) * 0.12, // Plus haut dans le ciel
+        size: 0.6 + seededRandom(i * 345.678) * 0.8,
+        speed: 0.5 + seededRandom(i * 901.234) * 1
+    });
+}
+
+var cloudPattern = [
+    [0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0],
+    [0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+];
+
+function getCloudOpacity(x, y, col, row) {
+    var time = Date.now() * 0.015;
+
+    for (var i = 0; i < clouds.length; i++) {
+        var cloud = clouds[i];
+        var baseX = cloud.x * canvas.width * 2;
+        var autoMove = time * cloud.speed;
+        var totalMove = baseX - scrollPos * 0.3 - autoMove;
+        var loopWidth = canvas.width * 3;
+        var cloudX = ((totalMove % loopWidth) + loopWidth) % loopWidth - canvas.width * 0.3;
+        var cloudY = cloud.yRatio * canvas.height;
+
+        var cloudCol = Math.floor(cloudX / dotSpacing);
+        var cloudRow = Math.floor(cloudY / dotSpacing);
+
+        var relCol = col - cloudCol;
+        var relRow = row - cloudRow;
+
+        var scaledCol = Math.floor(relCol / cloud.size);
+        var scaledRow = Math.floor(relRow / cloud.size);
+
+        if (scaledRow >= 0 && scaledRow < cloudPattern.length) {
+            var patternRow = cloudPattern[scaledRow];
+            if (scaledCol >= 0 && scaledCol < patternRow.length) {
+                if (patternRow[scaledCol] === 1) {
+                    return 0.5;
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+function getBridgeOpacity(x, y) {
+    var bridgeOffset = scrollPos * 0.5;
+
+    // Pont plus petit sur mobile (écrans étroits)
+    var isMobile = canvas.width < 768;
+    var bridgeScale = isMobile ? 0.6 : 1;
+
+    // Toutes les valeurs proportionnelles à l'écran
+    var roadY = canvas.height * (isMobile ? 0.92 : 0.88);
+    var towerHeight = canvas.height * 0.25 * bridgeScale;
+    var towerTop = roadY - towerHeight;
+
+    var worldX = x + bridgeOffset;
+    var spanWidth = canvas.width;
+    var localX = worldX % spanWidth;
+    if (localX < 0) localX += spanWidth;
+
+    var towerWidth = dotSpacing;
+    if ((localX < towerWidth || localX > spanWidth - towerWidth) && y >= towerTop && y <= roadY + towerWidth * 0.5) {
+        return 1;
+    }
+
+    var mainSag = (roadY - towerTop) * 0.5;
+    var t = localX / spanWidth;
+    var cableY = towerTop + Math.sin(t * Math.PI) * mainSag;
+
+    var cableThickness = dotSpacing * 0.4;
+    if (Math.abs(y - cableY) < cableThickness) return 0.8;
+
+    var suspenderSpacing = dotSpacing * 1.5;
+    if (localX > suspenderSpacing && localX < spanWidth - suspenderSpacing) {
+        if (Math.floor(localX / suspenderSpacing) % 2 === 0) {
+            if (y > cableY + cableThickness && y < roadY - cableThickness) return 0.35;
+        }
+    }
+
+    if (y >= roadY - cableThickness && y <= roadY + cableThickness) return 0.85;
+
+    return 0;
+}
+
+function getWaterOpacity(x, y) {
+    var isMobile = canvas.width < 768;
+    var roadY = canvas.height * (isMobile ? 0.92 : 0.88);
+    var bridgeOffset = scrollPos * 0.5;
+    var worldX = x + bridgeOffset;
+    var waveGap = dotSpacing * 2;
+    var waveThickness = dotSpacing * 0.4;
+
+    if (y > roadY + waveGap) {
+        var time = Date.now() * 0.0008;
+        var waveAmplitude = dotSpacing * 0.3;
+        var wave1 = Math.sin((worldX * 0.015) + time) * waveAmplitude;
+        var wave2 = Math.sin((worldX * 0.02) + time * 1.3) * waveAmplitude;
+        var wave3 = Math.sin((worldX * 0.028) + time * 0.9) * waveAmplitude;
+
+        var waveY1 = roadY + waveGap * 1.5 + wave1;
+        var waveY2 = roadY + waveGap * 2.2 + wave2;
+        var waveY3 = roadY + waveGap * 2.9 + wave3;
+
+        if (Math.abs(y - waveY1) < waveThickness) return 0.4;
+        if (Math.abs(y - waveY2) < waveThickness) return 0.35;
+        if (Math.abs(y - waveY3) < waveThickness) return 0.3;
+    }
+    return 0;
+}
+
+// Mode jour par défaut
+var isDay = true;
+
+// Toggle jour/nuit
+var themeToggle = document.getElementById('theme-toggle');
+
+var moonSVG = '<svg class="moon" viewBox="0 0 24 24" fill="none" stroke="#1E1E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+
+var sunSVG = '<svg class="sun" viewBox="0 0 24 24" fill="none" stroke="#EFECD4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+
+themeToggle.addEventListener('click', function() {
+    isDay = !isDay;
+    if (isDay) {
+        // Mode jour -> affiche lune noire pour switcher vers nuit
+        themeToggle.innerHTML = moonSVG;
+    } else {
+        // Mode nuit -> affiche soleil blanc pour switcher vers jour
+        themeToggle.innerHTML = sunSVG;
+    }
+});
+
+// Générer les étoiles pour le mode nuit
+var stars = [];
+var numStars = 80;
+for (var i = 0; i < numStars; i++) {
+    stars.push({
+        x: seededRandom(i * 111.111) * 1.5,
+        y: seededRandom(i * 222.222) * 0.6,
+        brightness: 0.3 + seededRandom(i * 333.333) * 0.7
+    });
+}
+
+function draw() {
+    // Couleurs selon le mode jour/nuit
+    var bgColor, dotColor, dotColorAlpha;
+
+    if (isDay) {
+        // Mode jour
+        bgColor = 'rgb(239, 236, 212)'; // #EFECD4
+        dotColor = 'rgb(30, 30, 30)';    // #1E1E1E
+        dotColorAlpha = 'rgba(30, 30, 30,';
+    } else {
+        // Mode nuit
+        bgColor = 'rgb(30, 30, 30)';     // #1E1E1E
+        dotColor = 'rgb(239, 236, 212)'; // #EFECD4
+        dotColorAlpha = 'rgba(239, 236, 212,';
+    }
+
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Mettre à jour le body aussi
+    document.body.style.backgroundColor = bgColor;
+    document.getElementById('content').style.color = dotColor;
+
+    // Soleil ou Lune - position basée sur le scroll
+    var scrollProgress = scrollPos / maxScroll;
+    var sunX = canvas.width * 0.1 + (canvas.width * 0.8) * scrollProgress;
+    var sunArc = Math.sin(scrollProgress * Math.PI);
+    var sunY = canvas.height * 0.7 - sunArc * canvas.height * 0.5;
+    var sunRadius = Math.max(15, Math.min(canvas.width, canvas.height) * 0.03);
+
+    // Couleur du soleil/lune selon le mode et la position
+    var sunR, sunG, sunB;
+    if (isDay) {
+        // Soleil - cycle de couleurs selon la position
+        if (scrollProgress < 0.2) {
+            var t = scrollProgress / 0.2;
+            sunR = 228 + Math.round(t * 27);
+            sunG = 53 + Math.round(t * 107);
+            sunB = 53 - Math.round(t * 23);
+        } else if (scrollProgress < 0.5) {
+            var t = (scrollProgress - 0.2) / 0.3;
+            sunR = 255;
+            sunG = 160 + Math.round(t * 40);
+            sunB = 30 - Math.round(t * 20);
+        } else if (scrollProgress < 0.8) {
+            sunR = 255;
+            sunG = 200;
+            sunB = 10;
+        } else {
+            var t = (scrollProgress - 0.8) / 0.2;
+            sunR = 255;
+            sunG = 200 - Math.round(t * 60);
+            sunB = 10 + Math.round(t * 30);
+        }
+    } else {
+        // Lune - blanc/gris
+        sunR = 200;
+        sunG = 200;
+        sunB = 200;
+    }
+    var sunColorAlpha = 'rgba(' + sunR + ',' + sunG + ',' + sunB + ',';
+
+    var cols = Math.ceil(canvas.width / dotSpacing) + 1;
+    var rows = Math.ceil(canvas.height / dotSpacing) + 1;
+
+    for (var row = 0; row < rows; row++) {
+        for (var col = 0; col < cols; col++) {
+            var x = col * dotSpacing + dotSpacing / 2;
+            var y = row * dotSpacing + dotSpacing / 2;
+
+            // Ne pas dessiner dans la marge (utiliser dotZone)
+            if (x < dotZone.x || x > dotZone.x + dotZone.width || y < dotZone.y || y > dotZone.y + dotZone.height) {
+                continue;
+            }
+
+            var bridgeOpacity = getBridgeOpacity(x, y);
+            var waterOpacity = getWaterOpacity(x, y);
+            var cloudOpacity = getCloudOpacity(x, y, col, row);
+
+            // Distance au soleil/lune
+            var distToSun = Math.sqrt((x - sunX) * (x - sunX) + (y - sunY) * (y - sunY));
+            var sunOpacity = 0;
+            if (distToSun < sunRadius * 2) sunOpacity = Math.max(0, 1 - distToSun / (sunRadius * 2)) * 0.5;
+            if (distToSun < sunRadius) sunOpacity = 1;
+
+            // Étoiles (seulement la nuit)
+            var starOpacity = 0;
+            if (!isDay) {
+                var time = Date.now() * 0.001;
+                for (var s = 0; s < stars.length; s++) {
+                    var starX = stars[s].x * canvas.width;
+                    var starY = dotZone.y + stars[s].y * dotZone.height;
+                    if (Math.abs(x - starX) < dotSpacing && Math.abs(y - starY) < dotSpacing) {
+                        var twinkle = 0.85 + 0.15 * Math.sin(time * 2 + s * 1.7);
+                        starOpacity = stars[s].brightness * twinkle;
+                        break;
+                    }
+                }
+            }
+
+            var baseOpacity = 0.12;
+            var opacity = Math.max(baseOpacity, bridgeOpacity);
+
+            ctx.beginPath();
+            ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
+
+            if (cloudOpacity > 0.05 && isDay) {
+                // Nuages (seulement le jour)
+                ctx.fillStyle = dotColorAlpha + cloudOpacity + ')';
+            } else if (starOpacity > 0.1) {
+                // Étoiles la nuit
+                ctx.fillStyle = 'rgba(255,255,200,' + starOpacity + ')';
+            } else if (sunOpacity > 0.1) {
+                ctx.fillStyle = sunColorAlpha + sunOpacity + ')';
+            } else if (waterOpacity > 0.1) {
+                ctx.fillStyle = dotColorAlpha + waterOpacity + ')';
+            } else if (bridgeOpacity > 0.12) {
+                var bridgeVis = Math.min(1, opacity + 0.3);
+                ctx.fillStyle = 'rgba(228,53,53,' + bridgeVis + ')';
+            } else {
+                ctx.fillStyle = dotColorAlpha + opacity + ')';
+            }
+            ctx.fill();
+        }
+    }
+
+    // Mettre à jour la position des sections
+    sections.forEach(function(section, i) {
+        var offset = i * dotZone.width - scrollPos;
+        section.style.transform = 'translateX(' + offset + 'px)';
+    });
+}
+
+function animate() {
+    draw();
+    requestAnimationFrame(animate);
+}
+
+function handleScroll(e) {
+    e.preventDefault();
+    scrollPos += e.deltaY * 2.5;
+    if (scrollPos < 0) scrollPos = 0;
+    if (scrollPos > maxScroll) scrollPos = maxScroll;
+}
+
+// Events
+document.body.addEventListener('wheel', handleScroll, { passive: false });
+
+var touchStartX = 0;
+var touchStartScroll = 0;
+document.addEventListener('touchstart', function(e) {
+    touchStartX = e.touches[0].clientX;
+    touchStartScroll = scrollPos;
+});
+document.addEventListener('touchmove', function(e) {
+    var diff = touchStartX - e.touches[0].clientX;
+    scrollPos = touchStartScroll + diff * 2;
+    if (scrollPos < 0) scrollPos = 0;
+    if (scrollPos > maxScroll) scrollPos = maxScroll;
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight') {
+        scrollPos += 400;
+        if (scrollPos > maxScroll) scrollPos = maxScroll;
+    } else if (e.key === 'ArrowLeft') {
+        scrollPos -= 400;
+        if (scrollPos < 0) scrollPos = 0;
+    }
+});
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+animate();
+</script>
+
+</body>
+</html>
