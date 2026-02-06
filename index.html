@@ -6,7 +6,7 @@
     <title>The Bridge</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -66,9 +66,9 @@
         }
 
         #apply-btn {
-            font-family: 'Courier New', monospace;
+            font-family: 'Instrument Sans', sans-serif;
             font-size: clamp(10px, 1.4vw, 13px);
-            font-weight: bold;
+            font-weight: 600;
             color: #FFFFFF !important;
             background-color: #E43535;
             text-decoration: none;
@@ -93,7 +93,13 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding-bottom: 10%;
+            padding-bottom: 12%;
+        }
+
+        @media (max-width: 768px) {
+            .section {
+                padding-bottom: 5%;
+            }
         }
 
         .section h1 {
@@ -112,7 +118,7 @@
         }
 
         .section p {
-            font-family: 'Courier New', monospace;
+            font-family: 'Instrument Sans', sans-serif;
             font-size: clamp(10px, 1.1vw, 14px);
             margin-top: clamp(15px, 3vh, 35px);
             letter-spacing: 0.08em;
@@ -121,7 +127,7 @@
         }
 
         .section .small {
-            font-family: 'Courier New', monospace;
+            font-family: 'Instrument Sans', sans-serif;
             font-size: clamp(9px, 0.9vw, 12px);
             letter-spacing: 0.15em;
             text-transform: uppercase;
@@ -139,6 +145,54 @@
         .section[data-section="0"] h1 em {
             color: #E43535;
         }
+
+        /* Backed By section */
+        .section[data-section="2"] .investors {
+            font-family: 'Instrument Sans', sans-serif;
+            font-size: clamp(10px, 1.2vw, 15px);
+            margin-top: clamp(15px, 4vh, 40px);
+            letter-spacing: 0.03em;
+            line-height: 1.8;
+            padding: 0 15px;
+            text-transform: none;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .section[data-section="2"] .investors {
+                font-size: 10px;
+                line-height: 2.2;
+            }
+        }
+
+        /* Apply section - big button */
+        .section[data-section="4"] .apply-big {
+            display: inline-block;
+            font-family: 'Instrument Sans', sans-serif;
+            font-size: clamp(12px, 2vw, 20px);
+            font-weight: 600;
+            color: #FFFFFF;
+            background-color: #E43535;
+            text-decoration: none;
+            letter-spacing: 2px;
+            padding: 16px 40px;
+            border-radius: 40px;
+            margin-top: clamp(20px, 5vh, 50px);
+            transition: all 0.2s ease;
+            pointer-events: auto;
+        }
+
+        .section[data-section="4"] .apply-big:hover {
+            background-color: #1E1E1E;
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .section[data-section="4"] .apply-big {
+                padding: 14px 32px;
+                font-size: 11px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -150,47 +204,52 @@
         <!-- Section 0 - Hero -->
         <div class="section" data-section="0">
             <h1>
-                The US residency for Europeans<br>
-                who want to build<br>
-                <em>massive</em> companies.
+                The <em>fastest</em> way to become<br>
+                a world-class founder.
             </h1>
             <p>8 weeks in the Bay Area • 40 spots • April 2026</p>
         </div>
 
-        <!-- Section 1 - How it works -->
+        <!-- Section 1 - Program Explained -->
         <div class="section" data-section="1">
-            <p class="small">How it works</p>
+            <p class="small">The Program</p>
             <h1>
-                Cross the <em>Atlantic</em>
+                Live in SF for <em>8 weeks</em>.<br>
+                Build alongside the best.<br>
+                Launch your company.
             </h1>
-            <p>We cover flights, visa and admin<br>to set you up in the Bay.</p>
+            <p>Flights, visa, housing — all covered.<br>You focus on what matters: building.</p>
         </div>
 
-        <!-- Section 2 - Find cofounder -->
+        <!-- Section 2 - Backed By -->
         <div class="section" data-section="2">
-            <p class="small">How it works</p>
+            <p class="small">Backed By</p>
             <h1>
-                Find your <em>people</em>
+                Investors who built<br>
+                <em>iconic</em> companies.
             </h1>
-            <p>The house will be full of builders,<br>hackers, engineers and operators.</p>
+            <p class="investors">
+                Thibaud Elziere • Xavier Niel • Jean-Charles Samuelian<br>
+                Alexis Ohanian • Thibault Elziere • Nicolas Brusson
+            </p>
         </div>
 
-        <!-- Section 3 - Mentorship -->
+        <!-- Section 3 - Build Massive Companies -->
         <div class="section" data-section="3">
-            <p class="small">How it works</p>
+            <p class="small">The Outcome</p>
             <h1>
-                Get <em>mentorship</em>
+                You will build<br>
+                <em>massive</em> companies.
             </h1>
-            <p>Eight weeks of guidance, demos,<br>deadlines and full-stack support.</p>
+            <p>Join the lineage of European founders<br>who crossed the ocean and changed the world.</p>
         </div>
 
-        <!-- Section 4 - Get funded -->
+        <!-- Section 4 - Apply -->
         <div class="section" data-section="4">
-            <p class="small">How it works</p>
             <h1>
-                Get <em>funded</em>
+                Ready to <em>cross</em>?
             </h1>
-            <p>$250K pre-seed investment.<br>Then raise from the best US VCs.</p>
+            <a href="#" class="apply-big">APPLY NOW</a>
         </div>
     </div>
 </div>
@@ -215,6 +274,9 @@ var dotSpacing, dotRadius, margin;
 // Calculer la zone des points
 var dotZone = { x: 0, y: 0, width: 0, height: 0 };
 
+// Position Y du pont (centre du pont où le texte doit être aligné)
+var bridgeCenterY = 0;
+
 function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -232,6 +294,8 @@ function resizeCanvas() {
     var marginTop = Math.max(50, baseSize * 0.06);
     margin = marginSide; // Pour les côtés et le bas
 
+    // maxScroll = largeur d'écran * (nombre de sections - 1)
+    // Chaque section correspond à 1 span du pont (1 largeur d'écran)
     maxScroll = canvas.width * (sections.length - 1);
 
     // Calculer la vraie zone des points
@@ -255,11 +319,19 @@ function resizeCanvas() {
     dotZone.width = lastDotX - firstDotX;
     dotZone.height = lastDotY - firstDotY;
 
-    // Appliquer la zone au container de texte
-    textContainer.style.left = dotZone.x + 'px';
-    textContainer.style.top = dotZone.y + 'px';
-    textContainer.style.width = dotZone.width + 'px';
-    textContainer.style.height = dotZone.height + 'px';
+    // Calculer la position Y du centre du pont (milieu entre le haut des tours et la route)
+    var isMobile = canvas.width < 768;
+    var roadY = canvas.height * (isMobile ? 0.92 : 0.88);
+    var bridgeScale = isMobile ? 0.6 : 1;
+    var towerHeight = canvas.height * 0.25 * bridgeScale;
+    var towerTop = roadY - towerHeight;
+    bridgeCenterY = towerTop + towerHeight * 0.3; // Un peu au-dessus du milieu du pont
+
+    // Appliquer la zone au container de texte - plein écran pour centrage parfait
+    textContainer.style.left = '0px';
+    textContainer.style.top = '0px';
+    textContainer.style.width = canvas.width + 'px';
+    textContainer.style.height = canvas.height + 'px';
 
     // Positionner le header juste au-dessus de la zone des points
     var headerTopMargin = marginSide * 0.5;
@@ -272,10 +344,11 @@ function resizeCanvas() {
     var logo = document.getElementById('logo');
     logo.style.height = Math.max(18, baseSize * 0.03) + 'px';
 
-    // Dimensionner les sections
+    // Dimensionner les sections - chaque section = 1 largeur d'écran (entre 2 tours)
+    // Le texte est centré horizontalement et verticalement dans chaque section
     sections.forEach(function(section, i) {
-        section.style.width = dotZone.width + 'px';
-        section.style.left = (i * dotZone.width) + 'px';
+        section.style.width = canvas.width + 'px';
+        section.style.left = (i * canvas.width) + 'px';
     });
 }
 
@@ -339,6 +412,83 @@ function getCloudOpacity(x, y, col, row) {
     return 0;
 }
 
+// SF Skyline pattern (buildings)
+var sfSkyline = [
+    // Transamerica Pyramid style
+    { x: 0.05, width: 0.04, height: 0.35, type: 'pyramid' },
+    { x: 0.12, width: 0.06, height: 0.22, type: 'box' },
+    { x: 0.20, width: 0.05, height: 0.28, type: 'box' },
+    { x: 0.27, width: 0.08, height: 0.18, type: 'box' },
+    // Salesforce Tower style
+    { x: 0.38, width: 0.06, height: 0.40, type: 'rounded' },
+    { x: 0.46, width: 0.05, height: 0.25, type: 'box' },
+    { x: 0.54, width: 0.07, height: 0.30, type: 'box' },
+    { x: 0.63, width: 0.04, height: 0.20, type: 'box' },
+    { x: 0.70, width: 0.06, height: 0.32, type: 'box' },
+    { x: 0.78, width: 0.05, height: 0.24, type: 'box' },
+    { x: 0.85, width: 0.08, height: 0.28, type: 'box' },
+    { x: 0.95, width: 0.05, height: 0.15, type: 'box' },
+];
+
+function getSkylineOpacity(x, y) {
+    var isMobile = canvas.width < 768;
+    var roadY = canvas.height * (isMobile ? 0.92 : 0.88);
+    var bridgeOffset = scrollPos * 0.5;
+    var worldX = x + bridgeOffset;
+
+    // La skyline commence à la fin du parcours (après section 4, donc à 4.5 spans)
+    var skylineStart = canvas.width * 4.3;
+    var skylineWidth = canvas.width * 0.7;
+
+    // Position relative dans la skyline
+    var relX = worldX - skylineStart;
+
+    if (relX < 0 || relX > skylineWidth) return 0;
+
+    var normalizedX = relX / skylineWidth;
+
+    // Vérifier chaque bâtiment
+    for (var i = 0; i < sfSkyline.length; i++) {
+        var building = sfSkyline[i];
+        var bLeft = building.x * skylineWidth;
+        var bRight = (building.x + building.width) * skylineWidth;
+        var bHeight = building.height * canvas.height * 0.4;
+        var bTop = roadY - bHeight;
+
+        if (relX >= bLeft && relX <= bRight && y >= bTop && y <= roadY) {
+            // Type de bâtiment
+            if (building.type === 'pyramid') {
+                var centerX = (bLeft + bRight) / 2;
+                var progress = (y - bTop) / bHeight;
+                var widthAtY = (bRight - bLeft) * progress;
+                if (Math.abs(relX - centerX) < widthAtY / 2) {
+                    return 0.9;
+                }
+            } else if (building.type === 'rounded') {
+                // Top arrondi
+                var centerX = (bLeft + bRight) / 2;
+                var topRadius = (bRight - bLeft) / 2;
+                if (y < bTop + topRadius) {
+                    var dist = Math.sqrt(Math.pow(relX - centerX, 2) + Math.pow(y - (bTop + topRadius), 2));
+                    if (dist < topRadius) return 0.9;
+                } else {
+                    return 0.9;
+                }
+            } else {
+                return 0.9;
+            }
+        }
+    }
+
+    // Terre/colline sous les bâtiments
+    var hillHeight = dotSpacing * 3;
+    if (relX >= 0 && y >= roadY && y <= roadY + hillHeight) {
+        return 0.7;
+    }
+
+    return 0;
+}
+
 function getBridgeOpacity(x, y) {
     var bridgeOffset = scrollPos * 0.5;
 
@@ -352,6 +502,11 @@ function getBridgeOpacity(x, y) {
     var towerTop = roadY - towerHeight;
 
     var worldX = x + bridgeOffset;
+
+    // Le pont s'arrête quand il arrive à la skyline (fin de section 4)
+    var bridgeEnd = canvas.width * 4.3;
+    if (worldX > bridgeEnd) return 0;
+
     var spanWidth = canvas.width;
     var localX = worldX % spanWidth;
     if (localX < 0) localX += spanWidth;
@@ -387,6 +542,10 @@ function getWaterOpacity(x, y) {
     var worldX = x + bridgeOffset;
     var waveGap = dotSpacing * 2;
     var waveThickness = dotSpacing * 0.4;
+
+    // Pas d'eau sous la skyline
+    var skylineStart = canvas.width * 4.3;
+    if (worldX > skylineStart) return 0;
 
     if (y > roadY + waveGap) {
         var time = Date.now() * 0.0008;
@@ -536,6 +695,7 @@ function draw() {
             var bridgeOpacity = getBridgeOpacity(x, y);
             var waterOpacity = getWaterOpacity(x, y);
             var cloudOpacity = getCloudOpacity(x, y, col, row);
+            var skylineOpacity = getSkylineOpacity(x, y);
 
             // Distance au soleil/lune
             var distToSun = Math.sqrt((x - sunX) * (x - sunX) + (y - sunY) * (y - sunY));
@@ -564,7 +724,10 @@ function draw() {
             ctx.beginPath();
             ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
 
-            if (cloudOpacity > 0.05 && isDay) {
+            if (skylineOpacity > 0.1) {
+                // SF Skyline - même couleur que le pont
+                ctx.fillStyle = 'rgba(228,53,53,' + skylineOpacity + ')';
+            } else if (cloudOpacity > 0.05 && isDay) {
                 // Nuages (seulement le jour)
                 ctx.fillStyle = dotColorAlpha + cloudOpacity + ')';
             } else if (starOpacity > 0.1) {
@@ -585,8 +748,9 @@ function draw() {
     }
 
     // Mettre à jour la position des sections
+    // Chaque section se déplace avec le scroll, centrée entre les 2 tours
     sections.forEach(function(section, i) {
-        var offset = i * dotZone.width - scrollPos;
+        var offset = i * canvas.width - scrollPos;
         section.style.transform = 'translateX(' + offset + 'px)';
     });
 }
