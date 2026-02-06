@@ -82,22 +82,6 @@
             background-color: #1E1E1E;
         }
 
-        #theme-toggle {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #theme-toggle svg {
-            width: 20px;
-            height: 20px;
-        }
 
         /* Sections de texte */
         .section {
@@ -213,14 +197,7 @@
 
 <!-- Header par-dessus tout -->
 <div id="header">
-    <div style="display: flex; align-items: center; gap: 12px;">
-        <img id="logo" src="logo.png" alt="The Bridge">
-        <button id="theme-toggle" title="Toggle dark mode">
-            <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="#1E1E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-            </svg>
-        </button>
-    </div>
+    <img id="logo" src="logo.png" alt="The Bridge">
     <a id="apply-btn" href="#">APPLY</a>
 </div>
 
@@ -429,26 +406,41 @@ function getWaterOpacity(x, y) {
     return 0;
 }
 
-// Mode jour par défaut
-var isDay = true;
+// Calculer si c'est le jour ou la nuit en Europe (Paris)
+function isDayInEurope() {
+    var now = new Date();
+    var europeTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Paris' }));
+    var hour = europeTime.getHours();
+    var month = europeTime.getMonth();
 
-// Toggle jour/nuit
-var themeToggle = document.getElementById('theme-toggle');
-
-var moonSVG = '<svg class="moon" viewBox="0 0 24 24" fill="none" stroke="#1E1E1E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
-
-var sunSVG = '<svg class="sun" viewBox="0 0 24 24" fill="none" stroke="#EFECD4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
-
-themeToggle.addEventListener('click', function() {
-    isDay = !isDay;
-    if (isDay) {
-        // Mode jour -> affiche lune noire pour switcher vers nuit
-        themeToggle.innerHTML = moonSVG;
+    // Heures de lever/coucher du soleil en Europe selon la saison
+    var sunriseHour, sunsetHour;
+    if (month >= 3 && month <= 8) {
+        // Printemps/Été
+        sunriseHour = 6;
+        sunsetHour = 21;
     } else {
-        // Mode nuit -> affiche soleil blanc pour switcher vers jour
-        themeToggle.innerHTML = sunSVG;
+        // Automne/Hiver
+        sunriseHour = 8;
+        sunsetHour = 17;
     }
-});
+
+    return hour >= sunriseHour && hour < sunsetHour;
+}
+
+// Mode initial basé sur l'heure de Paris
+var isDay = isDayInEurope();
+var userOverride = false;
+
+// Position du soleil/lune pour détecter les clics
+var sunClickArea = { x: 0, y: 0, radius: 0 };
+
+// Vérifier toutes les minutes si l'heure a changé
+setInterval(function() {
+    if (!userOverride) {
+        isDay = isDayInEurope();
+    }
+}, 60000);
 
 // Générer les étoiles pour le mode nuit
 var stars = [];
@@ -490,6 +482,11 @@ function draw() {
     var sunArc = Math.sin(scrollProgress * Math.PI);
     var sunY = canvas.height * 0.7 - sunArc * canvas.height * 0.5;
     var sunRadius = Math.max(15, Math.min(canvas.width, canvas.height) * 0.03);
+
+    // Mettre à jour la zone cliquable du soleil/lune
+    sunClickArea.x = sunX;
+    sunClickArea.y = sunY;
+    sunClickArea.radius = sunRadius * 2.5; // Zone un peu plus grande pour faciliter le clic
 
     // Couleur du soleil/lune selon le mode et la position
     var sunR, sunG, sunB;
@@ -609,18 +606,20 @@ function handleScroll(e) {
 // Events
 document.body.addEventListener('wheel', handleScroll, { passive: false });
 
-var touchStartX = 0;
+var touchStartY = 0;
 var touchStartScroll = 0;
 document.addEventListener('touchstart', function(e) {
-    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
     touchStartScroll = scrollPos;
 });
 document.addEventListener('touchmove', function(e) {
-    var diff = touchStartX - e.touches[0].clientX;
-    scrollPos = touchStartScroll + diff * 2;
+    e.preventDefault();
+    // Balayer vers le haut = scroll vers la droite
+    var diff = touchStartY - e.touches[0].clientY;
+    scrollPos = touchStartScroll + diff * 2.5;
     if (scrollPos < 0) scrollPos = 0;
     if (scrollPos > maxScroll) scrollPos = maxScroll;
-});
+}, { passive: false });
 
 document.addEventListener('keydown', function(e) {
     if (e.key === 'ArrowRight') {
@@ -630,6 +629,39 @@ document.addEventListener('keydown', function(e) {
         scrollPos -= 400;
         if (scrollPos < 0) scrollPos = 0;
     }
+});
+
+// Clic sur le soleil/lune pour changer de thème
+canvas.addEventListener('click', function(e) {
+    var rect = canvas.getBoundingClientRect();
+    var clickX = e.clientX - rect.left;
+    var clickY = e.clientY - rect.top;
+
+    var dist = Math.sqrt(
+        (clickX - sunClickArea.x) * (clickX - sunClickArea.x) +
+        (clickY - sunClickArea.y) * (clickY - sunClickArea.y)
+    );
+
+    if (dist < sunClickArea.radius) {
+        isDay = !isDay;
+        userOverride = true;
+        // Reset après 1 heure pour revenir au mode automatique
+        setTimeout(function() { userOverride = false; }, 3600000);
+    }
+});
+
+// Changer le curseur quand on survole le soleil/lune
+canvas.addEventListener('mousemove', function(e) {
+    var rect = canvas.getBoundingClientRect();
+    var mouseX = e.clientX - rect.left;
+    var mouseY = e.clientY - rect.top;
+
+    var dist = Math.sqrt(
+        (mouseX - sunClickArea.x) * (mouseX - sunClickArea.x) +
+        (mouseY - sunClickArea.y) * (mouseY - sunClickArea.y)
+    );
+
+    canvas.style.cursor = dist < sunClickArea.radius ? 'pointer' : 'default';
 });
 
 window.addEventListener('resize', resizeCanvas);
