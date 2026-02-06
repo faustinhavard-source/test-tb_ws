@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manifesto - The Bridge</title>
+    <title>FAQ - The Bridge</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
@@ -15,9 +15,9 @@
         }
 
         body {
-            background-color: #E43535;
+            background-color: #EFECD4;
             font-family: 'Courier New', monospace;
-            color: #FFFFFF;
+            color: #1E1E1E;
             min-height: 100vh;
         }
 
@@ -33,14 +33,13 @@
             pointer-events: auto;
         }
 
-        #header a {
+        #header > a {
             display: flex;
             align-items: flex-end;
         }
 
         #logo {
             height: 24px;
-            filter: brightness(0) invert(1);
         }
 
         #apply-btn {
@@ -48,9 +47,9 @@
             font-size: clamp(10px, 1vw, 13px);
             font-style: italic;
             font-weight: 400;
-            color: #FFFFFF;
+            color: #1E1E1E;
             background-color: transparent;
-            border: 1px solid #FFFFFF;
+            border: 1px solid #1E1E1E;
             text-decoration: none;
             letter-spacing: 0.02em;
             padding: 8px 20px;
@@ -59,8 +58,8 @@
         }
 
         #apply-btn:hover {
-            background-color: #FFFFFF;
-            color: #E43535;
+            background-color: #1E1E1E;
+            color: #EFECD4;
         }
 
         .header-right {
@@ -77,7 +76,7 @@
         #nav-menu a {
             font-family: 'IBM Plex Mono', monospace;
             font-size: clamp(9px, 0.9vw, 12px);
-            color: #FFFFFF;
+            color: #1E1E1E;
             text-decoration: none;
             letter-spacing: 0.05em;
             transition: opacity 0.2s ease;
@@ -103,7 +102,7 @@
             display: block;
             width: 100%;
             height: 1.5px;
-            background-color: #FFFFFF;
+            background-color: #1E1E1E;
             transition: all 0.3s ease;
         }
 
@@ -127,7 +126,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #E43535;
+            background-color: #EFECD4;
             z-index: 100;
             flex-direction: column;
             justify-content: center;
@@ -143,7 +142,7 @@
             font-family: 'Lora', serif;
             font-size: 32px;
             font-style: italic;
-            color: #FFFFFF;
+            color: #1E1E1E;
             text-decoration: none;
             transition: opacity 0.2s ease;
         }
@@ -164,113 +163,82 @@
 
         /* Content */
         #content {
-            max-width: 700px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 0 8%;
         }
 
         /* Hero */
         .hero {
-            min-height: 100vh;
+            min-height: 50vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: flex-start;
+            padding-top: 100px;
         }
 
         .hero h1 {
             font-family: 'Lora', serif;
-            font-size: clamp(64px, 15vw, 160px);
+            font-size: clamp(48px, 10vw, 100px);
             font-weight: 400;
             font-style: italic;
-            color: #FFFFFF;
+            color: #1E1E1E;
             letter-spacing: -0.03em;
             line-height: 0.9;
         }
 
-        /* Stories */
-        .stories {
-            padding-bottom: 100px;
+        /* FAQ */
+        .faq {
+            padding: 40px 0 120px;
         }
 
-        .story {
-            margin-bottom: 80px;
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.7s ease;
+        .faq-item {
+            border-bottom: 1px solid rgba(30, 30, 30, 0.15);
+            padding: 30px 0;
         }
 
-        .story.visible {
-            opacity: 1;
-            transform: translateY(0);
+        .faq-item:first-child {
+            border-top: 1px solid rgba(30, 30, 30, 0.15);
         }
 
-        .story p {
+        .faq-question {
             font-family: 'Lora', serif;
-            font-size: clamp(20px, 3vw, 32px);
+            font-size: clamp(18px, 2vw, 24px);
             font-weight: 400;
-            line-height: 1.6;
-            letter-spacing: -0.01em;
-        }
-
-        .story em {
             font-style: italic;
-            font-weight: 400;
+            margin-bottom: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        /* Separator */
-        .separator {
-            padding: 80px 0;
+        .faq-question::after {
+            content: '+';
+            font-family: 'IBM Plex Mono', monospace;
+            font-style: normal;
+            font-size: 20px;
             opacity: 0.5;
-            font-size: 32px;
-            letter-spacing: 0.3em;
+            transition: transform 0.3s;
         }
 
-        /* Conclusion */
-        .conclusion {
-            padding: 0 0 60px;
+        .faq-item.open .faq-question::after {
+            transform: rotate(45deg);
         }
 
-        .conclusion p {
-            font-family: 'Lora', serif;
-            font-size: clamp(22px, 3.5vw, 36px);
-            font-weight: 400;
-            line-height: 1.5;
-            margin-bottom: 50px;
-            letter-spacing: -0.01em;
+        .faq-answer {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(13px, 1.2vw, 15px);
+            line-height: 1.7;
+            opacity: 0.7;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
         }
 
-        .conclusion .final {
-            font-size: clamp(28px, 5vw, 52px);
-            font-style: italic;
-            font-weight: 400;
-            margin-top: 60px;
-            line-height: 1.3;
-        }
-
-        /* CTA */
-        .cta {
-            padding: 60px 0 120px;
-        }
-
-        .cta a {
-            font-family: 'Lora', serif;
-            font-size: clamp(11px, 1.1vw, 14px);
-            font-style: italic;
-            font-weight: 400;
-            color: #E43535;
-            background-color: #FFFFFF;
-            text-decoration: none;
-            letter-spacing: 0.02em;
-            padding: 16px 40px;
-            border-radius: 50px;
-            transition: all 0.2s ease;
-            display: inline-block;
-        }
-
-        .cta a:hover {
-            background-color: #1E1E1E;
-            color: #FFFFFF;
+        .faq-item.open .faq-answer {
+            max-height: 300px;
         }
 
         /* Back link */
@@ -286,7 +254,7 @@
         .back-link a {
             font-family: 'IBM Plex Mono', monospace;
             font-size: 11px;
-            color: #FFFFFF;
+            color: #1E1E1E;
             text-decoration: none;
             letter-spacing: 2px;
             opacity: 0.5;
@@ -329,54 +297,70 @@
 <div id="content">
     <!-- Hero -->
     <div class="hero">
-        <h1>Manifesto</h1>
+        <h1>FAQ</h1>
     </div>
 
-    <!-- Stories -->
-    <div class="stories">
-        <div class="story">
-            <p><em>Andy Grove</em> escapes Hungary in '56, arrives in Santa Clara, and helps turn Intel into the engine of the PC era.</p>
+    <!-- FAQ -->
+    <div class="faq">
+        <div class="faq-item">
+            <div class="faq-question">Is this an accelerator?</div>
+            <div class="faq-answer">We help you find a co founder and launch your company. You can come with or without an idea. Most will come solo but if you're in a team lets chat.</div>
         </div>
 
-        <div class="story">
-            <p>Two teenagers from Ireland, <em>Patrick and John Collison</em>, land in San Francisco. They hack a better way to move money online. Stripe becomes the internet's payment layer.</p>
+        <div class="faq-item">
+            <div class="faq-question">How much equity do you take?</div>
+            <div class="faq-answer">We invest up to $250k on simple terms: $125k for 8% via an EF SAFE, plus an optional $125k MFN SAFE.</div>
         </div>
 
-        <div class="story">
-            <p><em>Benoît Dageville, Thierry Cruanes, Marcin Zukowski</em> reimagine the data warehouse in San Mateo. Snowflake IPOs in 2020 and changes how data teams work.</p>
+        <div class="faq-item">
+            <div class="faq-question">Do I need an idea or a cofounder?</div>
+            <div class="faq-answer">No. Most arrive solo and form teams here. Ideas evolve, so do teams.</div>
         </div>
 
-        <div class="story">
-            <p><em>Jawed Karim</em> leaves Germany, lands in the PayPal pit in San Bruno, and co-founds YouTube. One clip at the zoo, then the way the world watches everything.</p>
+        <div class="faq-item">
+            <div class="faq-question">I'm not in Europe. Can I still apply?</div>
+            <div class="faq-answer">Yes. But if you're already in the US or Asia, check out the EF programmes already running in those regions instead.</div>
         </div>
 
-        <div class="story">
-            <p><em>Jan Koum</em> emigrates from Ukraine to Mountain View. He starts by cleaning grocery store floors. A big hustle later, he ships WhatsApp and rewrites how two billion people talk.</p>
+        <div class="faq-item">
+            <div class="faq-question">Is this only for CS or "AI people"?</div>
+            <div class="faq-answer">No. We back builders across software, robotics, and other weird tech. If you can ship, you're welcome. We also back people who can grow, sell and distribute.</div>
         </div>
 
-        <div class="story">
-            <p><em>Ion Stoica, Matei Zaharia, Ali Ghodsi</em>, a Berkeley lab team from Romania and Sweden, spin out Databricks. Spark graduates from paper to platform.</p>
+        <div class="faq-item">
+            <div class="faq-question">What happens after 8 weeks?</div>
+            <div class="faq-answer">You pitch for $250k in pre-seed funding, keep building in the US, and plug into our EF program and office in San Francisco. There's no limit on the number of companies we can invest in - we're just looking for great teams.</div>
         </div>
 
-        <div class="story">
-            <p><em>Wojciech Zaremba</em> leaves Poland, arrives in San Francisco, and helps found OpenAI. And the rest is history.</p>
+        <div class="faq-item">
+            <div class="faq-question">Do you help with visas / banking / phones / the boring stuff?</div>
+            <div class="faq-answer">Yes. We'll land you softly so you can sprint from day one. We'll even cover your Pringles in the plane if you're exceptional.</div>
         </div>
-    </div>
 
-    <div class="separator">...</div>
+        <div class="faq-item">
+            <div class="faq-question">Visas are scary. How real is the support?</div>
+            <div class="faq-answer">Very. We start paperwork the moment you're in and walk you through it.</div>
+        </div>
 
-    <!-- Conclusion -->
-    <div class="conclusion">
-        <p>Europe is a talent hub, but San Francisco is still the best place in the world to build a huge company.</p>
+        <div class="faq-item">
+            <div class="faq-question">How competitive is this?</div>
+            <div class="faq-answer">EF's existing programmes have an X% acceptance rate. We expect this to be more competitive - there are only 40 spots.</div>
+        </div>
 
-        <p>That's where we come in. We run an 8-week residency in the Bay Area where you live, ideate, and build alongside other Europeans.</p>
+        <div class="faq-item">
+            <div class="faq-question">Where exactly is the house?</div>
+            <div class="faq-answer">Bay Area. Address shared with accepted founders only.</div>
+        </div>
 
-        <p class="final">We're here to remove the wall, so that your ability is all that matters.</p>
-    </div>
+        <div class="faq-item">
+            <div class="faq-question">What does this cost to attend?</div>
+            <div class="faq-answer">We cover the residency: housing, workspace, food, program.</div>
+        </div>
 
-    <!-- CTA -->
-    <div class="cta">
-        <a href="apply.html">Apply Now</a>
+        <div class="faq-item">
+            <div class="faq-question">I'm not ready yet.</div>
+            <div class="faq-answer">Meet us on tour, get feedback, and we'll let you know what we think.</div>
+        </div>
     </div>
 </div>
 
@@ -422,17 +406,11 @@ function positionHeader() {
     logo.style.height = Math.max(18, baseSize * 0.03) + 'px';
 }
 
-// Intersection Observer pour les animations
-var observer = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
+// FAQ toggle
+document.querySelectorAll('.faq-question').forEach(function(question) {
+    question.addEventListener('click', function() {
+        this.parentElement.classList.toggle('open');
     });
-}, { threshold: 0.15 });
-
-document.querySelectorAll('.story').forEach(function(story) {
-    observer.observe(story);
 });
 
 window.addEventListener('resize', positionHeader);

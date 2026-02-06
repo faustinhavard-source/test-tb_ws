@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manifesto - The Bridge</title>
+    <title>Apply - The Bridge</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
@@ -15,13 +15,13 @@
         }
 
         body {
-            background-color: #E43535;
+            background-color: #1E1E1E;
             font-family: 'Courier New', monospace;
             color: #FFFFFF;
             min-height: 100vh;
         }
 
-        /* Header - identique à index.html */
+        /* Header - identique à index.html (version sombre) */
         #header {
             position: fixed;
             left: 0;
@@ -33,7 +33,7 @@
             pointer-events: auto;
         }
 
-        #header a {
+        #header > a {
             display: flex;
             align-items: flex-end;
         }
@@ -60,7 +60,7 @@
 
         #apply-btn:hover {
             background-color: #FFFFFF;
-            color: #E43535;
+            color: #1E1E1E;
         }
 
         .header-right {
@@ -127,7 +127,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #E43535;
+            background-color: #1E1E1E;
             z-index: 100;
             flex-direction: column;
             justify-content: center;
@@ -164,112 +164,113 @@
 
         /* Content */
         #content {
-            max-width: 700px;
+            max-width: 600px;
             margin: 0 auto;
             padding: 0 8%;
-        }
-
-        /* Hero */
-        .hero {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            align-items: flex-start;
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 100px 0 60px;
         }
 
         .hero h1 {
             font-family: 'Lora', serif;
-            font-size: clamp(64px, 15vw, 160px);
+            font-size: clamp(48px, 10vw, 80px);
             font-weight: 400;
             font-style: italic;
             color: #FFFFFF;
             letter-spacing: -0.03em;
             line-height: 0.9;
+            margin-bottom: 20px;
         }
 
-        /* Stories */
-        .stories {
-            padding-bottom: 100px;
-        }
-
-        .story {
-            margin-bottom: 80px;
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.7s ease;
-        }
-
-        .story.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .story p {
-            font-family: 'Lora', serif;
-            font-size: clamp(20px, 3vw, 32px);
-            font-weight: 400;
+        .hero p {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(12px, 1.2vw, 14px);
+            opacity: 0.6;
+            max-width: 400px;
+            margin: 0 auto;
             line-height: 1.6;
-            letter-spacing: -0.01em;
         }
 
-        .story em {
-            font-style: italic;
-            font-weight: 400;
+        /* Form */
+        .apply-form {
+            padding: 20px 0 80px;
         }
 
-        /* Separator */
-        .separator {
-            padding: 80px 0;
-            opacity: 0.5;
-            font-size: 32px;
-            letter-spacing: 0.3em;
+        .form-group {
+            margin-bottom: 30px;
         }
 
-        /* Conclusion */
-        .conclusion {
-            padding: 0 0 60px;
+        .form-group label {
+            display: block;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(10px, 1vw, 12px);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.6;
+            margin-bottom: 10px;
         }
 
-        .conclusion p {
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            background-color: transparent;
+            border: 1px solid rgba(239, 236, 212, 0.3);
+            border-radius: 8px;
+            padding: 15px;
             font-family: 'Lora', serif;
-            font-size: clamp(22px, 3.5vw, 36px);
-            font-weight: 400;
-            line-height: 1.5;
-            margin-bottom: 50px;
-            letter-spacing: -0.01em;
+            font-size: clamp(14px, 1.3vw, 16px);
+            color: #FFFFFF;
+            transition: border-color 0.2s;
         }
 
-        .conclusion .final {
-            font-size: clamp(28px, 5vw, 52px);
-            font-style: italic;
-            font-weight: 400;
-            margin-top: 60px;
-            line-height: 1.3;
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #FFFFFF;
         }
 
-        /* CTA */
-        .cta {
-            padding: 60px 0 120px;
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
         }
 
-        .cta a {
-            font-family: 'Lora', serif;
-            font-size: clamp(11px, 1.1vw, 14px);
-            font-style: italic;
-            font-weight: 400;
-            color: #E43535;
-            background-color: #FFFFFF;
-            text-decoration: none;
-            letter-spacing: 0.02em;
-            padding: 16px 40px;
-            border-radius: 50px;
-            transition: all 0.2s ease;
-            display: inline-block;
+        .form-group select {
+            cursor: pointer;
         }
 
-        .cta a:hover {
+        .form-group select option {
             background-color: #1E1E1E;
+            color: #FFFFFF;
+        }
+
+        .submit-btn {
+            width: 100%;
+            font-family: 'Lora', serif;
+            font-size: clamp(14px, 1.3vw, 16px);
+            font-style: italic;
+            font-weight: 400;
+            color: #1E1E1E;
+            background-color: #FFFFFF;
+            border: none;
+            border-radius: 50px;
+            padding: 18px 40px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            background-color: #E43535;
             color: #FFFFFF;
         }
 
@@ -329,55 +330,55 @@
 <div id="content">
     <!-- Hero -->
     <div class="hero">
-        <h1>Manifesto</h1>
+        <h1>Apply</h1>
+        <p>Ready to make the leap? Tell us about yourself and what you're building.</p>
     </div>
 
-    <!-- Stories -->
-    <div class="stories">
-        <div class="story">
-            <p><em>Andy Grove</em> escapes Hungary in '56, arrives in Santa Clara, and helps turn Intel into the engine of the PC era.</p>
+    <!-- Form -->
+    <form class="apply-form">
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" placeholder="Your name" required>
         </div>
 
-        <div class="story">
-            <p>Two teenagers from Ireland, <em>Patrick and John Collison</em>, land in San Francisco. They hack a better way to move money online. Stripe becomes the internet's payment layer.</p>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" placeholder="your@email.com" required>
         </div>
 
-        <div class="story">
-            <p><em>Benoît Dageville, Thierry Cruanes, Marcin Zukowski</em> reimagine the data warehouse in San Mateo. Snowflake IPOs in 2020 and changes how data teams work.</p>
+        <div class="form-group">
+            <label>LinkedIn</label>
+            <input type="url" placeholder="linkedin.com/in/yourprofile">
         </div>
 
-        <div class="story">
-            <p><em>Jawed Karim</em> leaves Germany, lands in the PayPal pit in San Bruno, and co-founds YouTube. One clip at the zoo, then the way the world watches everything.</p>
+        <div class="form-group">
+            <label>Where are you based?</label>
+            <input type="text" placeholder="City, Country">
         </div>
 
-        <div class="story">
-            <p><em>Jan Koum</em> emigrates from Ukraine to Mountain View. He starts by cleaning grocery store floors. A big hustle later, he ships WhatsApp and rewrites how two billion people talk.</p>
+        <div class="form-group">
+            <label>Stage</label>
+            <select>
+                <option value="">Select your stage</option>
+                <option value="idea">Just an idea</option>
+                <option value="prototype">Building a prototype</option>
+                <option value="launched">Launched, early users</option>
+                <option value="revenue">Some revenue</option>
+            </select>
         </div>
 
-        <div class="story">
-            <p><em>Ion Stoica, Matei Zaharia, Ali Ghodsi</em>, a Berkeley lab team from Romania and Sweden, spin out Databricks. Spark graduates from paper to platform.</p>
+        <div class="form-group">
+            <label>What are you building?</label>
+            <textarea placeholder="Tell us about your idea or company..."></textarea>
         </div>
 
-        <div class="story">
-            <p><em>Wojciech Zaremba</em> leaves Poland, arrives in San Francisco, and helps found OpenAI. And the rest is history.</p>
+        <div class="form-group">
+            <label>Why do you want to join The Bridge?</label>
+            <textarea placeholder="What do you hope to get out of the program?"></textarea>
         </div>
-    </div>
 
-    <div class="separator">...</div>
-
-    <!-- Conclusion -->
-    <div class="conclusion">
-        <p>Europe is a talent hub, but San Francisco is still the best place in the world to build a huge company.</p>
-
-        <p>That's where we come in. We run an 8-week residency in the Bay Area where you live, ideate, and build alongside other Europeans.</p>
-
-        <p class="final">We're here to remove the wall, so that your ability is all that matters.</p>
-    </div>
-
-    <!-- CTA -->
-    <div class="cta">
-        <a href="apply.html">Apply Now</a>
-    </div>
+        <button type="submit" class="submit-btn">Submit Application</button>
+    </form>
 </div>
 
 <div class="back-link">
@@ -422,17 +423,10 @@ function positionHeader() {
     logo.style.height = Math.max(18, baseSize * 0.03) + 'px';
 }
 
-// Intersection Observer pour les animations
-var observer = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-        }
-    });
-}, { threshold: 0.15 });
-
-document.querySelectorAll('.story').forEach(function(story) {
-    observer.observe(story);
+// Form submit
+document.querySelector('.apply-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    alert('Thanks for applying! We\'ll be in touch soon.');
 });
 
 window.addEventListener('resize', positionHeader);
