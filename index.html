@@ -61,6 +61,17 @@
             /* top et padding seront définis en JS */
         }
 
+        /* Header background to hide content scrolling underneath */
+        #header-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9;
+            pointer-events: none;
+            /* height sera défini en JS */
+        }
+
         #header > a {
             display: flex;
             align-items: flex-end;
@@ -441,11 +452,15 @@
 
 <!-- Mobile menu overlay -->
 <div id="mobile-menu">
+    <a href="index.html">Home</a>
     <a href="manifesto.html">Manifesto</a>
     <a href="meet-us.html">Meet us</a>
     <a href="faq.html">FAQ</a>
     <a href="apply.html">Apply</a>
 </div>
+
+<!-- Header background overlay -->
+<div id="header-bg"></div>
 
 <script>
 var canvas = document.getElementById('dots');
@@ -526,6 +541,10 @@ function resizeCanvas() {
     header.style.height = (dotZone.y - headerTopMargin - 10) + 'px';
     header.style.paddingLeft = dotZone.x + 'px';
     header.style.paddingRight = (canvas.width - dotZone.x - dotZone.width) + 'px';
+
+    // Positionner le fond du header pour cacher le texte qui défile dessous
+    var headerBg = document.getElementById('header-bg');
+    headerBg.style.height = dotZone.y + 'px';
 
     // Ajuster la taille du logo proportionnellement
     var logo = document.getElementById('logo');
@@ -750,6 +769,7 @@ function draw() {
     // Mettre à jour le body aussi
     document.body.style.backgroundColor = bgColor;
     document.getElementById('content').style.color = dotColor;
+    document.getElementById('header-bg').style.backgroundColor = bgColor;
 
     // Ajouter/retirer la classe night-mode pour le hover du bouton
     if (isDay) {
