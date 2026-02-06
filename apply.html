@@ -87,39 +87,48 @@
             opacity: 0.6;
         }
 
-        /* Mobile menu hamburger */
+        /* Mobile menu hamburger - dot matrix style */
         #menu-toggle {
             display: none;
-            flex-direction: column;
-            justify-content: center;
-            gap: 4px;
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             cursor: pointer;
             z-index: 101;
+            position: relative;
         }
 
-        #menu-toggle span {
-            display: block;
-            width: 100%;
-            height: 1.5px;
+        #menu-toggle .dot {
+            position: absolute;
+            width: 3px;
+            height: 3px;
             background-color: #FFFFFF;
+            border-radius: 50%;
             transition: all 0.3s ease;
         }
 
-        #menu-toggle.open span:nth-child(1) {
-            transform: rotate(45deg) translate(4px, 4px);
-        }
+        /* Grille 3x3 de points */
+        #menu-toggle .dot:nth-child(1) { top: 0; left: 0; }
+        #menu-toggle .dot:nth-child(2) { top: 0; left: 50%; transform: translateX(-50%); }
+        #menu-toggle .dot:nth-child(3) { top: 0; right: 0; }
+        #menu-toggle .dot:nth-child(4) { top: 50%; left: 0; transform: translateY(-50%); }
+        #menu-toggle .dot:nth-child(5) { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        #menu-toggle .dot:nth-child(6) { top: 50%; right: 0; transform: translateY(-50%); }
+        #menu-toggle .dot:nth-child(7) { bottom: 0; left: 0; }
+        #menu-toggle .dot:nth-child(8) { bottom: 0; left: 50%; transform: translateX(-50%); }
+        #menu-toggle .dot:nth-child(9) { bottom: 0; right: 0; }
 
-        #menu-toggle.open span:nth-child(2) {
-            opacity: 0;
-        }
+        /* Animation vers X */
+        #menu-toggle.open .dot:nth-child(1) { top: 50%; left: 50%; transform: translate(-50%, -50%) translate(-6px, -6px); }
+        #menu-toggle.open .dot:nth-child(2) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(3) { top: 50%; right: auto; left: 50%; transform: translate(-50%, -50%) translate(6px, -6px); }
+        #menu-toggle.open .dot:nth-child(4) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(5) { transform: translate(-50%, -50%); }
+        #menu-toggle.open .dot:nth-child(6) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(7) { bottom: auto; top: 50%; left: 50%; transform: translate(-50%, -50%) translate(-6px, 6px); }
+        #menu-toggle.open .dot:nth-child(8) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(9) { bottom: auto; top: 50%; right: auto; left: 50%; transform: translate(-50%, -50%) translate(6px, 6px); }
 
-        #menu-toggle.open span:nth-child(3) {
-            transform: rotate(-45deg) translate(4px, -4px);
-        }
-
-        /* Mobile overlay menu */
+        /* Mobile overlay menu - terminal style */
         #mobile-menu {
             display: none;
             position: fixed;
@@ -131,8 +140,9 @@
             z-index: 100;
             flex-direction: column;
             justify-content: center;
-            align-items: center;
-            gap: 30px;
+            align-items: flex-start;
+            padding: 0 15%;
+            gap: 0;
         }
 
         #mobile-menu.open {
@@ -140,16 +150,32 @@
         }
 
         #mobile-menu a {
-            font-family: 'Lora', serif;
-            font-size: 32px;
-            font-style: italic;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
             color: #FFFFFF;
             text-decoration: none;
-            transition: opacity 0.2s ease;
+            transition: all 0.2s ease;
+            padding: 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #mobile-menu a:first-child {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #mobile-menu a::before {
+            content: attr(data-index);
+            font-size: 10px;
+            opacity: 0.4;
+            min-width: 20px;
         }
 
         #mobile-menu a:hover {
-            opacity: 0.6;
+            padding-left: 10px;
         }
 
         @media (max-width: 600px) {
@@ -167,52 +193,52 @@
             max-width: 700px;
             margin: 0 auto;
             padding: 0 8%;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
         }
 
         /* Hero */
         .hero {
-            text-align: center;
-            padding-top: 80px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
         }
 
         .hero h1 {
             font-family: 'Lora', serif;
-            font-size: clamp(48px, 12vw, 120px);
+            font-size: clamp(64px, 15vw, 140px);
             font-weight: 400;
             font-style: italic;
             color: #FFFFFF;
             letter-spacing: -0.03em;
             line-height: 0.9;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
 
-        .hero p {
-            font-family: 'IBM Plex Mono', monospace;
-            font-size: clamp(12px, 1.2vw, 14px);
-            opacity: 0.6;
-            line-height: 1.7;
-            margin-bottom: 40px;
+        .hero .subtitle {
+            font-family: 'Lora', serif;
+            font-size: clamp(18px, 2.5vw, 28px);
+            font-style: italic;
+            font-weight: 400;
+            line-height: 1.5;
+            margin-bottom: 50px;
+            max-width: 500px;
         }
 
         /* CTA */
         .cta-btn {
             display: inline-block;
             font-family: 'Lora', serif;
-            font-size: clamp(14px, 1.5vw, 18px);
+            font-size: clamp(12px, 1.2vw, 15px);
             font-style: italic;
             font-weight: 400;
             color: #1E1E1E;
             background-color: #FFFFFF;
             text-decoration: none;
             letter-spacing: 0.02em;
-            padding: 18px 50px;
+            padding: 16px 40px;
             border-radius: 50px;
             transition: all 0.2s ease;
-            margin-bottom: 60px;
         }
 
         .cta-btn:hover {
@@ -220,63 +246,118 @@
             color: #FFFFFF;
         }
 
-        /* Info */
-        .info {
+        /* Cohorts section */
+        .cohorts {
+            padding: 0 0 80px;
+        }
+
+        .cohorts-title {
             font-family: 'IBM Plex Mono', monospace;
-            font-size: clamp(11px, 1vw, 13px);
-            line-height: 1.8;
-            opacity: 0.5;
-            text-align: center;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            opacity: 0.4;
+            margin-bottom: 30px;
+            text-transform: uppercase;
         }
 
-        .info strong {
-            font-weight: 500;
-            opacity: 1;
-        }
-
-        /* Process */
-        .process {
+        .cohort {
             display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 50px;
-            padding-top: 40px;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .cohort:first-of-type {
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .process-step {
-            text-align: center;
-        }
-
-        .process-step span {
+        .cohort-name {
             font-family: 'Lora', serif;
-            font-size: clamp(28px, 4vw, 40px);
+            font-size: clamp(18px, 2vw, 24px);
             font-style: italic;
-            opacity: 0.2;
-            display: block;
-            margin-bottom: 10px;
         }
 
-        .process-step strong {
+        .cohort-info {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(11px, 1vw, 13px);
+            opacity: 0.5;
+            text-align: right;
+        }
+
+        .cohort-info span {
+            display: block;
+        }
+
+        .cohort-info .deadline {
+            color: #E43535;
+            opacity: 1;
+        }
+
+        /* Process section */
+        .process {
+            padding: 80px 0;
+        }
+
+        .process-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            opacity: 0.4;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+        }
+
+        .process-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .process-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 25px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .process-step:first-child {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .step-number {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            opacity: 0.3;
+            min-width: 20px;
+        }
+
+        .step-content strong {
             font-family: 'Lora', serif;
-            font-size: clamp(14px, 1.5vw, 18px);
+            font-size: clamp(16px, 1.8vw, 20px);
             font-style: italic;
             font-weight: 400;
             display: block;
             margin-bottom: 5px;
         }
 
-        .process-step p {
+        .step-content p {
             font-family: 'IBM Plex Mono', monospace;
-            font-size: clamp(10px, 0.9vw, 12px);
+            font-size: clamp(11px, 1vw, 13px);
             opacity: 0.5;
             line-height: 1.5;
         }
 
         @media (max-width: 600px) {
-            .process {
+            .cohort {
                 flex-direction: column;
-                gap: 25px;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .cohort-info {
+                text-align: left;
             }
         }
 
@@ -318,46 +399,76 @@
         </nav>
         <a id="apply-btn" href="apply.html">Apply</a>
         <div id="menu-toggle">
-            <span></span>
-            <span></span>
-            <span></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
         </div>
     </div>
 </div>
 
 <!-- Mobile menu overlay -->
 <div id="mobile-menu">
-    <a href="index.html">Home</a>
-    <a href="manifesto.html">Manifesto</a>
-    <a href="meet-us.html">Meet us</a>
-    <a href="faq.html">FAQ</a>
-    <a href="apply.html">Apply</a>
+    <a href="index.html" data-index="01">Home</a>
+    <a href="manifesto.html" data-index="02">Manifesto</a>
+    <a href="meet-us.html" data-index="03">Meet us</a>
+    <a href="faq.html" data-index="04">FAQ</a>
+    <a href="apply.html" data-index="05">Apply</a>
 </div>
 
 <div id="content">
     <div class="hero">
         <h1>Apply</h1>
-        <p>Students, fresh grads, dropouts, or operators inside breakout startups. Builders and future CEOs welcome.</p>
-        <a href="#" class="cta-btn">Start Application</a>
-        <p class="info">
-            <strong>Spring 2026</strong> — Starts April in SF. Deadline: Feb 15th. <strong>Summer 2026</strong> — Starts June. Applications open.
-        </p>
+        <p class="subtitle">Students, dropouts, operators. Builders and future CEOs welcome.</p>
+        <a href="https://apply.joinef.com/" class="cta-btn">Start Application</a>
+    </div>
 
-        <div class="process">
+    <div class="cohorts">
+        <div class="cohorts-title">Upcoming cohorts</div>
+        <div class="cohort">
+            <div class="cohort-name">Spring 2026</div>
+            <div class="cohort-info">
+                <span>Starts April in SF</span>
+                <span class="deadline">Deadline: Feb 15th</span>
+            </div>
+        </div>
+        <div class="cohort">
+            <div class="cohort-name">Summer 2026</div>
+            <div class="cohort-info">
+                <span>Starts June in SF</span>
+                <span>Applications open</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="process">
+        <div class="process-title">Selection process</div>
+        <div class="process-steps">
             <div class="process-step">
-                <span>1</span>
-                <strong>Apply</strong>
-                <p>Form + video</p>
+                <span class="step-number">01</span>
+                <div class="step-content">
+                    <strong>Apply</strong>
+                    <p>Form + short video</p>
+                </div>
             </div>
             <div class="process-step">
-                <span>2</span>
-                <strong>Interview</strong>
-                <p>2 rounds, video or in-person</p>
+                <span class="step-number">02</span>
+                <div class="step-content">
+                    <strong>Interview</strong>
+                    <p>2 rounds, video or in-person</p>
+                </div>
             </div>
             <div class="process-step">
-                <span>3</span>
-                <strong>Selection Days</strong>
-                <p>In-person, detailed feedback</p>
+                <span class="step-number">03</span>
+                <div class="step-content">
+                    <strong>Selection Days</strong>
+                    <p>In-person, detailed feedback</p>
+                </div>
             </div>
         </div>
     </div>
