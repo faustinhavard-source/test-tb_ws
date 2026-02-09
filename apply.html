@@ -334,6 +334,52 @@
             opacity: 0.7;
         }
 
+        /* Apply hints list */
+        .apply-hints {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .apply-hints li {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            opacity: 0.5;
+            line-height: 1.6;
+            padding-left: 20px;
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .apply-hints li.highlight {
+            font-family: 'Lora', serif;
+            font-size: clamp(14px, 1.4vw, 18px);
+            font-style: italic;
+            opacity: 0.85;
+            padding-left: 0;
+            margin-bottom: 20px;
+        }
+
+        .apply-hints li.highlight::before {
+            display: none;
+        }
+
+        .apply-hints li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            opacity: 0.6;
+        }
+
+        .apply-hints a {
+            color: #FFFFFF;
+            text-decoration: underline;
+            transition: opacity 0.2s;
+        }
+
+        .apply-hints a:hover {
+            opacity: 0.7;
+        }
+
         /* Cohorts */
         .cohort {
             display: flex;
@@ -484,9 +530,9 @@
     <a href="index.html"><img id="logo" src="logo.png" alt="The Bridge"></a>
     <div class="header-right">
         <nav id="nav-menu">
-            <a href="manifesto.html">Manifesto</a>
-            <a href="meet-us.html">Meet us</a>
             <a href="faq.html">FAQ</a>
+            <a href="meet-us.html">Meet us</a>
+            <a href="manifesto.html">Manifesto</a>
         </nav>
         <a id="apply-btn" href="apply.html">Apply</a>
         <div id="menu-toggle">
@@ -506,9 +552,9 @@
 <!-- Mobile menu overlay -->
 <div id="mobile-menu">
     <a href="index.html" data-index="01">Home</a>
-    <a href="manifesto.html" data-index="02">Manifesto</a>
+    <a href="faq.html" data-index="02">FAQ</a>
     <a href="meet-us.html" data-index="03">Meet us</a>
-    <a href="faq.html" data-index="04">FAQ</a>
+    <a href="manifesto.html" data-index="04">Manifesto</a>
     <a href="apply.html" data-index="05">Apply</a>
 </div>
 
@@ -530,11 +576,14 @@
 
         <!-- Start -->
         <section class="apply-section" id="start">
-            <h2>Start your application</h2>
             <div class="cta-box">
                 <a href="https://apply.joinef.com/" class="cta-btn">Start Application</a>
             </div>
-            <p class="faq-hint">Students, dropouts, builders, researchers, operators, or people who know how to distribute, grow, sell, or lead.<br><br>Make sure to read the <a href="faq.html">FAQ</a> before applying.</p>
+            <ul class="apply-hints">
+                <li class="highlight">Students, dropouts, builders, researchers, operators. People who know how to distribute, grow, sell, or lead.</li>
+                <li>We process applications in batches. The final deadline to apply for the Spring cohort is February 15th at 11:59 PT. If you apply after that deadline, we can still consider your application but cannot guarantee when we will get back to you.</li>
+                <li>Make sure to read the <a href="faq.html">FAQ</a> before applying.</li>
+            </ul>
         </section>
 
         <!-- Cohorts -->

@@ -394,6 +394,27 @@
             line-height: 1.6;
         }
 
+        .section[data-section="4"] .faq-link {
+            font-family: 'Lora', serif;
+            font-style: italic;
+            font-size: clamp(12px, 1.1vw, 15px);
+            margin-top: 30px;
+            opacity: 0.7;
+            text-transform: none;
+            letter-spacing: 0.02em;
+        }
+
+        .section[data-section="4"] .faq-link a {
+            color: inherit;
+            text-decoration: underline;
+            pointer-events: auto;
+            transition: opacity 0.2s;
+        }
+
+        .section[data-section="4"] .faq-link a:hover {
+            opacity: 0.7;
+        }
+
         .apply-big {
             display: inline-block;
             font-family: 'Lora', serif;
@@ -458,7 +479,7 @@
             <h1>
                 Start at stage 0.<br>Build the foundations of a <em>generational</em> company.
             </h1>
-            <p class="subtitle">For non-US founders at the very beginning — pre-idea, pre-team, or just getting started.</p>
+            <p class="subtitle">For non-US founders at the very beginning: pre-idea, pre-team, or just getting started.</p>
         </div>
 
         <!-- Section 3 - The Program -->
@@ -467,7 +488,7 @@
             <h1>
                 Live in San Francisco.<br>Build with <em>peers</em>.<br>Raise from the best.
             </h1>
-            <p class="subtitle">$250k first check • Sequoia, Founders Fund, a16z, Benchmark, Index</p>
+            <p class="subtitle">We invest a $250k first check and help you close your first round (alumni have raised from Sequoia, Founders Fund, Benchmark, Index…)</p>
         </div>
 
         <!-- Section 4 - Backed By -->
@@ -489,6 +510,7 @@
             <p class="small">Built by Entrepreneurs First</p>
             <p class="ef-stats">$15B+ in portfolio value</p>
             <p class="ef-investors">Cleo (unicorn) • Aztec Network (unicorn) • Gensyn (unicorn) • PolyAI (Khosla) • Neptune Robotics (Sequoia) • Magdrive (Founders Fund)</p>
+            <p class="faq-link">Questions? Read through the <a href="faq.html">FAQ</a> where everything is explained in detail.</p>
         </div>
     </div>
 </div>
@@ -498,9 +520,9 @@
     <a href="index.html"><img id="logo" src="logo.png" alt="The Bridge"></a>
     <div class="header-right">
         <nav id="nav-menu">
-            <a href="manifesto.html">Manifesto</a>
-            <a href="meet-us.html">Meet us</a>
             <a href="faq.html">FAQ</a>
+            <a href="meet-us.html">Meet us</a>
+            <a href="manifesto.html">Manifesto</a>
         </nav>
         <a id="apply-btn" href="apply.html">Apply</a>
         <div id="menu-toggle">
@@ -520,9 +542,9 @@
 <!-- Mobile menu overlay -->
 <div id="mobile-menu">
     <a href="index.html" data-index="01">Home</a>
-    <a href="manifesto.html" data-index="02">Manifesto</a>
+    <a href="faq.html" data-index="02">FAQ</a>
     <a href="meet-us.html" data-index="03">Meet us</a>
-    <a href="faq.html" data-index="04">FAQ</a>
+    <a href="manifesto.html" data-index="04">Manifesto</a>
     <a href="apply.html" data-index="05">Apply</a>
 </div>
 
@@ -636,22 +658,59 @@ function seededRandom(seed) {
     return x - Math.floor(x);
 }
 
-// Générer les nuages (positions relatives)
+// Nuages pixel art style - allongés et irréguliers
+var cloudPatterns = [
+    // Nuage pixel art long 1
+    [
+        [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0],
+        [0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+        [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    ],
+    // Nuage pixel art long 2
+    [
+        [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0],
+        [0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+    ],
+    // Nuage pixel art moyen
+    [
+        [0, 0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0],
+        [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+    ],
+    // Nuage pixel art avec bosses
+    [
+        [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0],
+        [0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+    ],
+];
+
+// Générer les nuages - mieux répartis sur toute la largeur
 for (var i = 0; i < numClouds; i++) {
+    // Répartition uniforme sur 5 sections (écran x 5)
+    var section = i % 5;
+    var baseX = section + seededRandom(i * 123.456) * 0.8;
+
     clouds.push({
-        x: seededRandom(i * 123.456) * 2.5,
-        yRatio: 0.08 + seededRandom(i * 789.012) * 0.12, // Plus haut dans le ciel
-        size: 0.6 + seededRandom(i * 345.678) * 0.8,
-        speed: 0.5 + seededRandom(i * 901.234) * 1
+        x: baseX,
+        yRatio: 0.12 + seededRandom(i * 789.012) * 0.12,
+        size: 0.4 + seededRandom(i * 345.678) * 0.5,
+        speed: 0.3 + seededRandom(i * 901.234) * 0.8,
+        pattern: Math.floor(seededRandom(i * 567.890) * cloudPatterns.length)
     });
 }
-
-var cloudPattern = [
-    [0, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 0],
-    [0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0],
-    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-];
 
 function getCloudOpacity(x, y, col, row) {
     var time = Date.now() * 0.015;
@@ -674,11 +733,12 @@ function getCloudOpacity(x, y, col, row) {
         var scaledCol = Math.floor(relCol / cloud.size);
         var scaledRow = Math.floor(relRow / cloud.size);
 
-        if (scaledRow >= 0 && scaledRow < cloudPattern.length) {
-            var patternRow = cloudPattern[scaledRow];
+        var pattern = cloudPatterns[cloud.pattern];
+        if (scaledRow >= 0 && scaledRow < pattern.length) {
+            var patternRow = pattern[scaledRow];
             if (scaledCol >= 0 && scaledCol < patternRow.length) {
                 if (patternRow[scaledCol] === 1) {
-                    return 0.5;
+                    return 0.65;
                 }
             }
         }
@@ -705,14 +765,50 @@ function getSkylineOpacity(x, y) {
         ? {r: 228, g: 53, b: 53, a: 0.85}   // Rouge
         : {r: 30, g: 30, b: 30, a: 0.85};    // Noir
 
-    // === CÔTE GAUCHE (Marin County) - Span 0 et début Span 1 ===
+    // === CÔTE GAUCHE - San Francisco skyline sur Span 0 ===
     if (currentSpan === 0) {
-        // Collines de Marin - forme ondulée
-        var hillHeight = h * 0.08 + Math.sin(t * Math.PI * 2) * h * 0.03;
-        if (t < 0.7) {
-            hillHeight += (0.7 - t) * h * 0.05; // Plus haut à gauche
+        // Colline de base
+        var hillBase = h * 0.03;
+        var hillHeight = hillBase;
+
+        // Buildings de SF
+        var buildingHeight = 0;
+
+        // Transamerica Pyramid (triangle iconique)
+        if (t > 0.25 && t < 0.35) {
+            var pyramidT = (t - 0.25) / 0.1;
+            var pyramidWidth = pyramidT < 0.5 ? pyramidT * 2 : (1 - pyramidT) * 2;
+            buildingHeight = h * 0.18 * pyramidWidth;
         }
-        if (y >= baseY - hillHeight && y <= baseY) return shoreColor;
+
+        // Salesforce Tower (le plus haut)
+        if (t > 0.38 && t < 0.46) {
+            buildingHeight = h * 0.15;
+        }
+
+        // Building moyen 1
+        if (t > 0.15 && t < 0.22) {
+            buildingHeight = h * 0.09;
+        }
+
+        // Building moyen 2
+        if (t > 0.48 && t < 0.55) {
+            buildingHeight = h * 0.10;
+        }
+
+        // Petits buildings
+        if (t > 0.08 && t < 0.13) {
+            buildingHeight = h * 0.06;
+        }
+        if (t > 0.57 && t < 0.63) {
+            buildingHeight = h * 0.07;
+        }
+        if (t > 0.65 && t < 0.70) {
+            buildingHeight = h * 0.05;
+        }
+
+        var totalHeight = Math.max(hillHeight, buildingHeight);
+        if (y >= baseY - totalHeight && y <= baseY) return shoreColor;
     }
 
     if (currentSpan === 1 && t < 0.15) {
@@ -728,14 +824,12 @@ function getSkylineOpacity(x, y) {
         if (y >= baseY - hillHeight && y <= baseY) return shoreColor;
     }
 
-    // Skyline SF sur section 4 - minimaliste
+    // Côte droite section 4 - simple colline
     if (currentSpan === 4) {
-        // Collines de SF
         var hillBase = h * 0.03;
         var hill1 = Math.sin(t * Math.PI * 0.8) * h * 0.04;
         var hillHeight = hillBase + Math.max(0, hill1);
 
-        // Colline de base
         if (y >= baseY - hillHeight && y <= baseY) return shoreColor;
     }
 
