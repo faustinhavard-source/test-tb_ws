@@ -21,6 +21,19 @@
             min-height: 100vh;
         }
 
+        /* Dot pattern background */
+        .dot-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
         /* Header - identique à index.html */
         #header {
             position: fixed;
@@ -31,6 +44,18 @@
             justify-content: space-between;
             align-items: flex-end;
             pointer-events: auto;
+        }
+
+        /* Fade overlay - clips content approaching header */
+        #header-fade {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 120px;
+            background: linear-gradient(to bottom, #E43535 0%, #E43535 50%, transparent 100%);
+            z-index: 9;
+            pointer-events: none;
         }
 
         #header a {
@@ -315,16 +340,27 @@
             color: #FFFFFF;
             text-decoration: none;
             letter-spacing: 2px;
-            opacity: 0.5;
-            transition: opacity 0.2s;
+            transition: all 0.2s;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
 
         .back-link a:hover {
-            opacity: 1;
+            background: rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
 <body>
+
+<!-- Dot pattern background -->
+<div class="dot-pattern"></div>
+
+<!-- Fade overlay -->
+<div id="header-fade"></div>
 
 <!-- Header -->
 <div id="header">

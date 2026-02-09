@@ -21,7 +21,20 @@
             min-height: 100vh;
         }
 
-        /* Header - identique à index.html */
+        /* Dot pattern background */
+        .dot-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            background-image: radial-gradient(rgba(30, 30, 30, 0.1) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        /* Header */
         #header {
             position: fixed;
             left: 0;
@@ -31,6 +44,17 @@
             justify-content: space-between;
             align-items: flex-end;
             pointer-events: auto;
+        }
+
+        #header-fade {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 120px;
+            background: linear-gradient(to bottom, #EFECD4 0%, #EFECD4 50%, transparent 100%);
+            z-index: 9;
+            pointer-events: none;
         }
 
         #header > a {
@@ -86,7 +110,7 @@
             opacity: 0.6;
         }
 
-        /* Mobile menu hamburger - dot matrix style */
+        /* Mobile menu hamburger */
         #menu-toggle {
             display: none;
             width: 20px;
@@ -105,7 +129,6 @@
             transition: all 0.3s ease;
         }
 
-        /* Grille 3x3 de points */
         #menu-toggle .dot:nth-child(1) { top: 0; left: 0; }
         #menu-toggle .dot:nth-child(2) { top: 0; left: 50%; transform: translateX(-50%); }
         #menu-toggle .dot:nth-child(3) { top: 0; right: 0; }
@@ -116,7 +139,6 @@
         #menu-toggle .dot:nth-child(8) { bottom: 0; left: 50%; transform: translateX(-50%); }
         #menu-toggle .dot:nth-child(9) { bottom: 0; right: 0; }
 
-        /* Animation vers X */
         #menu-toggle.open .dot:nth-child(1) { top: 50%; left: 50%; transform: translate(-50%, -50%) translate(-6px, -6px); }
         #menu-toggle.open .dot:nth-child(2) { opacity: 0; }
         #menu-toggle.open .dot:nth-child(3) { top: 50%; right: auto; left: 50%; transform: translate(-50%, -50%) translate(6px, -6px); }
@@ -127,7 +149,6 @@
         #menu-toggle.open .dot:nth-child(8) { opacity: 0; }
         #menu-toggle.open .dot:nth-child(9) { bottom: auto; top: 50%; right: auto; left: 50%; transform: translate(-50%, -50%) translate(6px, 6px); }
 
-        /* Mobile overlay menu - terminal style */
         #mobile-menu {
             display: none;
             position: fixed;
@@ -187,16 +208,57 @@
             }
         }
 
+        /* Main layout */
+        .main-layout {
+            display: flex;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 5%;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Category navigation - left sidebar */
+        .category-nav {
+            position: sticky;
+            top: 120px;
+            width: 180px;
+            flex-shrink: 0;
+            padding-top: 40vh;
+            align-self: flex-start;
+        }
+
+        .category-nav ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .category-nav a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            color: #1E1E1E;
+            text-decoration: none;
+            opacity: 0.4;
+            transition: opacity 0.2s;
+        }
+
+        .category-nav a:hover,
+        .category-nav a.active {
+            opacity: 1;
+        }
+
         /* Content */
         #content {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 8%;
+            flex: 1;
+            max-width: 650px;
+            padding-left: 60px;
         }
 
         /* Hero */
         .hero {
-            min-height: 50vh;
+            min-height: 40vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -206,7 +268,7 @@
 
         .hero h1 {
             font-family: 'Lora', serif;
-            font-size: clamp(48px, 10vw, 100px);
+            font-size: clamp(48px, 10vw, 80px);
             font-weight: 400;
             font-style: italic;
             color: #1E1E1E;
@@ -214,57 +276,70 @@
             line-height: 0.9;
         }
 
-        /* FAQ */
-        .faq {
-            padding: 40px 0 120px;
+        /* FAQ Sections */
+        .faq-section {
+            margin-bottom: 60px;
+        }
+
+        .faq-section h2 {
+            font-family: 'Lora', serif;
+            font-size: clamp(24px, 4vw, 32px);
+            font-weight: 400;
+            font-style: italic;
+            margin-bottom: 30px;
+            padding-top: 20px;
         }
 
         .faq-item {
-            border-bottom: 1px solid rgba(30, 30, 30, 0.15);
-            padding: 30px 0;
-        }
-
-        .faq-item:first-child {
-            border-top: 1px solid rgba(30, 30, 30, 0.15);
+            margin-bottom: 35px;
         }
 
         .faq-question {
             font-family: 'Lora', serif;
-            font-size: clamp(18px, 2vw, 24px);
-            font-weight: 400;
-            font-style: italic;
-            margin-bottom: 15px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .faq-question::after {
-            content: '+';
-            font-family: 'IBM Plex Mono', monospace;
-            font-style: normal;
-            font-size: 20px;
-            opacity: 0.5;
-            transition: transform 0.3s;
-        }
-
-        .faq-item.open .faq-question::after {
-            transform: rotate(45deg);
+            font-size: clamp(16px, 2vw, 20px);
+            font-weight: 500;
+            margin-bottom: 12px;
+            line-height: 1.4;
         }
 
         .faq-answer {
             font-family: 'IBM Plex Mono', monospace;
-            font-size: clamp(13px, 1.2vw, 15px);
-            line-height: 1.7;
-            opacity: 0.7;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
+            font-size: clamp(13px, 1.1vw, 15px);
+            line-height: 1.8;
+            opacity: 0.75;
         }
 
-        .faq-item.open .faq-answer {
-            max-height: 300px;
+        .faq-answer p {
+            margin-bottom: 12px;
+        }
+
+        .faq-answer p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Footer spacing */
+        .footer-space {
+            height: 120px;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .main-layout {
+                flex-direction: column;
+            }
+
+            .category-nav {
+                display: none;
+            }
+
+            #content {
+                padding-left: 0;
+            }
+
+            .hero {
+                padding-top: 100px;
+                min-height: 30vh;
+            }
         }
 
         /* Back link */
@@ -283,16 +358,27 @@
             color: #1E1E1E;
             text-decoration: none;
             letter-spacing: 2px;
-            opacity: 0.5;
-            transition: opacity 0.2s;
+            transition: all 0.2s;
+            background: rgba(239, 236, 212, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: 1px solid rgba(30, 30, 30, 0.15);
         }
 
         .back-link a:hover {
-            opacity: 1;
+            background: rgba(30, 30, 30, 0.1);
         }
     </style>
 </head>
 <body>
+
+<!-- Dot pattern background -->
+<div class="dot-pattern"></div>
+
+<!-- Fade overlay -->
+<div id="header-fade"></div>
 
 <!-- Header -->
 <div id="header">
@@ -327,73 +413,144 @@
     <a href="apply.html" data-index="05">Apply</a>
 </div>
 
-<div id="content">
-    <!-- Hero -->
-    <div class="hero">
-        <h1>FAQ</h1>
-    </div>
+<div class="main-layout">
+    <!-- Category navigation - left sidebar -->
+    <nav class="category-nav">
+        <ul>
+            <li><a href="#program" class="active">The Program</a></li>
+            <li><a href="#eligibility">Eligibility</a></li>
+            <li><a href="#funding">Funding</a></li>
+            <li><a href="#logistics">Logistics</a></li>
+        </ul>
+    </nav>
 
-    <!-- FAQ -->
-    <div class="faq">
+    <div id="content">
+        <!-- Hero -->
+        <div class="hero">
+            <h1>FAQ</h1>
+        </div>
+
+        <!-- The Program -->
+    <section class="faq-section" id="program">
+        <h2>The Program</h2>
+
         <div class="faq-item">
-            <div class="faq-question">Is this an accelerator?</div>
-            <div class="faq-answer">We help you find a co founder and launch your company. You can come with or without an idea. Most will come solo but if you're in a team lets chat.</div>
+            <div class="faq-question">What is The Bridge?</div>
+            <div class="faq-answer">
+                <p>The Bridge is a two-part program in San Francisco for exceptional non-US founders who are at the very beginning of their company's journey.</p>
+                <p><strong>Part 1: The Residency (8 weeks)</strong> — Everyone starts with an 8-week residency in San Francisco. You live and build together in our founder house, work on ideas or co-founder matching, talk to users, and make rapid progress. This phase is about finding the right team, market, and problem space.</p>
+                <p>At the end of the residency, teams that are ready pitch to our Investment Committee. The best teams get a $250k check and stay in San Francisco for a further 3 months.</p>
+                <p><strong>Part 2: Company Building (3 months, funded teams only)</strong> — During this phase, you build full-time from the Entrepreneurs First San Francisco office, get hands-on support from the EF team, and prepare to raise your next round at Demo Day.</p>
+            </div>
         </div>
 
         <div class="faq-item">
-            <div class="faq-question">How much equity do you take?</div>
-            <div class="faq-answer">We invest up to $250k on simple terms: $125k for 8% via an EF SAFE, plus an optional $125k MFN SAFE.</div>
+            <div class="faq-question">What is the goal of The Bridge?</div>
+            <div class="faq-answer">
+                <p>The goal is to help you lay the strongest possible foundations for your company.</p>
+                <p>We want you to leave the residency with clarity on what you're building, who you're building it with, and a realistic path to building something generational. For most people, that means leaving with a) a very strong conviction on your founding team b) a very strong conviction on which market and problem space you are building in and c) far better fundraising options than they would have had otherwise.</p>
+                <p>Our alumni have raised from Sequoia, Founders Fund, a16z, Benchmark, Index, and other top funds.</p>
+            </div>
         </div>
 
         <div class="faq-item">
-            <div class="faq-question">Do I need an idea or a cofounder?</div>
-            <div class="faq-answer">No. Most arrive solo and form teams here. Ideas evolve, so do teams.</div>
+            <div class="faq-question">What happens during the program?</div>
+            <div class="faq-answer">
+                <p>The residency is intense and focused. For eight weeks, you live in San Francisco surrounded by other top builders and EF staff.</p>
+                <p>You'll spend your time meeting potential co-founders, talking to users, shipping early versions, stress-testing ideas, and getting direct feedback from people who've built companies before. There are structured sessions, 1:1 support, and a lot of unstructured time to build.</p>
+            </div>
         </div>
 
         <div class="faq-item">
-            <div class="faq-question">I'm not in Europe. Can I still apply?</div>
-            <div class="faq-answer">Yes. But if you're already in the US or Asia, check out the EF programmes already running in those regions instead.</div>
-        </div>
-
-        <div class="faq-item">
-            <div class="faq-question">Is this only for CS or "AI people"?</div>
-            <div class="faq-answer">No. We back builders across software, robotics, and other weird tech. If you can ship, you're welcome. We also back people who can grow, sell and distribute.</div>
-        </div>
-
-        <div class="faq-item">
-            <div class="faq-question">What happens after 8 weeks?</div>
-            <div class="faq-answer">You pitch for $250k in pre-seed funding, keep building in the US, and plug into our EF program and office in San Francisco. There's no limit on the number of companies we can invest in - we're just looking for great teams.</div>
-        </div>
-
-        <div class="faq-item">
-            <div class="faq-question">Do you help with visas / banking / phones / the boring stuff?</div>
-            <div class="faq-answer">Yes. We'll land you softly so you can sprint from day one. We'll even cover your Pringles in the plane if you're exceptional.</div>
-        </div>
-
-        <div class="faq-item">
-            <div class="faq-question">Visas are scary. How real is the support?</div>
-            <div class="faq-answer">Very. We start paperwork the moment you're in and walk you through it.</div>
+            <div class="faq-question">What is the residency like?</div>
+            <div class="faq-answer">
+                <p>It's focused, social, and intense.</p>
+                <p>You'll live and work with other founders who are taking the same leap. Days and nights are spent building and talking to users. Founders describe the experience as one of the most intense and productive periods of their lives.</p>
+            </div>
         </div>
 
         <div class="faq-item">
             <div class="faq-question">How competitive is this?</div>
-            <div class="faq-answer">EF's existing programmes have an X% acceptance rate. We expect this to be more competitive - there are only 40 spots.</div>
+            <div class="faq-answer">
+                <p>Very. EF's existing programs are already highly selective. The Bridge is even more competitive because there are only 40 spots in the residency.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Eligibility -->
+    <section class="faq-section" id="eligibility">
+        <h2>Eligibility</h2>
+
+        <div class="faq-item">
+            <div class="faq-question">Who is The Bridge for?</div>
+            <div class="faq-answer">
+                <p>The Bridge is for founders at Stage 0. Many arrive pre-idea or pre-team. Some come with an early idea or founding team. All are serious about building ambitious, venture-scale companies.</p>
+                <p>We look for various profiles. Think builder: product obsessive, engineer, researcher, hacker. Or future CEO: commercial operator who knows how to lead, build, distribute, grow or sell what people want.</p>
+                <p>Founders are based outside the US and want direct access to Bay Area speed, talent, and capital.</p>
+            </div>
         </div>
 
         <div class="faq-item">
-            <div class="faq-question">Where exactly is the house?</div>
-            <div class="faq-answer">Bay Area. Address shared with accepted founders only.</div>
+            <div class="faq-question">I'm not in Europe. Can I still apply?</div>
+            <div class="faq-answer">
+                <p>Yes. But if you're already in the US or Asia, check out the EF programs already running in those regions instead. The Bridge is primarily designed for founders coming from outside the main US startup ecosystem.</p>
+            </div>
         </div>
 
         <div class="faq-item">
-            <div class="faq-question">What does this cost to attend?</div>
-            <div class="faq-answer">We cover the residency: housing, workspace, food, program.</div>
+            <div class="faq-question">Is this only for CS or "AI people"?</div>
+            <div class="faq-answer">
+                <p>No. We back builders across software, robotics, and other weird tech. If you can ship, you're welcome. We also back people who can grow, sell and distribute.</p>
+            </div>
         </div>
 
         <div class="faq-item">
             <div class="faq-question">I'm not ready yet.</div>
-            <div class="faq-answer">Meet us on tour, get feedback, and we'll let you know what we think.</div>
+            <div class="faq-answer">
+                <p>Meet us at one of our events, apply for feedback, or stay in touch. If you're not ready now, we'll tell you honestly and help you understand what to work on.</p>
+            </div>
         </div>
+    </section>
+
+    <!-- Funding -->
+    <section class="faq-section" id="funding">
+        <h2>Funding</h2>
+
+        <div class="faq-item">
+            <div class="faq-question">Do you fund founders?</div>
+            <div class="faq-answer">
+                <p>Yes. The strongest teams receive a check of up to $250k in pre-seed funding and continue building as part of the EF program in San Francisco. We also help teams raise their next round from top US investors once they're ready.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">How much equity do you take?</div>
+            <div class="faq-answer">
+                <p>We invest up to $250k on simple terms: $125k for 8% via an EF SAFE, plus an optional $125k MFN SAFE.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Logistics -->
+    <section class="faq-section" id="logistics">
+        <h2>Logistics</h2>
+
+        <div class="faq-item">
+            <div class="faq-question">What does this cost to attend?</div>
+            <div class="faq-answer">
+                <p>Nothing. We cover the residency: housing, workspace, food, the program.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">Do you help with visas?</div>
+            <div class="faq-answer">
+                <p>Yes. We'll land you softly so you can sprint from day one. We start paperwork the moment you're in and walk you through it.</p>
+            </div>
+        </div>
+    </section>
+
+        <div class="footer-space"></div>
     </div>
 </div>
 
@@ -402,7 +559,7 @@
 </div>
 
 <script>
-// Positionnement du header identique à index.html
+// Positionnement du header
 function positionHeader() {
     var header = document.getElementById('header');
     var baseSize = Math.min(window.innerWidth, window.innerHeight);
@@ -410,7 +567,6 @@ function positionHeader() {
     var marginSide = baseSize * 0.035;
     var marginTop = Math.max(50, baseSize * 0.06);
 
-    // Calculer dotZone comme dans index.html
     var cols = Math.ceil(window.innerWidth / dotSpacing) + 1;
     var rows = Math.ceil(window.innerHeight / dotSpacing) + 1;
 
@@ -439,10 +595,34 @@ function positionHeader() {
     logo.style.height = Math.max(18, baseSize * 0.03) + 'px';
 }
 
-// FAQ toggle
-document.querySelectorAll('.faq-question').forEach(function(question) {
-    question.addEventListener('click', function() {
-        this.parentElement.classList.toggle('open');
+// Smooth scroll for anchor links
+var navLinks = document.querySelectorAll('.category-nav a');
+navLinks.forEach(function(link) {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        var target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        // Update active state
+        navLinks.forEach(function(l) { l.classList.remove('active'); });
+        this.classList.add('active');
+    });
+});
+
+// Update active nav on scroll
+var sections = document.querySelectorAll('.faq-section');
+window.addEventListener('scroll', function() {
+    var scrollPos = window.scrollY + 200;
+    sections.forEach(function(section) {
+        if (section.offsetTop <= scrollPos && section.offsetTop + section.offsetHeight > scrollPos) {
+            navLinks.forEach(function(link) {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + section.id) {
+                    link.classList.add('active');
+                }
+            });
+        }
     });
 });
 

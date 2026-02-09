@@ -225,8 +225,8 @@
         }
 
         body.night-mode #mobile-menu a {
-            color: #EFECD4;
-            border-color: rgba(239, 236, 212, 0.1);
+            color: #FFFFFF;
+            border-color: rgba(255, 255, 255, 0.1);
         }
 
         #mobile-menu a:hover {
@@ -290,17 +290,21 @@
         .section p.subtitle {
             font-family: 'IBM Plex Mono', monospace;
             text-transform: none;
-            letter-spacing: 0.01em;
-            font-size: clamp(10px, 1vw, 13px);
+            letter-spacing: 0.03em;
+            font-size: clamp(10px, 1vw, 14px);
+            opacity: 0.6;
+            max-width: 600px;
+            line-height: 1.6;
         }
 
         .section .small {
             font-family: 'IBM Plex Mono', monospace;
-            font-size: clamp(9px, 0.9vw, 12px);
-            letter-spacing: 0.1em;
+            font-size: clamp(10px, 1vw, 13px);
+            letter-spacing: 0.15em;
             text-transform: uppercase;
-            opacity: 0.6;
+            opacity: 1;
             margin-bottom: 10px;
+            font-weight: 500;
         }
 
         /* Hero section spéciale */
@@ -356,8 +360,20 @@
             }
         }
 
+        /* Backed by section - and many others */
+        .section p.and-more {
+            font-family: 'Lora', serif;
+            font-size: clamp(11px, 1.2vw, 16px);
+            font-style: italic;
+            font-weight: 400;
+            margin-top: 20px;
+            opacity: 1;
+            text-transform: none;
+            letter-spacing: 0.02em;
+        }
+
         /* Apply section */
-        .section[data-section="3"] .ef-stats {
+        .section[data-section="4"] .ef-stats {
             font-family: 'Lora', serif;
             font-size: clamp(24px, 4vw, 48px);
             font-style: italic;
@@ -367,16 +383,18 @@
             letter-spacing: 0.02em;
         }
 
-        .section[data-section="3"] .ef-investors {
+        .section[data-section="4"] .ef-investors {
             font-family: 'IBM Plex Mono', monospace;
-            font-size: clamp(9px, 0.9vw, 12px);
+            font-size: clamp(10px, 1vw, 14px);
             margin-top: 15px;
             opacity: 0.6;
             text-transform: none;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.03em;
+            max-width: 600px;
+            line-height: 1.6;
         }
 
-        .section[data-section="3"] .apply-big {
+        .apply-big {
             display: inline-block;
             font-family: 'Lora', serif;
             font-size: clamp(11px, 1.1vw, 14px);
@@ -389,22 +407,33 @@
             text-decoration: none;
             letter-spacing: 0.02em;
             padding: 10px 28px;
-            margin-top: clamp(25px, 5vh, 50px);
+            margin-top: clamp(20px, 4vh, 40px);
             transition: all 0.2s ease;
             pointer-events: auto;
         }
 
-        .section[data-section="3"] .apply-big:hover {
+        .apply-big:hover {
             background-color: #1E1E1E;
             color: #FFFFFF;
         }
 
+        body.night-mode .apply-big {
+            color: #FFFFFF;
+            border-color: #FFFFFF;
+        }
+
+        body.night-mode .apply-big:hover {
+            background-color: #FFFFFF;
+            color: #1E1E1E;
+        }
+
         @media (max-width: 768px) {
-            .section[data-section="3"] .apply-big {
+            .apply-big {
                 padding: 8px 24px;
                 font-size: 10px;
             }
         }
+
     </style>
 </head>
 <body>
@@ -417,23 +446,33 @@
         <div class="section" data-section="0">
             <h1>
                 The <em>fastest</em> way<br>
-                into Silicon Valley.
+                to Silicon Valley.
             </h1>
-            <p class="subtitle">A residency in San Francisco for founders building massive companies.</p>
+            <p class="subtitle">A residency in San Francisco for those who want to start massive companies.</p>
+            <a href="apply.html" class="apply-big">Apply Now</a>
         </div>
 
-        <!-- Section 2 - Program -->
+        <!-- Section 2 - Who is this for -->
         <div class="section" data-section="1">
+            <p class="small">Who is this for</p>
+            <h1>
+                Start at stage 0.<br>Build the foundations of a <em>generational</em> company.
+            </h1>
+            <p class="subtitle">For non-US founders at the very beginning — pre-idea, pre-team, or just getting started.</p>
+        </div>
+
+        <!-- Section 3 - The Program -->
+        <div class="section" data-section="2">
             <p class="small">The Program</p>
             <h1>
-                Live in SF. Build with the <em>best</em>. Raise from top VCs.
+                Live in San Francisco.<br>Build with <em>peers</em>.<br>Raise from the best.
             </h1>
-            <p class="subtitle">Up to $250k pre-seed • Sequoia, a16z, Founders Fund</p>
+            <p class="subtitle">$250k first check • Sequoia, Founders Fund, a16z, Benchmark, Index</p>
         </div>
 
-        <!-- Section 3 - Backed By -->
-        <div class="section" data-section="2">
-            <p class="small">Backed By</p>
+        <!-- Section 4 - Backed By -->
+        <div class="section" data-section="3">
+            <p class="small">We're backed by</p>
             <div class="founders-cloud">
                 <span class="founder"><em>John Collison</em><small>Stripe</small></span>
                 <span class="founder"><em>Demis Hassabis</em><small>DeepMind</small></span>
@@ -441,18 +480,15 @@
                 <span class="founder"><em>Nat Friedman</em><small>GitHub</small></span>
                 <span class="founder"><em>Reid Hoffman</em><small>LinkedIn</small></span>
                 <span class="founder"><em>Mustafa Suleyman</em><small>Microsoft AI</small></span>
-                <span class="founder"><em>Taavet Hinrikus</em><small>Wise</small></span>
-                <span class="founder"><em>Charlie Songhurst</em><small>Meta</small></span>
-                <span class="founder"><em>Lachy Groom</em><small>Physical Intelligence</small></span>
             </div>
+            <p class="and-more">and many others.</p>
         </div>
 
-        <!-- Section 4 - Apply -->
-        <div class="section" data-section="3">
+        <!-- Section 5 - Built by EF -->
+        <div class="section" data-section="4">
             <p class="small">Built by Entrepreneurs First</p>
-            <p class="ef-stats">$13B+ portfolio value</p>
-            <p class="ef-investors">Cleo • Tractable • Permutive • Wayve • Synthesia</p>
-            <a href="#" class="apply-big">Apply Now</a>
+            <p class="ef-stats">$15B+ in portfolio value</p>
+            <p class="ef-investors">Cleo (unicorn) • Aztec Network (unicorn) • Gensyn (unicorn) • PolyAI (Khosla) • Neptune Robotics (Sequoia) • Magdrive (Founders Fund)</p>
         </div>
     </div>
 </div>
@@ -651,7 +687,58 @@ function getCloudOpacity(x, y, col, row) {
 }
 
 function getSkylineOpacity(x, y) {
-    // Plus de skyline - le pont continue sur toutes les sections
+    var bridgeOffset = scrollPos;
+    var worldX = x + bridgeOffset;
+    var spanWidth = canvas.width;
+    var currentSpan = Math.floor(worldX / spanWidth);
+    var localX = worldX % spanWidth;
+    if (localX < 0) localX += spanWidth;
+    var t = localX / spanWidth;
+
+    var isMobile = canvas.width < 768;
+    var roadY = canvas.height * (isMobile ? 0.92 : 0.88);
+    var baseY = roadY;
+    var h = canvas.height;
+
+    // Couleur des collines : rouge en mode jour, noir en mode nuit
+    var shoreColor = isDay
+        ? {r: 228, g: 53, b: 53, a: 0.85}   // Rouge
+        : {r: 30, g: 30, b: 30, a: 0.85};    // Noir
+
+    // === CÔTE GAUCHE (Marin County) - Span 0 et début Span 1 ===
+    if (currentSpan === 0) {
+        // Collines de Marin - forme ondulée
+        var hillHeight = h * 0.08 + Math.sin(t * Math.PI * 2) * h * 0.03;
+        if (t < 0.7) {
+            hillHeight += (0.7 - t) * h * 0.05; // Plus haut à gauche
+        }
+        if (y >= baseY - hillHeight && y <= baseY) return shoreColor;
+    }
+
+    if (currentSpan === 1 && t < 0.15) {
+        // Fin de la côte Marin qui rejoint le pont
+        var hillHeight = h * 0.05 * (1 - t / 0.15);
+        if (y >= baseY - hillHeight && y <= baseY) return shoreColor;
+    }
+
+    // === CÔTE DROITE (San Francisco) - Fin Span 3 et Span 4 ===
+    if (currentSpan === 3 && t > 0.85) {
+        // Début de la côte SF qui rejoint le pont
+        var hillHeight = h * 0.05 * ((t - 0.85) / 0.15);
+        if (y >= baseY - hillHeight && y <= baseY) return shoreColor;
+    }
+
+    // Skyline SF sur section 4 - minimaliste
+    if (currentSpan === 4) {
+        // Collines de SF
+        var hillBase = h * 0.03;
+        var hill1 = Math.sin(t * Math.PI * 0.8) * h * 0.04;
+        var hillHeight = hillBase + Math.max(0, hill1);
+
+        // Colline de base
+        if (y >= baseY - hillHeight && y <= baseY) return shoreColor;
+    }
+
     return 0;
 }
 
@@ -670,30 +757,79 @@ function getBridgeOpacity(x, y) {
 
     var worldX = x + bridgeOffset;
 
-    // Le pont fait 4 cycles complets (toutes les sections)
-    var bridgeEnd = canvas.width * 4;
+    // Le pont fait 5 cycles complets (toutes les sections)
+    var bridgeEnd = canvas.width * 5;
     if (worldX > bridgeEnd) return 0;
 
     var spanWidth = canvas.width;
     var localX = worldX % spanWidth;
     if (localX < 0) localX += spanWidth;
 
+    // Numéro du span actuel (0 à 4)
+    var currentSpan = Math.floor(worldX / spanWidth);
+
     var towerWidth = dotSpacing;
-    if ((localX < towerWidth || localX > spanWidth - towerWidth) && y >= towerTop && y <= roadY + towerWidth * 0.5) {
+    var coastY = roadY - canvas.height * 0.03;
+
+    // Tours : entre slide 1-2 et entre slide 2-3
+    var showTower = false;
+    if ((currentSpan === 1 && localX > spanWidth - towerWidth) ||
+        (currentSpan === 2 && localX < towerWidth) ||
+        (currentSpan === 2 && localX > spanWidth - towerWidth) ||
+        (currentSpan === 3 && localX < towerWidth)) {
+        if (y >= towerTop && y <= roadY + towerWidth * 0.5) {
+            showTower = true;
+        }
+    }
+
+    if (showTower) {
         return 1;
     }
 
     var mainSag = (roadY - towerTop) * 0.5;
     var t = localX / spanWidth;
-    var cableY = towerTop + Math.sin(t * Math.PI) * mainSag;
+    var cableY;
+
+    // Span 0 : pas de câble supérieur
+    if (currentSpan === 0) {
+        cableY = roadY + 1000; // Hors écran
+    }
+    // Span 1 : câble d'approche - demi-parabole de roadY vers towerTop
+    else if (currentSpan === 1) {
+        // Demi-parabole : t² donne une courbe qui accélère vers le haut
+        var halfParabola = t * t;
+        cableY = roadY - halfParabola * (roadY - towerTop);
+    }
+    // Span 2 : parabole entre les deux tours (le vrai pont Golden Gate)
+    else if (currentSpan === 2) {
+        // Parabole : 4 * t * (1 - t) donne une courbe qui va de 0 à 1 à 0
+        var parabola = 4 * t * (1 - t);
+        cableY = towerTop + parabola * mainSag;
+    }
+    // Span 3 : câble de sortie - demi-parabole de towerTop vers roadY (symétrique au span 1)
+    else if (currentSpan === 3) {
+        // Demi-parabole inversée : (1-t)² donne une courbe symétrique
+        var halfParabola = (1 - t) * (1 - t);
+        cableY = roadY - halfParabola * (roadY - towerTop);
+    }
+    // Span 4 : pas de câble, juste la skyline
+    else if (currentSpan === 4) {
+        cableY = roadY + 1000;
+    }
+    else {
+        cableY = roadY + 1000;
+    }
 
     var cableThickness = dotSpacing * 0.4;
     if (Math.abs(y - cableY) < cableThickness) return 0.8;
 
-    var suspenderSpacing = dotSpacing * 1.5;
-    if (localX > suspenderSpacing && localX < spanWidth - suspenderSpacing) {
-        if (Math.floor(localX / suspenderSpacing) % 2 === 0) {
-            if (y > cableY + cableThickness && y < roadY - cableThickness) return 0.35;
+    // Suspenders seulement sur les spans avec câble (1, 2, 3)
+    if (currentSpan >= 1 && currentSpan <= 3) {
+        var suspenderSpacing = dotSpacing * 1.5;
+        if (localX > suspenderSpacing && localX < spanWidth - suspenderSpacing) {
+            if (Math.floor(localX / suspenderSpacing) % 2 === 0) {
+                if (y > cableY + cableThickness && y < roadY - cableThickness) return 0.35;
+            }
         }
     }
 
@@ -711,7 +847,7 @@ function getWaterOpacity(x, y) {
     var waveThickness = dotSpacing * 0.4;
 
     // Eau sur toutes les sections
-    var bridgeEnd = canvas.width * 4;
+    var bridgeEnd = canvas.width * 5;
     if (worldX > bridgeEnd) return 0;
 
     if (y > roadY + waveGap) {
@@ -785,14 +921,14 @@ function draw() {
 
     if (isDay) {
         // Mode jour
-        bgColor = 'rgb(239, 236, 212)'; // #FFFFFF
+        bgColor = 'rgb(239, 236, 212)'; // #EFECD4
         dotColor = 'rgb(30, 30, 30)';    // #1E1E1E
         dotColorAlpha = 'rgba(30, 30, 30,';
     } else {
         // Mode nuit
         bgColor = 'rgb(30, 30, 30)';     // #1E1E1E
-        dotColor = 'rgb(239, 236, 212)'; // #FFFFFF
-        dotColorAlpha = 'rgba(239, 236, 212,';
+        dotColor = 'rgb(255, 255, 255)'; // #FFFFFF
+        dotColorAlpha = 'rgba(255, 255, 255,';
     }
 
     ctx.fillStyle = bgColor;
@@ -823,7 +959,9 @@ function draw() {
     var scrollProgress = scrollPos / maxScroll;
     var sunX = canvas.width * 0.1 + (canvas.width * 0.8) * scrollProgress;
     var sunArc = Math.sin(scrollProgress * Math.PI);
-    var sunY = canvas.height * 0.7 - sunArc * canvas.height * 0.5;
+    // Arc moins prononcé sur mobile (ratio hauteur/largeur > 1.2 = portrait)
+    var arcHeight = (canvas.height / canvas.width > 1.2) ? canvas.height * 0.35 : canvas.height * 0.5;
+    var sunY = canvas.height * 0.7 - sunArc * arcHeight;
     var sunRadius = Math.max(15, Math.min(canvas.width, canvas.height) * 0.03);
 
     // Mettre à jour la zone cliquable du soleil/lune
@@ -908,7 +1046,10 @@ function draw() {
             ctx.beginPath();
             ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
 
-            if (skylineOpacity > 0.1) {
+            if (skylineOpacity && typeof skylineOpacity === 'object') {
+                // Victorian Houses avec couleurs pastel
+                ctx.fillStyle = 'rgba(' + skylineOpacity.r + ',' + skylineOpacity.g + ',' + skylineOpacity.b + ',' + skylineOpacity.a + ')';
+            } else if (skylineOpacity > 0.1) {
                 // SF Skyline - même couleur que le pont
                 ctx.fillStyle = 'rgba(228,53,53,' + skylineOpacity + ')';
             } else if (cloudOpacity > 0.05 && isDay) {
@@ -1022,6 +1163,7 @@ menuToggle.addEventListener('click', function() {
     menuToggle.classList.toggle('open');
     mobileMenu.classList.toggle('open');
 });
+
 </script>
 
 </body>
