@@ -765,70 +765,36 @@ function getSkylineOpacity(x, y) {
         ? {r: 228, g: 53, b: 53, a: 0.85}   // Rouge
         : {r: 30, g: 30, b: 30, a: 0.85};    // Noir
 
-    // === CÔTE GAUCHE - San Francisco skyline sur Span 0 ===
+    // === CÔTE GAUCHE - Collines bien vallonnées ===
     if (currentSpan === 0) {
-        // Colline de base
-        var hillBase = h * 0.03;
-        var hillHeight = hillBase;
+        // Ondes plus prononcées pour de vraies collines
+        var wave1 = Math.sin(t * Math.PI * 1.5) * h * 0.06;
+        var wave2 = Math.sin(t * Math.PI * 3 + 0.8) * h * 0.03;
+        var wave3 = Math.sin(t * Math.PI * 0.8 + 1.5) * h * 0.04;
+        var hillHeight = h * 0.02 + Math.max(0, wave1 + wave2 + wave3);
 
-        // Buildings de SF
-        var buildingHeight = 0;
-
-        // Transamerica Pyramid (triangle iconique)
-        if (t > 0.25 && t < 0.35) {
-            var pyramidT = (t - 0.25) / 0.1;
-            var pyramidWidth = pyramidT < 0.5 ? pyramidT * 2 : (1 - pyramidT) * 2;
-            buildingHeight = h * 0.18 * pyramidWidth;
-        }
-
-        // Salesforce Tower (le plus haut)
-        if (t > 0.38 && t < 0.46) {
-            buildingHeight = h * 0.15;
-        }
-
-        // Building moyen 1
-        if (t > 0.15 && t < 0.22) {
-            buildingHeight = h * 0.09;
-        }
-
-        // Building moyen 2
-        if (t > 0.48 && t < 0.55) {
-            buildingHeight = h * 0.10;
-        }
-
-        // Petits buildings
-        if (t > 0.08 && t < 0.13) {
-            buildingHeight = h * 0.06;
-        }
-        if (t > 0.57 && t < 0.63) {
-            buildingHeight = h * 0.07;
-        }
-        if (t > 0.65 && t < 0.70) {
-            buildingHeight = h * 0.05;
-        }
-
-        var totalHeight = Math.max(hillHeight, buildingHeight);
-        if (y >= baseY - totalHeight && y <= baseY) return shoreColor;
+        if (y >= baseY - hillHeight && y <= baseY) return shoreColor;
     }
 
     if (currentSpan === 1 && t < 0.15) {
-        // Fin de la côte Marin qui rejoint le pont
-        var hillHeight = h * 0.05 * (1 - t / 0.15);
+        // Transition douce vers le pont
+        var hillHeight = h * 0.04 * (1 - t / 0.15);
         if (y >= baseY - hillHeight && y <= baseY) return shoreColor;
     }
 
-    // === CÔTE DROITE (San Francisco) - Fin Span 3 et Span 4 ===
+    // === CÔTE DROITE - Collines douces ===
     if (currentSpan === 3 && t > 0.85) {
-        // Début de la côte SF qui rejoint le pont
-        var hillHeight = h * 0.05 * ((t - 0.85) / 0.15);
+        // Transition depuis le pont
+        var hillHeight = h * 0.04 * ((t - 0.85) / 0.15);
         if (y >= baseY - hillHeight && y <= baseY) return shoreColor;
     }
 
-    // Côte droite section 4 - simple colline
+    // Côte droite - collines vallonnées
     if (currentSpan === 4) {
-        var hillBase = h * 0.03;
-        var hill1 = Math.sin(t * Math.PI * 0.8) * h * 0.04;
-        var hillHeight = hillBase + Math.max(0, hill1);
+        var wave1 = Math.sin(t * Math.PI * 1.2) * h * 0.05;
+        var wave2 = Math.sin(t * Math.PI * 2.8 + 0.5) * h * 0.03;
+        var wave3 = Math.sin(t * Math.PI * 0.7 + 1) * h * 0.04;
+        var hillHeight = h * 0.02 + Math.max(0, wave1 + wave2 + wave3);
 
         if (y >= baseY - hillHeight && y <= baseY) return shoreColor;
     }
