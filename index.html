@@ -522,9 +522,9 @@
     <a href="index.html"><img id="logo" src="logo.png" alt="The Bridge"></a>
     <div class="header-right">
         <nav id="nav-menu">
-            <a href="residency.html">The Program</a>
             <a href="faq.html">FAQ</a>
-            <a href="meet-us.html">Meet us</a>
+            <a href="meet-us.html">Meet Us</a>
+            <a href="residency.html">Residency</a>
         </nav>
         <a id="apply-btn" href="apply.html">Apply</a>
         <div id="menu-toggle">
@@ -544,9 +544,9 @@
 <!-- Mobile menu overlay -->
 <div id="mobile-menu">
     <a href="index.html" data-index="01">Home</a>
-    <a href="residency.html" data-index="02">The Program</a>
+    <a href="residency.html" data-index="02">Residency</a>
     <a href="faq.html" data-index="03">FAQ</a>
-    <a href="meet-us.html" data-index="04">Meet us</a>
+    <a href="meet-us.html" data-index="04">Meet Us</a>
     <a href="apply.html" data-index="05">Apply</a>
 </div>
 
@@ -718,7 +718,45 @@ var numClouds = 28;
 function generateClouds() {
     clouds = [];
     var isMobile = window.innerWidth < 768;
-    var count = isMobile ? 12 : numClouds;
+
+    if (isMobile) {
+        // Mobile : nuages GROS et imposants sur les 5 sections
+        var cloudsPerSection = 3;  // 3 gros nuages par section
+        var totalClouds = 5 * cloudsPerSection;
+
+        for (var section = 0; section < 5; section++) {
+            for (var j = 0; j < cloudsPerSection; j++) {
+                var i = section * cloudsPerSection + j;
+
+                // Positions variées dans chaque section
+                var xPositions = [0.15, 0.5, 0.75];
+                var yPositions = [0.08, 0.18, 0.12];
+
+                var xBase = section + xPositions[j];
+                var yBase = yPositions[j];
+
+                // Décalages aléatoires
+                var xRandom = (seededRandom(i * 111.111) - 0.5) * 0.15;
+                var yRandom = (seededRandom(i * 222.222) - 0.5) * 0.04;
+
+                // GROS nuages - patterns 0-1 (les plus gros) et grande taille
+                var patternIndex = Math.floor(seededRandom(i * 999.999) * 2);
+                var cloudSize = 1.0 + seededRandom(i * 333.333) * 0.6;  // Taille x2 !
+
+                clouds.push({
+                    xRatio: xBase + xRandom,
+                    yRatio: yBase + yRandom,
+                    size: cloudSize,
+                    pattern: patternIndex,
+                    opacity: 0.20 + seededRandom(i * 555.555) * 0.15
+                });
+            }
+        }
+        return;
+    }
+
+    // Desktop : beaucoup de nuages répartis sur les 5 sections
+    var count = numClouds;
 
     for (var i = 0; i < count; i++) {
         var rand = seededRandom(i * 777.777);
@@ -726,10 +764,10 @@ function generateClouds() {
 
         if (rand < 0.4) {
             patternIndex = Math.floor(seededRandom(i * 888.888) * 2);
-            cloudSize = isMobile ? 0.8 + seededRandom(i * 333.333) * 0.4 : 1.4 + seededRandom(i * 333.333) * 0.6;
+            cloudSize = 1.4 + seededRandom(i * 333.333) * 0.6;
         } else {
             patternIndex = 2 + Math.floor(seededRandom(i * 999.999) * 3);
-            cloudSize = isMobile ? 0.6 + seededRandom(i * 333.333) * 0.3 : 1.0 + seededRandom(i * 333.333) * 0.5;
+            cloudSize = 1.0 + seededRandom(i * 333.333) * 0.5;
         }
 
         var section = Math.floor(i / (count / 5));
@@ -1288,16 +1326,6 @@ setInterval(function() {
     }
 }, 60000);
 
-// Générer les étoiles pour le mode nuit - plus discrètes
-var stars = [];
-var numStars = 40;
-for (var i = 0; i < numStars; i++) {
-    stars.push({
-        x: seededRandom(i * 111.111) * 1.5,
-        y: seededRandom(i * 222.222) * 0.5,
-        brightness: 0.2 + seededRandom(i * 333.333) * 0.35
-    });
-}
 
 function draw() {
     // Les nuages sont statiques, pas besoin de mise à jour chaque frame
@@ -1424,58 +1452,67 @@ function draw() {
                 continue;
             }
 
-            // Nuages d'abord (jour seulement) - le soleil passe DERRIÈRE
-            // Les nuages commencent sous le header (y > dotZone.y)
-            if (isDay && y > dotZone.y) {
-                var cloudResult = getCloudOpacity(x, y, col, row);
-                if (cloudResult && cloudResult.opacity > 0.03) {
-                    if (cloudResult.type === 'white') {
-                        // Centre lumineux - très clair
-                        ctx.fillStyle = 'rgba(30, 30, 30, ' + (cloudResult.opacity * 0.35) + ')';
-                    } else {
-                        // Ombre/bords - légèrement plus foncé
-                        ctx.fillStyle = 'rgba(30, 30, 30, ' + (cloudResult.opacity * 0.5) + ')';
-                    }
-                    ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
-                    continue;
-                }
-            }
 
-            // Soleil/Lune (dessiné après les nuages = passe derrière)
+            // Soleil/Lune - dessiné en premier (passera DERRIÈRE les nuages)
             var dx = x - sunX;
             var dy = y - sunY;
             var distToSunSq = dx * dx + dy * dy;
             var sunRadiusSq = sunRadius * sunRadius;
 
+            // Dessiner le soleil/lune SANS continue pour permettre aux nuages de se superposer
             if (distToSunSq < sunRadiusSq) {
                 ctx.fillStyle = sunColorAlpha + '1)';
                 ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
-                continue;
-            }
-            if (distToSunSq < sunRadiusSq * 4) {
+                // Pas de continue - les nuages pourront se dessiner par-dessus
+            } else if (distToSunSq < sunRadiusSq * 4) {
                 var sunOpacity = Math.max(0, 1 - Math.sqrt(distToSunSq) / (sunRadius * 2)) * 0.5;
                 if (sunOpacity > 0.1) {
                     ctx.fillStyle = sunColorAlpha + sunOpacity + ')';
+                    ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                    // Pas de continue - les nuages pourront se dessiner par-dessus
+                }
+            }
+
+            // Nuages (jour ET nuit) - passent DEVANT le soleil/lune
+            if (y > dotZone.y) {
+                var cloudResult = getCloudOpacity(x, y, col, row);
+                if (cloudResult && cloudResult.opacity > 0.03) {
+                    // Vérifier si on est dans la zone du soleil/lune
+                    var inSunZone = distToSunSq < sunRadiusSq * 4;
+
+                    if (isDay) {
+                        // Nuages jour - gris sur fond beige
+                        if (inSunZone) {
+                            // Devant le soleil : dessiner le fond beige d'abord, puis le nuage par-dessus
+                            ctx.fillStyle = 'rgb(235, 228, 195)';
+                            ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                        }
+                        if (cloudResult.type === 'white') {
+                            ctx.fillStyle = 'rgba(30, 30, 30, ' + (cloudResult.opacity * 0.35) + ')';
+                        } else {
+                            ctx.fillStyle = 'rgba(30, 30, 30, ' + (cloudResult.opacity * 0.5) + ')';
+                        }
+                    } else {
+                        // Nuages nuit - gris clair sur fond sombre
+                        if (inSunZone) {
+                            // Devant la lune : dessiner le fond sombre d'abord, puis le nuage par-dessus
+                            ctx.fillStyle = 'rgb(30, 32, 40)';
+                            ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                        }
+                        if (cloudResult.type === 'white') {
+                            ctx.fillStyle = 'rgba(200, 200, 210, ' + (cloudResult.opacity * 0.4) + ')';
+                        } else {
+                            ctx.fillStyle = 'rgba(150, 150, 160, ' + (cloudResult.opacity * 0.5) + ')';
+                        }
+                    }
                     ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
                     continue;
                 }
             }
 
-            // Étoiles (nuit seulement)
-            if (!isDay) {
-                var foundStar = false;
-                for (var s = 0; s < stars.length; s++) {
-                    var starX = stars[s].x * canvas.width;
-                    var starY = dotZone.y + stars[s].y * dotZone.height;
-                    if (Math.abs(x - starX) < pixelSize && Math.abs(y - starY) < pixelSize) {
-                        var twinkle = 0.85 + 0.15 * Math.sin(starTime * 2 + s * 1.7);
-                        ctx.fillStyle = 'rgba(255,255,200,' + (stars[s].brightness * twinkle) + ')';
-                        ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
-                        foundStar = true;
-                        break;
-                    }
-                }
-                if (foundStar) continue;
+            // Si on était dans le soleil/lune mais pas dans un nuage, on a déjà dessiné, on continue
+            if (distToSunSq < sunRadiusSq || (distToSunSq < sunRadiusSq * 4 && Math.max(0, 1 - Math.sqrt(distToSunSq) / (sunRadius * 2)) * 0.5 > 0.1)) {
+                continue;
             }
 
             // Eau
