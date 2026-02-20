@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply - The Bridge</title>
+    <!-- Vercel Analytics -->
+    <script defer ></script>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M4JZJVEZE9"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-M4JZJVEZE9');
+    </script>
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #1E1E1E;
+            font-family: 'Courier New', monospace;
+            color: #FFFFFF;
+            min-height: 100vh;
+        }
+
+        /* Dot pattern background */
+        .dot-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        /* Header */
+        #header {
+            position: fixed;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            pointer-events: auto;
+        }
+
+        #header-fade {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: linear-gradient(to bottom, #1E1E1E 0%, #1E1E1E 60px, transparent 80px);
+            z-index: 9;
+            pointer-events: none;
+        }
+
+        #header > a {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        #logo {
+            height: 24px;
+            filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(2041%) hue-rotate(344deg) brightness(91%) contrast(93%);
+        }
+
+        #apply-btn {
+            font-family: 'Lora', serif;
+            font-size: clamp(10px, 1vw, 13px);
+            font-style: italic;
+            font-weight: 400;
+            color: #FFFFFF;
+            background-color: transparent;
+            border: 1px solid #FFFFFF;
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            padding: 8px 20px;
+            border-radius: 50px;
+            transition: all 0.2s ease;
+        }
+
+        #apply-btn:hover {
+            background-color: #FFFFFF;
+            color: #1E1E1E;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: clamp(15px, 3vw, 40px);
+        }
+
+        #nav-menu {
+            display: flex;
+            gap: clamp(12px, 2.5vw, 30px);
+        }
+
+        #nav-menu a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(9px, 0.9vw, 12px);
+            color: #FFFFFF;
+            text-decoration: none;
+            letter-spacing: 0.05em;
+            transition: opacity 0.2s ease;
+        }
+
+        #nav-menu a:hover {
+            opacity: 0.6;
+        }
+
+        /* Mobile menu hamburger */
+        #menu-toggle {
+            display: none;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            z-index: 101;
+            position: relative;
+        }
+
+        #menu-toggle .dot {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background-color: #FFFFFF;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        #menu-toggle .dot:nth-child(1) { top: 0; left: 0; }
+        #menu-toggle .dot:nth-child(2) { top: 0; left: 50%; transform: translateX(-50%); }
+        #menu-toggle .dot:nth-child(3) { top: 0; right: 0; }
+        #menu-toggle .dot:nth-child(4) { top: 50%; left: 0; transform: translateY(-50%); }
+        #menu-toggle .dot:nth-child(5) { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        #menu-toggle .dot:nth-child(6) { top: 50%; right: 0; transform: translateY(-50%); }
+        #menu-toggle .dot:nth-child(7) { bottom: 0; left: 0; }
+        #menu-toggle .dot:nth-child(8) { bottom: 0; left: 50%; transform: translateX(-50%); }
+        #menu-toggle .dot:nth-child(9) { bottom: 0; right: 0; }
+
+        #menu-toggle.open .dot:nth-child(1) { top: 50%; left: 50%; transform: translate(-50%, -50%) translate(-6px, -6px); }
+        #menu-toggle.open .dot:nth-child(2) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(3) { top: 50%; right: auto; left: 50%; transform: translate(-50%, -50%) translate(6px, -6px); }
+        #menu-toggle.open .dot:nth-child(4) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(5) { transform: translate(-50%, -50%); }
+        #menu-toggle.open .dot:nth-child(6) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(7) { bottom: auto; top: 50%; left: 50%; transform: translate(-50%, -50%) translate(-6px, 6px); }
+        #menu-toggle.open .dot:nth-child(8) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(9) { bottom: auto; top: 50%; right: auto; left: 50%; transform: translate(-50%, -50%) translate(6px, 6px); }
+
+        #mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #1E1E1E;
+            z-index: 100;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 0 15%;
+            gap: 0;
+        }
+
+        #mobile-menu.open {
+            display: flex;
+        }
+
+        #mobile-menu a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            color: #FFFFFF;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            padding: 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #mobile-menu a:first-child {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #mobile-menu a::before {
+            content: attr(data-index);
+            font-size: 10px;
+            opacity: 0.4;
+            min-width: 20px;
+        }
+
+        #mobile-menu a:hover {
+            padding-left: 10px;
+        }
+
+        @media (max-width: 600px) {
+            #nav-menu {
+                display: none;
+            }
+
+            #menu-toggle {
+                display: flex;
+            }
+        }
+
+        /* Main layout */
+        .main-layout {
+            display: flex;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 5%;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Category navigation - left sidebar */
+        .category-nav {
+            position: sticky;
+            top: 120px;
+            width: 180px;
+            flex-shrink: 0;
+            padding-top: 40vh;
+            align-self: flex-start;
+        }
+
+        .category-nav ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .category-nav a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            color: #FFFFFF;
+            text-decoration: none;
+            opacity: 0.4;
+            transition: opacity 0.2s;
+        }
+
+        .category-nav a:hover,
+        .category-nav a.active {
+            opacity: 1;
+        }
+
+        /* Content */
+        #content {
+            flex: 1;
+            max-width: 650px;
+            padding-left: 60px;
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 40vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 100px;
+        }
+
+        .hero h1 {
+            font-family: 'Lora', serif;
+            font-size: clamp(48px, 10vw, 80px);
+            font-weight: 400;
+            font-style: italic;
+            color: #FFFFFF;
+            letter-spacing: -0.03em;
+            line-height: 0.9;
+        }
+
+        /* Sections */
+        .apply-section {
+            margin-bottom: 60px;
+        }
+
+        .apply-section h2 {
+            font-family: 'Lora', serif;
+            font-size: clamp(24px, 4vw, 32px);
+            font-weight: 400;
+            font-style: italic;
+            margin-bottom: 30px;
+            padding-top: 20px;
+        }
+
+        /* CTA */
+        .cta-box {
+            margin-bottom: 25px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            font-family: 'Lora', serif;
+            font-size: clamp(13px, 1.3vw, 16px);
+            font-style: italic;
+            font-weight: 400;
+            color: #1E1E1E;
+            background-color: #FFFFFF;
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            padding: 18px 50px;
+            border-radius: 50px;
+            transition: all 0.2s ease;
+        }
+
+        .cta-btn:hover {
+            background-color: #E43535;
+            color: #FFFFFF;
+        }
+
+        .faq-hint {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            opacity: 0.5;
+            margin-top: 20px;
+            line-height: 1.6;
+        }
+
+        .faq-hint a {
+            color: #FFFFFF;
+            text-decoration: underline;
+            transition: opacity 0.2s;
+        }
+
+        .faq-hint a:hover {
+            opacity: 0.7;
+        }
+
+        /* Apply hints list */
+        .apply-hints {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .apply-hints li {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 12px;
+            opacity: 0.5;
+            line-height: 1.6;
+            padding-left: 20px;
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .apply-hints li.highlight {
+            font-family: 'Lora', serif;
+            font-size: clamp(14px, 1.4vw, 18px);
+            font-style: italic;
+            opacity: 0.85;
+            padding-left: 0;
+            margin-bottom: 20px;
+        }
+
+        .apply-hints li.highlight::before {
+            display: none;
+        }
+
+        .apply-hints li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            opacity: 0.6;
+        }
+
+        .apply-hints a {
+            color: #FFFFFF;
+            text-decoration: underline;
+            transition: opacity 0.2s;
+        }
+
+        .apply-hints a:hover {
+            opacity: 0.7;
+        }
+
+        /* Cohorts */
+        .cohort {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .cohort:first-of-type {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .cohort-left {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .cohort-name {
+            font-family: 'Lora', serif;
+            font-size: clamp(18px, 2vw, 24px);
+            font-style: italic;
+        }
+
+        .cohort-date {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(11px, 1vw, 13px);
+            font-style: normal;
+            opacity: 0.5;
+        }
+
+        .cohort-info {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(11px, 1vw, 13px);
+            opacity: 0.5;
+        }
+
+        .cohort-info span {
+            display: block;
+        }
+
+        .cohort-info .late {
+            color: #E43535;
+            opacity: 1;
+        }
+
+        .cohort-btn {
+            font-family: 'Lora', serif;
+            font-size: clamp(11px, 1.1vw, 14px);
+            font-style: italic;
+            font-weight: 400;
+            color: #FFFFFF;
+            background-color: transparent;
+            border: 1px solid #FFFFFF;
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            padding: 10px 28px;
+            border-radius: 50px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .cohort-btn:hover {
+            background-color: #FFFFFF;
+            color: #1E1E1E;
+        }
+
+        /* Process steps */
+        .process-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 25px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .process-step:first-of-type {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .step-number {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            opacity: 0.3;
+            min-width: 20px;
+            padding-top: 5px;
+        }
+
+        .step-content strong {
+            font-family: 'Lora', serif;
+            font-size: clamp(16px, 1.6vw, 20px);
+            font-style: italic;
+            font-weight: 400;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .step-content p {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(12px, 1.1vw, 14px);
+            opacity: 0.5;
+            line-height: 1.6;
+        }
+
+        /* Footer spacing */
+        .footer-space {
+            height: 120px;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .main-layout {
+                flex-direction: column;
+            }
+
+            .category-nav {
+                display: none;
+            }
+
+            #content {
+                padding-left: 0;
+            }
+
+            .hero {
+                padding-top: 100px;
+                min-height: 30vh;
+            }
+
+            .cohort {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+
+        /* Back link */
+        .back-link {
+            position: fixed;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .back-link a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: #FFFFFF;
+            text-decoration: none;
+            letter-spacing: 2px;
+            transition: all 0.2s;
+            background: rgba(30, 30, 30, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .back-link a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Dot pattern background -->
+<div class="dot-pattern"></div>
+
+<!-- Fade overlay -->
+<div id="header-fade"></div>
+
+<!-- Header -->
+<div id="header">
+    <a href="../"><img id="logo" src="../assets/logo.png" alt="The Bridge"></a>
+    <div class="header-right">
+        <nav id="nav-menu">
+            <a href="../faq">FAQ</a>
+            <a href="../meet-us">Meet Us</a>
+            <a href="../community">Community</a>
+            <a href="../residency">Residency</a>
+        </nav>
+        <a id="apply-btn" href="../apply">Apply</a>
+        <div id="menu-toggle">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile menu overlay -->
+<div id="mobile-menu">
+    <a href="../" data-index="01">Home</a>
+    <a href="../residency" data-index="02">Residency</a>
+    <a href="../faq" data-index="03">FAQ</a>
+    <a href="../meet-us" data-index="04">Meet Us</a>
+    <a href="../apply" data-index="05">Apply</a>
+</div>
+
+<div class="main-layout">
+    <!-- Category navigation - left sidebar -->
+    <nav class="category-nav">
+        <ul>
+            <li><a href="#start" class="active">Start</a></li>
+            <li><a href="#cohorts">Cohorts</a></li>
+            <li><a href="#process">Process</a></li>
+        </ul>
+    </nav>
+
+    <div id="content">
+        <!-- Hero -->
+        <div class="hero">
+            <h1>Apply</h1>
+        </div>
+
+        <!-- Start -->
+        <section class="apply-section" id="start">
+            <ul class="apply-hints">
+                <li class="highlight">Students, dropouts, builders, researchers, operators. People who know how to distribute, grow, sell, or lead.</li>
+                <li>Make sure to read the <a href="../faq">FAQ</a> before applying.</li>
+            </ul>
+        </section>
+
+        <!-- Cohorts -->
+        <section class="apply-section" id="cohorts">
+            <h2>Upcoming cohorts</h2>
+            <div class="cohort">
+                <div class="cohort-left">
+                    <div class="cohort-name">Spring 2026 <span class="cohort-date">— April in SF</span></div>
+                    <div class="cohort-info">
+                        <span class="late">Accepting late applications</span>
+                    </div>
+                </div>
+                <a href="https://apply.joinef.com/app/san-francisco-thebridge/" class="cohort-btn">Apply</a>
+            </div>
+            <div class="cohort">
+                <div class="cohort-left">
+                    <div class="cohort-name">Summer 2026 <span class="cohort-date">— July in SF</span></div>
+                    <div class="cohort-info">
+                        <span>Deadline: April 6th</span>
+                    </div>
+                </div>
+                <a href="https://apply.joinef.com/app/san-francisco-thebridge-summer/" class="cohort-btn">Apply</a>
+            </div>
+        </section>
+
+        <!-- Process -->
+        <section class="apply-section" id="process">
+            <h2>Selection process</h2>
+            <div class="process-step">
+                <span class="step-number">01</span>
+                <div class="step-content">
+                    <strong>Apply</strong>
+                    <p>Submit application form and short video</p>
+                </div>
+            </div>
+            <div class="process-step">
+                <span class="step-number">02</span>
+                <div class="step-content">
+                    <strong>Interview</strong>
+                    <p>2 rounds of interviews, video or in-person</p>
+                </div>
+            </div>
+            <div class="process-step">
+                <span class="step-number">03</span>
+                <div class="step-content">
+                    <strong>Selection Days</strong>
+                    <p>Full day in person event to evaluate mutual fit</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="footer-space"></div>
+    </div>
+</div>
+
+<div class="back-link">
+    <a href="../">BACK TO HOME</a>
+</div>
+
+<script>
+// Positionnement du header
+function positionHeader() {
+    var header = document.getElementById('header');
+    var baseSize = Math.min(window.innerWidth, window.innerHeight);
+    var dotSpacing = Math.max(8, baseSize * 0.01);
+    var marginSide = baseSize * 0.035;
+    var marginTop = Math.max(50, baseSize * 0.06);
+
+    var cols = Math.ceil(window.innerWidth / dotSpacing) + 1;
+    var rows = Math.ceil(window.innerHeight / dotSpacing) + 1;
+
+    var firstDotX, lastDotX, firstDotY;
+    for (var c = 0; c < cols; c++) {
+        var px = c * dotSpacing + dotSpacing / 2;
+        if (px >= marginSide && firstDotX === undefined) firstDotX = px;
+        if (px <= window.innerWidth - marginSide) lastDotX = px;
+    }
+    for (var r = 0; r < rows; r++) {
+        var py = r * dotSpacing + dotSpacing / 2;
+        if (py >= marginTop && firstDotY === undefined) firstDotY = py;
+    }
+
+    var dotZoneX = firstDotX;
+    var dotZoneY = firstDotY;
+    var dotZoneWidth = lastDotX - firstDotX;
+
+    var headerTopMargin = marginSide * 0.5;
+    header.style.top = headerTopMargin + 'px';
+    header.style.height = (dotZoneY - headerTopMargin - 10) + 'px';
+    header.style.paddingLeft = dotZoneX + 'px';
+    header.style.paddingRight = (window.innerWidth - dotZoneX - dotZoneWidth) + 'px';
+
+    var logo = document.getElementById('logo');
+    logo.style.height = Math.max(18, baseSize * 0.03) + 'px';
+}
+
+// Smooth scroll for anchor links
+var navLinks = document.querySelectorAll('.category-nav a');
+navLinks.forEach(function(link) {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        var target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        // Update active state
+        navLinks.forEach(function(l) { l.classList.remove('active'); });
+        this.classList.add('active');
+    });
+});
+
+// Update active nav on scroll
+var sections = document.querySelectorAll('.apply-section');
+window.addEventListener('scroll', function() {
+    var scrollPos = window.scrollY + 200;
+    sections.forEach(function(section) {
+        if (section.offsetTop <= scrollPos && section.offsetTop + section.offsetHeight > scrollPos) {
+            navLinks.forEach(function(link) {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + section.id) {
+                    link.classList.add('active');
+                }
+            });
+        }
+    });
+});
+
+window.addEventListener('resize', positionHeader);
+positionHeader();
+
+// Mobile menu toggle
+var menuToggle = document.getElementById('menu-toggle');
+var mobileMenu = document.getElementById('mobile-menu');
+
+menuToggle.addEventListener('click', function() {
+    menuToggle.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+});
+</script>
+
+</body>
+</html>

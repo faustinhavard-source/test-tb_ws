@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meet Us - The Bridge</title>
+    <!-- Vercel Analytics -->
+    <script defer ></script>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M4JZJVEZE9"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-M4JZJVEZE9');
+    </script>
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        /* Night mode (default) */
+        body.night-mode {
+            background-color: #1E2021;
+            color: #FFFFFF;
+        }
+
+        /* Day mode */
+        body.day-mode {
+            background-color: #EFECD4;
+            color: #1E1E1E;
+        }
+
+        /* Dot pattern background */
+        .dot-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            transition: background-image 0.5s ease;
+        }
+
+        body.night-mode .dot-pattern {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        body.day-mode .dot-pattern {
+            background-image: radial-gradient(rgba(30, 30, 30, 0.1) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        /* Header - identique à index.html */
+        #header {
+            position: fixed;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            pointer-events: auto;
+        }
+
+        /* Fade overlay - clips content approaching header */
+        #header-fade {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            z-index: 9;
+            pointer-events: none;
+            transition: background 0.5s ease;
+        }
+
+        body.night-mode #header-fade {
+            background: linear-gradient(to bottom, #1E2021 60px, transparent 80px);
+        }
+
+        body.day-mode #header-fade {
+            background: linear-gradient(to bottom, #EFECD4 60px, transparent 80px);
+        }
+
+        #header-fade::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            background-size: 24px 24px;
+        }
+
+        body.night-mode #header-fade::after {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+        }
+
+        body.day-mode #header-fade::after {
+            background-image: radial-gradient(rgba(30, 30, 30, 0.1) 1px, transparent 1px);
+        }
+
+        #header > a {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        #logo {
+            height: 24px;
+            filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(2041%) hue-rotate(344deg) brightness(91%) contrast(93%);
+        }
+
+        #apply-btn {
+            font-family: 'Lora', serif;
+            font-size: clamp(10px, 1vw, 13px);
+            font-style: italic;
+            font-weight: 400;
+            background-color: transparent;
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            padding: 8px 20px;
+            border-radius: 50px;
+            transition: all 0.2s ease;
+        }
+
+        body.night-mode #apply-btn {
+            color: #FFFFFF;
+            border: 1px solid #FFFFFF;
+        }
+
+        body.night-mode #apply-btn:hover {
+            background-color: #FFFFFF;
+            color: #1E1E1E;
+        }
+
+        body.day-mode #apply-btn {
+            color: #1E1E1E;
+            border: 1px solid #1E1E1E;
+        }
+
+        body.day-mode #apply-btn:hover {
+            background-color: #1E1E1E;
+            color: #EFECD4;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: clamp(15px, 3vw, 40px);
+        }
+
+        #nav-menu {
+            display: flex;
+            gap: clamp(12px, 2.5vw, 30px);
+        }
+
+        #nav-menu a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(9px, 0.9vw, 12px);
+            text-decoration: none;
+            letter-spacing: 0.05em;
+            transition: opacity 0.2s ease, color 0.5s ease;
+        }
+
+        body.night-mode #nav-menu a { color: #FFFFFF; }
+        body.day-mode #nav-menu a { color: #1E1E1E; }
+
+        #nav-menu a:hover {
+            opacity: 0.6;
+        }
+
+        /* Mobile menu hamburger - dot matrix style */
+        #menu-toggle {
+            display: none;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            z-index: 101;
+            position: relative;
+        }
+
+        #menu-toggle .dot {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        body.night-mode #menu-toggle .dot { background-color: #FFFFFF; }
+        body.day-mode #menu-toggle .dot { background-color: #1E1E1E; }
+
+        /* Grille 3x3 de points */
+        #menu-toggle .dot:nth-child(1) { top: 0; left: 0; }
+        #menu-toggle .dot:nth-child(2) { top: 0; left: 50%; transform: translateX(-50%); }
+        #menu-toggle .dot:nth-child(3) { top: 0; right: 0; }
+        #menu-toggle .dot:nth-child(4) { top: 50%; left: 0; transform: translateY(-50%); }
+        #menu-toggle .dot:nth-child(5) { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        #menu-toggle .dot:nth-child(6) { top: 50%; right: 0; transform: translateY(-50%); }
+        #menu-toggle .dot:nth-child(7) { bottom: 0; left: 0; }
+        #menu-toggle .dot:nth-child(8) { bottom: 0; left: 50%; transform: translateX(-50%); }
+        #menu-toggle .dot:nth-child(9) { bottom: 0; right: 0; }
+
+        /* Animation vers X */
+        #menu-toggle.open .dot:nth-child(1) { top: 50%; left: 50%; transform: translate(-50%, -50%) translate(-6px, -6px); }
+        #menu-toggle.open .dot:nth-child(2) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(3) { top: 50%; right: auto; left: 50%; transform: translate(-50%, -50%) translate(6px, -6px); }
+        #menu-toggle.open .dot:nth-child(4) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(5) { transform: translate(-50%, -50%); }
+        #menu-toggle.open .dot:nth-child(6) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(7) { bottom: auto; top: 50%; left: 50%; transform: translate(-50%, -50%) translate(-6px, 6px); }
+        #menu-toggle.open .dot:nth-child(8) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(9) { bottom: auto; top: 50%; right: auto; left: 50%; transform: translate(-50%, -50%) translate(6px, 6px); }
+
+        /* Mobile overlay menu - terminal style */
+        #mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 100;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 0 15%;
+            gap: 0;
+        }
+
+        body.night-mode #mobile-menu { background-color: #1E1E1E; }
+        body.day-mode #mobile-menu { background-color: #EFECD4; }
+
+        #mobile-menu.open {
+            display: flex;
+        }
+
+        #mobile-menu a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            padding: 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+        }
+
+        body.night-mode #mobile-menu a {
+            color: #FFFFFF;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        body.night-mode #mobile-menu a:first-child {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.day-mode #mobile-menu a {
+            color: #1E1E1E;
+            border-bottom: 1px solid rgba(30, 30, 30, 0.1);
+        }
+        body.day-mode #mobile-menu a:first-child {
+            border-top: 1px solid rgba(30, 30, 30, 0.1);
+        }
+
+        #mobile-menu a::before {
+            content: attr(data-index);
+            font-size: 10px;
+            opacity: 0.4;
+            min-width: 20px;
+        }
+
+        #mobile-menu a:hover {
+            padding-left: 10px;
+        }
+
+        @media (max-width: 600px) {
+            #nav-menu {
+                display: none;
+            }
+
+            #menu-toggle {
+                display: flex;
+            }
+        }
+
+        /* Content */
+        #content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 8%;
+        }
+
+        /* Hero */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            padding-top: calc(20vh + 10px);
+        }
+
+        .hero h1 {
+            font-family: 'Lora', serif;
+            font-size: clamp(48px, 10vw, 80px);
+            font-weight: 400;
+            font-style: italic;
+            letter-spacing: -0.03em;
+            line-height: 0.9;
+            transition: color 0.5s ease;
+        }
+
+        body.night-mode .hero h1 { color: #FFFFFF; }
+        body.day-mode .hero h1 { color: #1E1E1E; }
+
+        .hero p {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(12px, 1.2vw, 16px);
+            margin-top: 30px;
+            opacity: 0.7;
+            max-width: 500px;
+            line-height: 1.6;
+        }
+
+        /* Events */
+        .events {
+            padding: 40px 0 120px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .events iframe {
+            max-width: 100%;
+            display: block;
+            opacity: 1;
+        }
+
+        body.night-mode .events iframe {
+            background-color: #111111;
+            color-scheme: dark;
+        }
+
+        body.day-mode .events iframe {
+            background-color: #ffffff;
+            color-scheme: light;
+        }
+
+        /* Past Events */
+        .past-events-title {
+            font-family: 'Lora', serif;
+            font-size: clamp(24px, 4vw, 36px);
+            font-weight: 400;
+            font-style: italic;
+            margin-bottom: 30px;
+            transition: color 0.5s ease;
+        }
+
+        body.night-mode .past-events-title { color: #FFFFFF; }
+        body.day-mode .past-events-title { color: #1E1E1E; }
+
+        #past-events {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .past-event-card {
+            border-radius: 12px;
+            overflow: hidden;
+            text-decoration: none;
+            display: block;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        .past-event-card:hover {
+            transform: translateY(-4px);
+            opacity: 0.85;
+        }
+
+        .past-event-card img {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            display: block;
+        }
+
+        .past-event-card .card-info {
+            padding: 14px 16px;
+        }
+
+        .past-event-card .card-date {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.5;
+            margin-bottom: 6px;
+        }
+
+        .past-event-card .card-name {
+            font-family: 'Lora', serif;
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.3;
+            margin-bottom: 4px;
+        }
+
+        .past-event-card .card-location {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            opacity: 0.5;
+        }
+
+        body.night-mode .past-event-card {
+            background-color: #333333;
+            color: #FFFFFF;
+        }
+
+        body.day-mode .past-event-card {
+            background-color: #F0F0F0;
+            color: #1E1E1E;
+        }
+
+        /* Social links */
+        .social {
+            display: flex;
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .social a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            text-decoration: none;
+            opacity: 0.4;
+            letter-spacing: 0.05em;
+            transition: opacity 0.2s, color 0.5s ease;
+        }
+
+        body.night-mode .social a { color: #FFFFFF; }
+        body.day-mode .social a { color: #1E1E1E; }
+
+        .social a:hover {
+            opacity: 1;
+        }
+
+        /* Back link */
+        .back-link {
+            position: fixed;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .back-link a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            text-decoration: none;
+            letter-spacing: 2px;
+            transition: all 0.2s;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 12px 24px;
+            border-radius: 50px;
+        }
+
+        body.night-mode .back-link a {
+            color: #FFFFFF;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        body.night-mode .back-link a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        body.day-mode .back-link a {
+            color: #1E1E1E;
+            background: rgba(239, 236, 212, 0.9);
+            border: 1px solid rgba(30, 30, 30, 0.15);
+        }
+        body.day-mode .back-link a:hover {
+            background: rgba(30, 30, 30, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Dot pattern background -->
+<div class="dot-pattern"></div>
+
+<!-- Fade overlay -->
+<div id="header-fade"></div>
+
+<!-- Header -->
+<div id="header">
+    <a href="../"><img id="logo" src="../assets/logo.png" alt="The Bridge"></a>
+    <div class="header-right">
+        <nav id="nav-menu">
+            <a href="../faq">FAQ</a>
+            <a href="../meet-us">Meet Us</a>
+            <a href="../community">Community</a>
+            <a href="../residency">Residency</a>
+        </nav>
+        <a id="apply-btn" href="../apply">Apply</a>
+        <div id="menu-toggle">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile menu overlay -->
+<div id="mobile-menu">
+    <a href="../" data-index="01">Home</a>
+    <a href="../residency" data-index="02">Residency</a>
+    <a href="../faq" data-index="03">FAQ</a>
+    <a href="../meet-us" data-index="04">Meet Us</a>
+    <a href="../apply" data-index="05">Apply</a>
+</div>
+
+<div id="content">
+    <!-- Hero -->
+    <div class="hero">
+        <h1>Meet Us</h1>
+        <p>We're a team of operators, founders, and investors who believe that talent is universal, but opportunity is not. We work to fix that.</p>
+        <div class="social">
+            <a href="https://www.linkedin.com/company/join-thebridge/posts/?feedView=all">LinkedIn</a>
+            <a href="https://x.com/jointhebridge">X</a>
+            <a href="https://www.youtube.com/@Join_ef">YouTube</a>
+        </div>
+    </div>
+
+    <!-- Events Calendar -->
+    <div class="events">
+        <iframe
+            id="luma-iframe"
+            width="100%"
+            height="700"
+            frameborder="0"
+            style="border: none; border-radius: 12px; opacity: 1;"
+            allowfullscreen=""
+            aria-hidden="false"
+            tabindex="0"
+        ></iframe>
+    </div>
+
+    <!-- Past Events -->
+    <div class="events" style="margin-top: 60px;">
+        <h2 class="past-events-title">Past Events</h2>
+        <div id="past-events"></div>
+    </div>
+</div>
+
+<div class="back-link">
+    <a href="../">BACK TO HOME</a>
+</div>
+
+<script>
+// Day/Night mode detection - same logic as index.html
+function isDayInEurope() {
+    var now = new Date();
+    var europeTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Paris' }));
+    var hour = europeTime.getHours();
+    return hour >= 8 && hour < 19;
+}
+
+var isDay = isDayInEurope();
+
+function applyTheme() {
+    if (isDay) {
+        document.body.classList.remove('night-mode');
+        document.body.classList.add('day-mode');
+    } else {
+        document.body.classList.remove('day-mode');
+        document.body.classList.add('night-mode');
+    }
+}
+
+// Apply theme immediately
+applyTheme();
+
+// Set iframe src based on current theme (only once on load)
+var lumaTheme = isDay ? 'light' : 'dark';
+var lumaIframe = document.getElementById('luma-iframe');
+if (lumaIframe) {
+    lumaIframe.src = 'https://lu.ma/embed/calendar/cal-hEr2YSF6EWS6yPX/events?lt=' + lumaTheme;
+}
+// Past events data (from Luma API - CORS blocks browser fetch)
+var pastEventsData = [
+    { name: 'tbc(afé) Stockholm', start_at: '2026-02-12T13:30:00.000Z', url: 'tbcafe-stockholm', cover_url: 'https://images.lumacdn.com/event-covers/5e/fb6f1eee-59c3-4ea7-80f3-f4e70f7e03a1.png', city: 'Stockholm' },
+    { name: 'PostHog x Founders House x The Bridge', start_at: '2026-02-11T18:00:00.000Z', url: 'aztsnc9y', cover_url: 'https://images.lumacdn.com/event-covers/81/b29cf8db-7267-416c-bce9-10c8a742dfda.png', city: 'Stockholm' },
+    { name: 'tbc(afé) Helsinki', start_at: '2026-02-05T12:00:00.000Z', url: 'tbcafe-helsinki', cover_url: 'https://images.lumacdn.com/event-covers/0u/7934354b-f3a2-41f9-8d50-24821177b539.png', city: 'Helsinki' },
+    { name: 'tbc(afé) Dublin', start_at: '2026-01-21T14:00:00.000Z', url: 'tbcafe-dublin', cover_url: 'https://images.lumacdn.com/event-covers/ky/9dbc6c5f-d186-4668-a469-c5eb688a3ae5.png', city: 'Dublin' },
+    { name: 'tbc(afé) Paris', start_at: '2026-01-16T12:00:00.000Z', url: 'tbcafe-paris', cover_url: 'https://images.lumacdn.com/event-covers/fm/d3bc0320-4c95-49a1-b548-6aef1817e3a9.png', city: 'Paris' },
+    { name: 'The Bridge Retreat: Stockholm edition', start_at: '2025-12-12T17:00:00.000Z', url: 'tbr-stockholm', cover_url: 'https://images.lumacdn.com/event-covers/mz/3be7e97f-5f80-4b47-b7e4-ef697164abc7.png', city: 'Stockholm' },
+    { name: 'The Bridge Retreat: Munich edition', start_at: '2025-11-21T17:00:00.000Z', url: 'tbr-munich', cover_url: 'https://images.lumacdn.com/event-covers/xq/e946707c-cb0b-4505-949d-2fbd29075cf9.png', city: 'Munich' },
+    { name: 'The Bridge Retreat: Zurich edition', start_at: '2025-10-31T17:00:00.000Z', url: 'tbr-zurich', cover_url: 'https://images.lumacdn.com/event-covers/xu/75f29d98-9d58-4af9-8089-9d31f3889f70.png', city: 'Zürich' }
+];
+
+(function() {
+    var container = document.getElementById('past-events');
+    if (!container) return;
+
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    pastEventsData.forEach(function(ev) {
+        var card = document.createElement('a');
+        card.className = 'past-event-card';
+        card.href = 'https://lu.ma/' + ev.url;
+        card.target = '_blank';
+        card.rel = 'noopener';
+
+        var startDate = new Date(ev.start_at);
+        var dateStr = months[startDate.getMonth()] + ' ' + startDate.getDate() + ', ' + startDate.getFullYear();
+
+        card.innerHTML =
+            '<img src="' + ev.cover_url + '" alt="' + ev.name + '">' +
+            '<div class="card-info">' +
+                '<div class="card-date">' + dateStr + '</div>' +
+                '<div class="card-name">' + ev.name + '</div>' +
+                '<div class="card-location">' + ev.city + '</div>' +
+            '</div>';
+
+        container.appendChild(card);
+    });
+})();
+
+// Check every minute if time changed
+setInterval(function() {
+    var newIsDay = isDayInEurope();
+    if (newIsDay !== isDay) {
+        isDay = newIsDay;
+        applyTheme();
+    }
+}, 60000);
+
+// Positionnement du header identique à index.html
+function positionHeader() {
+    var header = document.getElementById('header');
+    var baseSize = Math.min(window.innerWidth, window.innerHeight);
+    var dotSpacing = Math.max(8, baseSize * 0.01);
+    var marginSide = baseSize * 0.035;
+    var marginTop = Math.max(50, baseSize * 0.06);
+
+    // Calculer dotZone comme dans index.html
+    var cols = Math.ceil(window.innerWidth / dotSpacing) + 1;
+    var rows = Math.ceil(window.innerHeight / dotSpacing) + 1;
+
+    var firstDotX, lastDotX, firstDotY;
+    for (var c = 0; c < cols; c++) {
+        var px = c * dotSpacing + dotSpacing / 2;
+        if (px >= marginSide && firstDotX === undefined) firstDotX = px;
+        if (px <= window.innerWidth - marginSide) lastDotX = px;
+    }
+    for (var r = 0; r < rows; r++) {
+        var py = r * dotSpacing + dotSpacing / 2;
+        if (py >= marginTop && firstDotY === undefined) firstDotY = py;
+    }
+
+    var dotZoneX = firstDotX;
+    var dotZoneY = firstDotY;
+    var dotZoneWidth = lastDotX - firstDotX;
+
+    var headerTopMargin = marginSide * 0.5;
+    header.style.top = headerTopMargin + 'px';
+    header.style.height = (dotZoneY - headerTopMargin - 10) + 'px';
+    header.style.paddingLeft = dotZoneX + 'px';
+    header.style.paddingRight = (window.innerWidth - dotZoneX - dotZoneWidth) + 'px';
+
+    var logo = document.getElementById('logo');
+    logo.style.height = Math.max(18, baseSize * 0.03) + 'px';
+}
+
+window.addEventListener('resize', positionHeader);
+positionHeader();
+
+// Mobile menu toggle
+var menuToggle = document.getElementById('menu-toggle');
+var mobileMenu = document.getElementById('mobile-menu');
+
+menuToggle.addEventListener('click', function() {
+    menuToggle.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+});
+</script>
+
+</body>
+</html>

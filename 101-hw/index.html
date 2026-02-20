@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>101 HW - The Bridge</title>
+    <script defer ></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M4JZJVEZE9"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-M4JZJVEZE9');
+    </script>
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;1,400&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #EFECD4; overflow: hidden; height: 100vh; }
+        #canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+        .hero-cta {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            z-index: 10;
+        }
+        .apply-big {
+            display: inline-block;
+            font-family: 'Lora', serif;
+            font-size: clamp(11px, 1.1vw, 14px);
+            font-style: italic;
+            font-weight: 400;
+            color: #1E1E1E;
+            background-color: transparent;
+            border: 1px solid #1E1E1E;
+            border-radius: 50px;
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            padding: 10px 28px;
+            transition: all 0.2s ease;
+        }
+        .apply-big:hover {
+            background-color: #1E1E1E;
+            color: #FFFFFF;
+        }
+        .deadline {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: #E43535;
+            letter-spacing: 0.02em;
+        }
+        @media (max-width: 768px) {
+            .apply-big {
+                padding: 8px 24px;
+                font-size: 10px;
+            }
+            .deadline {
+                font-size: 9px;
+            }
+            .hero-cta {
+                bottom: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<div class="hero-cta">
+    <a href="../apply" class="apply-big">Apply Now</a>
+</div>
+<script>
+var canvas = document.getElementById('canvas');
+var ctx = canvas.getContext('2d');
+
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+function draw() {
+    var w = canvas.width;
+    var h = canvas.height;
+    var px = Math.max(2, Math.floor(Math.min(w, h) / 200));
+
+    // Horizon - très haut pour caméra dans le dos du skater
+    var horizon = h * 0.85;
+    var vanishX = w / 2;
+
+    // Fond beige (tout l'écran)
+    ctx.fillStyle = '#EFECD4';
+    ctx.fillRect(0, 0, w, h);
+
+    // Vanishing point beyond horizon
+    var beyondHorizon = horizon - h * 0.15;
+    var vpX = vanishX;
+    var vpY = beyondHorizon;
+
+    // Bâtiments + route drawn together so road follows building inner edges
+    drawScene(w, h, px, vpX, vpY);
+
+    // Skater
+    drawSkater(w, h, px);
+}
+
+// Pseudo-random pour bâtiments
+function buildingRandom(seed) {
+    var x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
+    return x - Math.floor(x);
+}
+
+function drawScene(w, h, px, vpX, vpY) {
+    var buildingFront = '#B02828';
+    var buildingSide = '#8C1E1E';
+    var windowColor = '#FFD966';
+    var lineColor = 'rgba(30, 30, 30, 0.25)';
+
+    var skaterHeight = px * 18;
+
+    // Depth along the road (0 = bottom/screen, 1 = vanishing point)
+    var depthLeft = 0.12;
+    var depthRight = 0.35;
+
+    // Helper: interpolate a point along a line from a base point to VP at a given t
+    function toVP(x, y, t) {
+        return [x + (vpX - x) * t, y + (vpY - y) * t];
+    }
+
+    // ============================================================
+    // Define building footprints at the bottom of the screen first,
+    // then project them toward VP to get perspective positions
+    // ============================================================
+
+    // LEFT BUILDING - front face anchored at bottom
+    // The inner edge (closest to road center) defines the road's left edge
+    var leftInnerBottom = w * 0.15;   // right edge of left building at screen bottom
+    var leftOuterBottom = w * -0.05;  // left edge of left building at screen bottom
+    var leftBldHeight = 0.55;         // how far up toward VP the building extends (0-1)
+
+    // Project corners toward VP
+    var lBottomRight = [leftInnerBottom, h];
+    var lBottomLeft  = [leftOuterBottom, h];
+    var lTopRight    = toVP(leftInnerBottom, h, leftBldHeight);
+    var lTopLeft     = toVP(leftOuterBottom, h, leftBldHeight);
+
+    // RIGHT BUILDING
+    var rightInnerBottom = w * 0.85;  // left edge of right building at screen bottom
+    var rightOuterBottom = w * 1.05;  // right edge of right building at screen bottom
+    var rightBldHeight = 0.60;
+
+    var rBottomLeft  = [rightInnerBottom, h];
+    var rBottomRight = [rightOuterBottom, h];
+    var rTopLeft     = toVP(rightInnerBottom, h, rightBldHeight);
+    var rTopRight    = toVP(rightOuterBottom, h, rightBldHeight);
+
+    // ============================================================
+    // PAVEMENT - flat color sidewalk
+    // ============================================================
+    ctx.fillStyle = '#B0ADA0';
+    ctx.beginPath();
+    ctx.moveTo(leftOuterBottom, h);
+    ctx.lineTo(leftInnerBottom, h);
+    ctx.lineTo(vpX, vpY);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = '#B0ADA0';
+    ctx.beginPath();
+    ctx.moveTo(rightInnerBottom, h);
+    ctx.lineTo(rightOuterBottom, h);
+    ctx.lineTo(vpX, vpY);
+    ctx.closePath();
+    ctx.fill();
+
+    // ============================================================
+    // ROAD - follows the inner edges of buildings to VP
+    // ============================================================
+    ctx.fillStyle = '#3A3A3A';
+    ctx.beginPath();
+    ctx.moveTo(leftInnerBottom, h);
+    ctx.lineTo(rightInnerBottom, h);
+    ctx.lineTo(vpX, vpY);
+    ctx.closePath();
+    ctx.fill();
+
+    // ============================================================
+    // PERSPECTIVE GUIDE LINES
+    // ============================================================
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = Math.max(1, px * 0.5);
+
+    var allCorners = [lBottomRight, lBottomLeft, lTopRight, lTopLeft, rBottomLeft, rBottomRight, rTopLeft, rTopRight];
+    for (var i = 0; i < allCorners.length; i++) {
+        ctx.beginPath();
+        ctx.moveTo(allCorners[i][0], allCorners[i][1]);
+        ctx.lineTo(vpX, vpY);
+        ctx.stroke();
+    }
+
+    // ============================================================
+    // LINES FROM TOP CORNERS to vanishing point
+    // ============================================================
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = Math.max(1, px * 0.5);
+    // Top-left corner to VP
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(vpX, vpY);
+    ctx.stroke();
+    // Top-right corner to VP
+    ctx.beginPath();
+    ctx.moveTo(w, 0);
+    ctx.lineTo(vpX, vpY);
+    ctx.stroke();
+
+    // ============================================================
+    // VERTICAL HEIGHT LINE at vanishing point
+    // ============================================================
+    ctx.strokeStyle = lineColor;
+    ctx.lineWidth = Math.max(1, px * 0.5);
+    ctx.beginPath();
+    ctx.moveTo(vpX, 0);
+    ctx.lineTo(vpX, h);
+    ctx.stroke();
+
+    // "height" label
+    ctx.save();
+    ctx.font = Math.max(10, px * 3) + 'px IBM Plex Mono, monospace';
+    ctx.fillStyle = 'rgba(30, 30, 30, 0.35)';
+    ctx.textAlign = 'center';
+    ctx.translate(vpX - Math.max(8, px * 2.5), vpY - 20);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('height', 0, 0);
+    ctx.restore();
+
+}
+
+function drawSkater(w, h, px) {
+    var size = px;
+    var centerX = w / 2;
+    var baseY = h * 0.85;
+
+    // Ombre
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.beginPath();
+    ctx.ellipse(centerX, baseY + size * 2, size * 6, size * 1.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Casquette rouge
+    ctx.fillStyle = '#C0392B';
+    ctx.fillRect(centerX - size * 2.5, baseY - size * 18, size * 5, size * 2);
+
+    // Tête
+    ctx.fillStyle = '#6B4423';
+    ctx.fillRect(centerX - size * 1.5, baseY - size * 16, size * 3, size * 2);
+
+    // Cou
+    ctx.fillStyle = '#F5CBA7';
+    ctx.fillRect(centerX - size * 0.5, baseY - size * 14, size * 1, size * 1);
+
+    // T-shirt vert
+    ctx.fillStyle = '#82E0AA';
+    ctx.fillRect(centerX - size * 2, baseY - size * 13, size * 4, size * 5);
+
+    // Bras étendus
+    ctx.fillStyle = '#F5CBA7';
+    ctx.fillRect(centerX - size * 7, baseY - size * 11, size * 5, size * 1.5);
+    ctx.fillRect(centerX + size * 2, baseY - size * 11, size * 5, size * 1.5);
+
+    // Short bleu
+    ctx.fillStyle = '#2980B9';
+    ctx.fillRect(centerX - size * 1.5, baseY - size * 8, size * 3, size * 3);
+
+    // Jambes
+    ctx.fillStyle = '#F5CBA7';
+    ctx.fillRect(centerX - size * 1.5, baseY - size * 5, size * 1, size * 3);
+    ctx.fillRect(centerX + size * 0.5, baseY - size * 5, size * 1, size * 3);
+
+    // Chaussures
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(centerX - size * 2, baseY - size * 2, size * 2, size * 2);
+    ctx.fillRect(centerX, baseY - size * 2, size * 2, size * 2);
+
+    // Skateboard
+    ctx.fillStyle = '#2C3E50';
+    ctx.fillRect(centerX - size * 4, baseY, size * 8, size * 1);
+    // Roues
+    ctx.fillStyle = '#8E44AD';
+    ctx.fillRect(centerX - size * 3.5, baseY + size, size * 1.5, size * 0.8);
+    ctx.fillRect(centerX + size * 2, baseY + size, size * 1.5, size * 0.8);
+}
+
+function animate() {
+    draw();
+    requestAnimationFrame(animate);
+}
+animate();
+</script>
+</body>
+</html>

@@ -1,0 +1,1835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Bridge</title>
+    <!-- Vercel Analytics -->
+    <script defer ></script>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M4JZJVEZE9"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-M4JZJVEZE9');
+    </script>
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #EFECD4;
+            overflow: hidden;
+            height: 100vh;
+            font-family: 'Courier New', monospace;
+            color: #1E1E1E;
+        }
+
+        #dots {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        #content {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* Zone de clipping pour le texte */
+        #text-container {
+            position: absolute;
+            overflow: hidden;
+            /* Sera défini dynamiquement */
+        }
+
+        /* Header */
+        #header {
+            position: fixed;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            pointer-events: auto;
+            /* top et padding seront définis en JS */
+        }
+
+        /* Header background to hide content scrolling underneath */
+        #header-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9;
+            pointer-events: none;
+            /* height sera défini en JS */
+        }
+
+        #header > a {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        #logo {
+            height: 24px;
+            filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(2041%) hue-rotate(344deg) brightness(91%) contrast(93%);
+        }
+
+        #apply-btn {
+            font-family: 'Lora', serif;
+            font-size: clamp(10px, 1vw, 13px);
+            font-style: italic;
+            font-weight: 400;
+            color: #1E1E1E;
+            background-color: transparent;
+            border: 1px solid #1E1E1E;
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            padding: 8px 20px;
+            border-radius: 50px;
+            transition: all 0.2s ease;
+        }
+
+        #apply-btn:hover {
+            opacity: 0.6;
+        }
+
+        body.night-mode #apply-btn:hover {
+            opacity: 0.6;
+        }
+
+        /* Header right side - nav + apply */
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: clamp(15px, 3vw, 40px);
+        }
+
+        #nav-menu {
+            display: flex;
+            gap: clamp(12px, 2.5vw, 30px);
+        }
+
+        #nav-menu a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(9px, 0.9vw, 12px);
+            color: #1E1E1E;
+            text-decoration: none;
+            letter-spacing: 0.05em;
+            transition: opacity 0.2s ease;
+        }
+
+        #nav-menu a:hover {
+            opacity: 0.6;
+        }
+
+        /* Mobile menu hamburger - dot matrix style */
+        #menu-toggle {
+            display: none;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            z-index: 101;
+            position: relative;
+        }
+
+        #menu-toggle .dot {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background-color: #1E1E1E;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        body.night-mode #menu-toggle .dot {
+            background-color: #FFFFFF;
+        }
+
+        /* Grille 3x3 de points */
+        #menu-toggle .dot:nth-child(1) { top: 0; left: 0; }
+        #menu-toggle .dot:nth-child(2) { top: 0; left: 50%; transform: translateX(-50%); }
+        #menu-toggle .dot:nth-child(3) { top: 0; right: 0; }
+        #menu-toggle .dot:nth-child(4) { top: 50%; left: 0; transform: translateY(-50%); }
+        #menu-toggle .dot:nth-child(5) { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        #menu-toggle .dot:nth-child(6) { top: 50%; right: 0; transform: translateY(-50%); }
+        #menu-toggle .dot:nth-child(7) { bottom: 0; left: 0; }
+        #menu-toggle .dot:nth-child(8) { bottom: 0; left: 50%; transform: translateX(-50%); }
+        #menu-toggle .dot:nth-child(9) { bottom: 0; right: 0; }
+
+        /* Animation vers X */
+        #menu-toggle.open .dot:nth-child(1) { top: 50%; left: 50%; transform: translate(-50%, -50%) translate(-6px, -6px); }
+        #menu-toggle.open .dot:nth-child(2) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(3) { top: 50%; right: auto; left: 50%; transform: translate(-50%, -50%) translate(6px, -6px); }
+        #menu-toggle.open .dot:nth-child(4) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(5) { transform: translate(-50%, -50%); }
+        #menu-toggle.open .dot:nth-child(6) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(7) { bottom: auto; top: 50%; left: 50%; transform: translate(-50%, -50%) translate(-6px, 6px); }
+        #menu-toggle.open .dot:nth-child(8) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(9) { bottom: auto; top: 50%; right: auto; left: 50%; transform: translate(-50%, -50%) translate(6px, 6px); }
+
+        /* Mobile overlay menu - terminal style */
+        #mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #EFECD4;
+            z-index: 100;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 0 15%;
+            gap: 0;
+        }
+
+        body.night-mode #mobile-menu {
+            background-color: #1E1E1E;
+        }
+
+        #mobile-menu.open {
+            display: flex;
+        }
+
+        #mobile-menu a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            color: #1E1E1E;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            padding: 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            border-bottom: 1px solid rgba(30, 30, 30, 0.1);
+        }
+
+        #mobile-menu a:first-child {
+            border-top: 1px solid rgba(30, 30, 30, 0.1);
+        }
+
+        #mobile-menu a::before {
+            content: attr(data-index);
+            font-size: 10px;
+            opacity: 0.4;
+            min-width: 20px;
+        }
+
+        body.night-mode #mobile-menu a {
+            color: #FFFFFF;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        #mobile-menu a:hover {
+            padding-left: 10px;
+        }
+
+        @media (max-width: 600px) {
+            #nav-menu {
+                display: none;
+            }
+
+            #menu-toggle {
+                display: flex;
+            }
+        }
+
+        /* Sections de texte */
+        .section {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding-bottom: 10%;
+            will-change: transform, opacity;
+        }
+
+        @media (max-width: 768px) {
+            .section {
+                padding-bottom: 5%;
+            }
+        }
+
+        .section h1 {
+            font-family: 'Lora', serif;
+            font-size: clamp(18px, 3vw, 36px);
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            line-height: 1.5;
+            text-transform: none;
+            padding: 0 20px;
+        }
+
+        .section h1 em {
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .section p {
+            font-family: 'Instrument Sans', sans-serif;
+            font-size: clamp(10px, 1.1vw, 14px);
+            margin-top: clamp(15px, 3vh, 35px);
+            letter-spacing: 0.08em;
+            padding: 0 20px;
+            text-transform: uppercase;
+        }
+
+        .section p.subtitle {
+            font-family: 'IBM Plex Mono', monospace;
+            text-transform: none;
+            letter-spacing: 0.03em;
+            font-size: clamp(10px, 1.1vw, 15px);
+            opacity: 0.6;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .section .small {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(10px, 1vw, 13px);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            opacity: 1;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        /* Hero section spéciale */
+        .section[data-section="0"] h1 {
+            font-size: clamp(32px, 6vw, 72px);
+            font-weight: 400;
+            line-height: 1.2;
+        }
+
+        /* Backed By section - founders cloud */
+        .founders-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: clamp(15px, 3vw, 40px);
+            max-width: 800px;
+            padding: 0 20px;
+            margin-top: clamp(15px, 3vh, 30px);
+        }
+
+        .founder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .founder em {
+            font-family: 'Lora', serif;
+            font-size: clamp(14px, 1.8vw, 22px);
+            font-style: italic;
+            font-weight: 400;
+            white-space: nowrap;
+        }
+
+        .founder small {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(8px, 0.7vw, 10px);
+            opacity: 0.5;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        @media (max-width: 768px) {
+            .founders-cloud {
+                gap: 15px 10px;
+                max-width: 340px;
+            }
+            /* Row 1: 1 founder */
+            .founders-cloud .founder:nth-child(1) {
+                flex-basis: 100%;
+            }
+            /* Row 2: 2 founders */
+            .founders-cloud .founder:nth-child(2),
+            .founders-cloud .founder:nth-child(3) {
+                flex-basis: 45%;
+            }
+            /* Row 3: 3 founders */
+            .founders-cloud .founder:nth-child(4),
+            .founders-cloud .founder:nth-child(5),
+            .founders-cloud .founder:nth-child(6) {
+                flex-basis: 30%;
+            }
+            .founder {
+                font-size: 13px;
+            }
+            .founder small {
+                font-size: 8px;
+            }
+        }
+
+        /* Backed by section - and many others */
+        .section p.and-more {
+            font-family: 'Lora', serif;
+            font-size: clamp(11px, 1.2vw, 16px);
+            font-style: italic;
+            font-weight: 400;
+            margin-top: 20px;
+            opacity: 1;
+            text-transform: none;
+            letter-spacing: 0.02em;
+        }
+
+        /* Apply section */
+        .section[data-section="3"] .ef-stats {
+            font-family: 'Lora', serif;
+            font-size: clamp(24px, 4vw, 48px);
+            font-style: italic;
+            font-weight: 400;
+            margin-top: 10px;
+            text-transform: none;
+            letter-spacing: 0.02em;
+        }
+
+        .section[data-section="3"] .ef-investors {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(10px, 1vw, 14px);
+            margin-top: 15px;
+            opacity: 0.6;
+            text-transform: none;
+            letter-spacing: 0.03em;
+            max-width: 600px;
+            line-height: 1.6;
+            position: relative;
+            z-index: 100;
+        }
+
+        .section[data-section="3"] .ef-investors a {
+            color: inherit;
+            text-decoration: none;
+            transition: opacity 0.2s ease;
+            pointer-events: auto;
+            position: relative;
+            z-index: 100;
+        }
+
+        .section[data-section="3"] .ef-investors a:hover {
+            opacity: 0.6;
+        }
+
+        .section[data-section="4"] .faq-link {
+            font-family: 'Lora', serif;
+            font-style: italic;
+            font-size: clamp(12px, 1.1vw, 15px);
+            margin-top: 30px;
+            opacity: 0.7;
+            text-transform: none;
+            letter-spacing: 0.02em;
+        }
+
+        .section[data-section="4"] .faq-link a {
+            color: inherit;
+            text-decoration: underline;
+            pointer-events: auto;
+            transition: opacity 0.2s;
+        }
+
+        .section[data-section="4"] .faq-link a:hover {
+            opacity: 0.7;
+        }
+
+        .apply-big {
+            display: inline-block;
+            font-family: 'Lora', serif;
+            font-size: clamp(11px, 1.1vw, 14px);
+            font-style: italic;
+            font-weight: 400;
+            color: #1E1E1E;
+            background-color: transparent;
+            border: 1px solid #1E1E1E;
+            border-radius: 50px;
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            padding: 10px 28px;
+            margin-top: clamp(20px, 4vh, 40px);
+            transition: all 0.2s ease;
+            pointer-events: auto;
+        }
+
+        .apply-big:hover {
+            background-color: #1E1E1E;
+            color: #FFFFFF;
+        }
+
+        body.night-mode .apply-big {
+            color: #FFFFFF;
+            border-color: #FFFFFF;
+        }
+
+        body.night-mode .apply-big:hover {
+            background-color: #FFFFFF;
+            color: #1E1E1E;
+        }
+
+        .hero-cta {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-top: clamp(20px, 4vh, 40px);
+        }
+
+        .hero-cta .apply-big {
+            margin-top: 0;
+        }
+
+        .hero-cta .deadline {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: #E43535;
+            letter-spacing: 0.02em;
+        }
+
+        body.night-mode .hero-cta .deadline {
+            color: #E43535;
+        }
+
+        @media (max-width: 768px) {
+            .apply-big {
+                padding: 8px 24px;
+                font-size: 10px;
+            }
+            .hero-cta .deadline {
+                font-size: 9px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+<canvas id="dots"></canvas>
+
+<div id="content">
+    <div id="text-container">
+        <!-- Section 1 - Hero -->
+        <div class="section" data-section="0">
+            <h1>
+                The <em>fastest</em> way<br>
+                to Silicon Valley.
+            </h1>
+            <p class="subtitle">A residency in San Francisco for those who want to start massive companies.</p>
+            <div class="hero-cta">
+                <a href="apply" class="apply-big">Apply Now</a>
+            </div>
+        </div>
+
+        <!-- Section 2 - Who is this for -->
+        <div class="section" data-section="1">
+            <p class="small">Who is this for</p>
+            <h1>
+                Start at stage 0.<br>Build the foundations of a <em>generational</em> company.
+            </h1>
+            <p class="subtitle">For non-US founders at the very beginning: pre-idea, pre-team, or just getting started.</p>
+        </div>
+
+        <!-- Section 3 - The Program -->
+        <div class="section" data-section="2">
+            <p class="small">The Program</p>
+            <h1>
+                Live with us in San Francisco.<br>Build with <em>peers</em>.<br>Raise from the best.
+            </h1>
+            <p class="subtitle">We invest a $250k first check and help you close your first round (alumni have raised from Sequoia, Founders Fund, Benchmark, Index…)</p>
+        </div>
+
+        <!-- Section 4 - Built by EF -->
+        <div class="section" data-section="3">
+            <p class="small">Built by Entrepreneurs First</p>
+            <p class="ef-stats">$16B+ in portfolio value</p>
+            <p class="ef-investors"><a href="https://www.meetcleo.com" target="_blank">Cleo</a> (unicorn) • <a href="https://aztec.network" target="_blank">Aztec Network</a> (a16z) • <a href="https://www.gensyn.ai" target="_blank">Gensyn</a> (a16z) • <a href="https://poly.ai" target="_blank">PolyAI</a> (Khosla) • <a href="https://neptune-robotics.com/" target="_blank">Neptune Robotics</a> (Sequoia) • <a href="https://magdrive.space/" target="_blank">Magdrive</a> (Founders Fund)</p>
+        </div>
+
+        <!-- Section 5 - Backed By -->
+        <div class="section" data-section="4">
+            <p class="small">As part of EF, we're backed by</p>
+            <div class="founders-cloud">
+                <span class="founder"><em>Patrick & John Collison</em><small>Stripe</small></span>
+                <span class="founder"><em>Demis Hassabis</em><small>DeepMind</small></span>
+                <span class="founder"><em>Daniel Gross</em><small>Safe Superintelligence</small></span>
+                <span class="founder"><em>Nat Friedman</em><small>GitHub</small></span>
+                <span class="founder"><em>Reid Hoffman</em><small>LinkedIn</small></span>
+                <span class="founder"><em>Mustafa Suleyman</em><small>Microsoft AI</small></span>
+            </div>
+            <p class="and-more" style="margin-top: 35px;">and many others.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Header par-dessus tout -->
+<div id="header">
+    <a href="./"><img id="logo" src="assets/logo.png" alt="The Bridge"></a>
+    <div class="header-right">
+        <nav id="nav-menu">
+            <a href="faq">FAQ</a>
+            <a href="meet-us">Meet Us</a>
+            <a href="community">Community</a>
+            <a href="residency">Residency</a>
+        </nav>
+        <a id="apply-btn" href="apply">Apply</a>
+        <div id="menu-toggle">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile menu overlay -->
+<div id="mobile-menu">
+    <a href="./" data-index="01">Home</a>
+    <a href="residency" data-index="02">Residency</a>
+    <a href="faq" data-index="03">FAQ</a>
+    <a href="meet-us" data-index="04">Meet Us</a>
+    <a href="apply" data-index="05">Apply</a>
+</div>
+
+<!-- Header background overlay -->
+<div id="header-bg"></div>
+
+<script>
+var canvas = document.getElementById('dots');
+var ctx = canvas.getContext('2d');
+var textContainer = document.getElementById('text-container');
+var header = document.getElementById('header');
+var sections = document.querySelectorAll('.section');
+
+var scrollPos = 0;
+var maxScroll;
+var pixelSize, margin;
+
+// Calculer la zone des points
+var dotZone = { x: 0, y: 0, width: 0, height: 0 };
+
+// Position Y du pont (centre du pont où le texte doit être aligné)
+var bridgeCenterY = 0;
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    var baseSize = Math.min(canvas.width, canvas.height);
+    var isMobile = canvas.width < 768;
+
+    // Pixel size pour style 8-bit (pixels plus gros sur mobile)
+    pixelSize = isMobile ? Math.max(5, Math.floor(baseSize * 0.008)) : Math.max(4, Math.floor(baseSize * 0.005));
+
+    // Marge uniquement en haut (plus de marges latérales)
+    var marginSide = baseSize * 0.035;  // Gardé pour le header
+    var marginTop = Math.max(50, baseSize * 0.06);
+    margin = 0;
+
+    maxScroll = canvas.width * (sections.length - 1);
+
+    // Zone de rendu - pleine largeur
+    dotZone.x = 0;
+    dotZone.y = marginTop;
+    dotZone.width = canvas.width;
+    dotZone.height = canvas.height - marginTop;
+
+    // Position Y du centre du pont
+    var isMobile = canvas.width < 768;
+    var roadY = canvas.height * (isMobile ? 0.92 : 0.88);
+    var bridgeScale = isMobile ? 0.6 : 1;
+    var towerHeight = canvas.height * 0.25 * bridgeScale;
+    var towerTop = roadY - towerHeight;
+    bridgeCenterY = towerTop + towerHeight * 0.3;
+
+    // Appliquer la zone au container de texte
+    textContainer.style.left = dotZone.x + 'px';
+    textContainer.style.top = dotZone.y + 'px';
+    textContainer.style.width = dotZone.width + 'px';
+    textContainer.style.height = dotZone.height + 'px';
+
+    // Positionner le header (aligné comme les autres pages)
+    // Calculer dotZoneX comme dans manifesto/faq/etc
+    var dotSpacing = Math.max(8, baseSize * 0.01);
+    var cols = Math.ceil(canvas.width / dotSpacing) + 1;
+    var rows = Math.ceil(canvas.height / dotSpacing) + 1;
+    var firstDotX, lastDotX, firstDotY;
+    for (var c = 0; c < cols; c++) {
+        var px = c * dotSpacing + dotSpacing / 2;
+        if (px >= marginSide && firstDotX === undefined) firstDotX = px;
+        if (px <= canvas.width - marginSide) lastDotX = px;
+    }
+    for (var r = 0; r < rows; r++) {
+        var py = r * dotSpacing + dotSpacing / 2;
+        if (py >= marginTop && firstDotY === undefined) firstDotY = py;
+    }
+    var dotZoneX = firstDotX;
+    var dotZoneY = firstDotY;
+    var dotZoneWidth = lastDotX - firstDotX;
+
+    var headerTopMargin = marginSide * 0.5;
+    header.style.top = headerTopMargin + 'px';
+    header.style.height = (dotZoneY - headerTopMargin - 10) + 'px';
+    header.style.paddingLeft = dotZoneX + 'px';
+    header.style.paddingRight = (canvas.width - dotZoneX - dotZoneWidth) + 'px';
+
+    var headerBg = document.getElementById('header-bg');
+    headerBg.style.height = (dotZone.y - pixelSize / 2) + 'px';
+
+    var logo = document.getElementById('logo');
+    logo.style.height = Math.max(18, baseSize * 0.03) + 'px';
+
+    sections.forEach(function(section, i) {
+        section.style.width = dotZone.width + 'px';
+        section.style.left = '0px';
+    });
+
+    // Régénérer nuages et bâtiments selon la taille d'écran
+    if (typeof generateClouds === 'function') {
+        generateClouds();
+    }
+    if (typeof generateBuildings === 'function') {
+        generateBuildings();
+    }
+    // Précalculer les nuages statiques
+    if (typeof updateStaticCloudPositions === 'function') {
+        updateStaticCloudPositions();
+    }
+}
+
+// Générateur de nombres pseudo-aléatoires avec seed pour consistance
+function seededRandom(seed) {
+    var x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+}
+
+// Nuages pixel art - gros nuages allongés avec volume (blanc = lumière en haut, gris = ombre en bas)
+// Valeurs: 0 = vide, 1 = gris (ombre/bords), 2 = blanc pur (centre lumineux)
+var cloudPatterns = [
+    // Très gros nuage allongé 1 (30x7) - fluffy avec volume
+    [
+        [0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0],
+        [0, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0],
+        [0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0],
+        [0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 0],
+        [1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 0],
+        [0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 0, 0],
+        [0, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+    ],
+    // Très gros nuage allongé 2 (28x6) - plus plat avec volume
+    [
+        [0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0],
+        [0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0],
+        [0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 0],
+        [1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 0],
+        [0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 0, 0],
+    ],
+    // Gros nuage allongé 3 (24x6) - ondulé avec volume
+    [
+        [0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0],
+        [0, 0, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0],
+        [0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 0],
+        [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 0],
+        [1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1],
+        [0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 0, 0],
+    ],
+    // Gros nuage allongé 4 (22x5) - simple et long avec volume
+    [
+        [0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0],
+        [0, 0, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 0, 0, 0],
+        [0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 0],
+        [1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 0],
+        [0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 0, 0],
+    ],
+    // Gros nuage très allongé 5 (26x5) - stratus doux avec volume
+    [
+        [0, 0, 2, 2, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 2, 0, 0],
+        [0, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 0],
+        [1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
+        [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1],
+        [0, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 0, 0],
+    ],
+];
+
+// === NUAGES STATIQUES - plus nombreux et mieux répartis ===
+var clouds = [];
+var numClouds = 28;
+
+function generateClouds() {
+    clouds = [];
+    var isMobile = window.innerWidth < 768;
+
+    if (isMobile) {
+        // Mobile : nuages GROS et imposants sur les 5 sections
+        var cloudsPerSection = 3;  // 3 gros nuages par section
+        var totalClouds = 5 * cloudsPerSection;
+
+        for (var section = 0; section < 5; section++) {
+            for (var j = 0; j < cloudsPerSection; j++) {
+                var i = section * cloudsPerSection + j;
+
+                // Positions variées dans chaque section
+                var xPositions = [0.15, 0.5, 0.75];
+                var yPositions = [0.08, 0.18, 0.12];
+
+                var xBase = section + xPositions[j];
+                var yBase = yPositions[j];
+
+                // Décalages aléatoires
+                var xRandom = (seededRandom(i * 111.111) - 0.5) * 0.15;
+                var yRandom = (seededRandom(i * 222.222) - 0.5) * 0.04;
+
+                // GROS nuages - patterns 0-1 (les plus gros) et grande taille
+                var patternIndex = Math.floor(seededRandom(i * 999.999) * 2);
+                var cloudSize = 1.0 + seededRandom(i * 333.333) * 0.6;  // Taille x2 !
+
+                clouds.push({
+                    xRatio: xBase + xRandom,
+                    yRatio: yBase + yRandom,
+                    size: cloudSize,
+                    pattern: patternIndex,
+                    opacity: 0.20 + seededRandom(i * 555.555) * 0.15
+                });
+            }
+        }
+        return;
+    }
+
+    // Desktop : beaucoup de nuages répartis sur les 5 sections
+    var count = numClouds;
+
+    for (var i = 0; i < count; i++) {
+        var rand = seededRandom(i * 777.777);
+        var patternIndex, cloudSize;
+
+        if (rand < 0.4) {
+            patternIndex = Math.floor(seededRandom(i * 888.888) * 2);
+            cloudSize = 1.4 + seededRandom(i * 333.333) * 0.6;
+        } else {
+            patternIndex = 2 + Math.floor(seededRandom(i * 999.999) * 3);
+            cloudSize = 1.0 + seededRandom(i * 333.333) * 0.5;
+        }
+
+        var section = Math.floor(i / (count / 5));
+        var inSectionPos = (i % (count / 5)) / (count / 5);
+
+        clouds.push({
+            xRatio: section + inSectionPos + seededRandom(i * 111.111) * 0.3,
+            yRatio: 0.08 + seededRandom(i * 222.222) * 0.20,
+            size: cloudSize,
+            pattern: patternIndex,
+            opacity: 0.20 + seededRandom(i * 555.555) * 0.15
+        });
+    }
+}
+
+generateClouds();
+
+// Cache pour positions des nuages (calculé une fois au resize)
+var cloudPositions = [];
+
+// Précalculer les nuages (appelé une seule fois au resize)
+function updateStaticCloudPositions() {
+    cloudPositions = [];
+    for (var i = 0; i < clouds.length; i++) {
+        var cloud = clouds[i];
+        var cloudY = cloud.yRatio * canvas.height;
+        var cloudRow = Math.floor(cloudY / pixelSize);
+        var pattern = cloudPatterns[cloud.pattern];
+        var patternHeight = Math.ceil(pattern.length * cloud.size);
+
+        cloudPositions.push({
+            xRatio: cloud.xRatio,
+            row: cloudRow,
+            size: cloud.size,
+            pattern: cloud.pattern,
+            opacity: cloud.opacity,
+            maxRow: cloudRow + patternHeight,
+            minRow: cloudRow
+        });
+    }
+}
+
+function getCloudOpacity(x, y, col, row) {
+    // Early exit si trop bas (nuages jusqu'à 45% de l'écran)
+    if (y > canvas.height * 0.45) return 0;
+
+    for (var i = 0; i < cloudPositions.length; i++) {
+        var cp = cloudPositions[i];
+
+        // Early exit si hors zone verticale
+        if (row < cp.minRow || row > cp.maxRow) continue;
+
+        // Position en colonne basée sur xRatio et scroll (parallax léger)
+        var cloudCol = Math.floor((cp.xRatio * canvas.width - scrollPos * 0.2) / pixelSize);
+
+        var relCol = col - cloudCol;
+        var relRow = row - cp.row;
+
+        var scaledCol = Math.floor(relCol / cp.size);
+        var scaledRow = Math.floor(relRow / cp.size);
+
+        var pattern = cloudPatterns[cp.pattern];
+        if (scaledRow >= 0 && scaledRow < pattern.length) {
+            var patternRow = pattern[scaledRow];
+            if (scaledCol >= 0 && scaledCol < patternRow.length) {
+                var pixelValue = patternRow[scaledCol];
+                if (pixelValue === 2) {
+                    // Blanc pur (centre lumineux) - opacité normale
+                    return { type: 'white', opacity: cp.opacity };
+                } else if (pixelValue === 1) {
+                    // Gris (ombre/bords) - opacité plus forte pour contraste
+                    return { type: 'gray', opacity: cp.opacity * 1.3 };
+                }
+            }
+        }
+    }
+
+    return 0;
+}
+
+// Générateur pseudo-aléatoire pour bâtiments consistants
+function buildingRandom(seed) {
+    var x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
+    return x - Math.floor(x);
+}
+
+// Skyline de bâtiments style 8-bit
+var cityBuildings = [];
+var numBuildings = 60;
+
+function generateBuildings() {
+    cityBuildings = [];
+    var isMobile = window.innerWidth < 768;
+    var count = isMobile ? 25 : numBuildings;
+
+    for (var b = 0; b < count; b++) {
+        cityBuildings.push({
+            xRatio: b / count + buildingRandom(b * 11) * 0.02,
+            widthRatio: isMobile ? 0.025 + buildingRandom(b * 22) * 0.025 : 0.012 + buildingRandom(b * 22) * 0.018,
+            heightRatio: isMobile ? 0.06 + buildingRandom(b * 33) * 0.12 : 0.08 + buildingRandom(b * 33) * 0.18,
+            hasAntenna: buildingRandom(b * 44) > 0.7,
+            windowRows: Math.floor(isMobile ? 2 + buildingRandom(b * 55) * 3 : 3 + buildingRandom(b * 55) * 6),
+            windowCols: Math.floor(2 + buildingRandom(b * 66) * 2),
+            depth: buildingRandom(b * 77)
+        });
+    }
+}
+
+// Générer les bâtiments une seule fois
+generateBuildings();
+
+function getSkylineOpacity(x, y) {
+    var bridgeOffset = scrollPos;
+    var worldX = x + bridgeOffset;
+    var spanWidth = canvas.width;
+    var currentSpan = Math.floor(worldX / spanWidth);
+    var localX = worldX % spanWidth;
+    if (localX < 0) localX += spanWidth;
+    var t = localX / spanWidth;
+
+    var isMobile = canvas.width < 768;
+    var roadY = canvas.height * (isMobile ? 0.94 : 0.90);
+    var baseY = roadY;
+    var h = canvas.height;
+    var bridgeScale = isMobile ? 0.6 : 1;
+    var towerHeight = h * 0.32 * bridgeScale;
+    var towerTop = roadY - towerHeight;
+
+    // Couleurs BRETAGNE / VIRGIN ISLANDS - roches, vert sauvage, côte
+    var rockDark = isDay
+        ? {r: 95, g: 90, b: 82, a: 0.85}        // Granit foncé
+        : {r: 35, g: 33, b: 30, a: 0.9};
+    var rockLight = isDay
+        ? {r: 140, g: 135, b: 125, a: 0.75}     // Granit clair
+        : {r: 50, g: 48, b: 45, a: 0.8};
+    var grassWild = isDay
+        ? {r: 25, g: 110, b: 25, a: 0.8}        // NES green
+        : {r: 25, g: 55, b: 28, a: 0.85};
+    var grassLight = isDay
+        ? {r: 55, g: 145, b: 50, a: 0.7}        // NES green light
+        : {r: 35, g: 65, b: 35, a: 0.75};
+
+    var shoreColor = isDay
+        ? {r: 235, g: 160, b: 60, a: 0.85}      // Coucher de soleil
+        : {r: 30, g: 30, b: 30, a: 0.85};
+
+    var buildingColor = isDay
+        ? {r: 180, g: 40, b: 40, a: 0.5}
+        : {r: 60, g: 60, b: 80, a: 0.4};
+
+    var windowColor = isDay
+        ? {r: 255, g: 200, b: 100, a: 0.7}
+        : {r: 255, g: 220, b: 100, a: 0.8};
+
+    // === SECTION 0 - Côte européenne avec relief ===
+    if (currentSpan === 0) {
+        // Les deux collines convergent vers le niveau du pont (baseY) à droite
+
+        // Colline arrière-plan (lointaine, claire) - plus grande avec plus de relief
+        var backHeight = h * 0.10 * (1 - t * 0.85)
+            + Math.sin(t * Math.PI * 2.5) * h * 0.025 * (1 - t)
+            + Math.sin(t * Math.PI * 4 + 0.5) * h * 0.012 * (1 - t);
+        var backBase = baseY - h * 0.05 * (1 - t);  // Descend vers baseY
+        if (backHeight > 0 && y >= backBase - backHeight && y <= backBase) {
+            return grassLight;
+        }
+
+        // Colline premier plan (proche, foncée) avec plus de relief
+        var frontHeight = h * 0.07 * (1 - t * 0.9)
+            + Math.sin(t * Math.PI * 3 + 1) * h * 0.03 * (1 - t)
+            + Math.sin(t * Math.PI * 5 + 2) * h * 0.015 * (1 - t);
+        if (frontHeight > 0 && y >= baseY - frontHeight && y <= baseY) {
+            // Partie haute = végétation
+            if (y < baseY - frontHeight * 0.4) {
+                return grassWild;
+            }
+            // Partie basse = roche
+            return rockDark;
+        }
+    }
+
+    // Transition vers le pont - colline s'abaisse progressivement pour rejoindre le tablier
+    if (currentSpan === 1 && t < 0.25) {
+        var fade = 1 - t / 0.25;
+        // Courbe douce pour une transition naturelle
+        var easeFade = fade * fade;
+        var hillFade = h * 0.025 * easeFade;
+        if (hillFade > 0 && y >= baseY - hillFade && y <= baseY) return rockDark;
+    }
+
+    // === CÔTE DROITE + SECTION 4 - Colline rocheuse avec bâtiments DEVANT ===
+    // Fonction pour calculer la hauteur de la colline à une position donnée
+    var getHillHeight = function(spanNum, tPos) {
+        if (spanNum === 3 && tPos > 0.85) {
+            return h * 0.025 * ((tPos - 0.85) / 0.15);
+        } else if (spanNum === 4) {
+            var hillMax = h * 0.025;
+            if (tPos < 0.7) {
+                return hillMax;
+            } else {
+                return hillMax * (1 - (tPos - 0.7) / 0.3);
+            }
+        }
+        return 0;
+    };
+
+    var hillHeight = getHillHeight(currentSpan, t);
+    var hillTop = baseY - hillHeight;
+
+    // Bâtiments DEVANT la colline (section 4) - dessinés en premier
+    if (currentSpan === 4) {
+        var skylineBaseY = baseY - h * 0.015;  // Bâtiments légèrement au-dessus pour montrer la colline
+        var skylineTopY = skylineBaseY - h * 0.35;
+        var buildingLocalX = localX;
+
+        for (var b = 0; b < cityBuildings.length; b++) {
+            var building = cityBuildings[b];
+            var buildingX = building.xRatio * spanWidth;
+            var buildingW = building.widthRatio * spanWidth * 1.5;
+            var buildingH = building.heightRatio * h * 0.8;
+
+            if (buildingLocalX >= buildingX && buildingLocalX < buildingX + buildingW) {
+                var buildingTop = skylineBaseY - buildingH;
+                buildingTop = Math.max(buildingTop, skylineTopY);
+
+                if (y >= buildingTop && y < skylineBaseY) {
+                    // Couleur du bâtiment selon sa profondeur (depth)
+                    // Plus depth est élevé = plus loin = plus clair et transparent
+                    var d = building.depth;
+                    var thisBuildingColor, thisWindowColor;
+
+                    if (isDay) {
+                        // Jour : du rouge foncé (proche) au rouge pâle (loin)
+                        thisBuildingColor = {
+                            r: Math.round(140 + d * 60),      // 140-200
+                            g: Math.round(30 + d * 40),       // 30-70
+                            b: Math.round(30 + d * 40),       // 30-70
+                            a: 0.7 - d * 0.25                 // 0.7-0.45
+                        };
+                        thisWindowColor = {
+                            r: 255,
+                            g: Math.round(180 + d * 40),
+                            b: Math.round(80 + d * 40),
+                            a: 0.8 - d * 0.2
+                        };
+                    } else {
+                        // Nuit : silhouettes sombres plus visibles
+                        thisBuildingColor = {
+                            r: Math.round(25 + d * 20),
+                            g: Math.round(25 + d * 20),
+                            b: Math.round(35 + d * 25),
+                            a: 0.9 - d * 0.15
+                        };
+                        thisWindowColor = {
+                            r: 255,
+                            g: Math.round(200 + d * 30),
+                            b: Math.round(80 + d * 40),
+                            a: 0.9 - d * 0.2
+                        };
+                    }
+
+                    // Antenne sur certains bâtiments
+                    if (building.hasAntenna && y < buildingTop + pixelSize * 3) {
+                        var antennaX = buildingX + buildingW / 2;
+                        if (Math.abs(buildingLocalX - antennaX) < pixelSize * 0.5) {
+                            return thisBuildingColor;
+                        }
+                    }
+
+                    // Fenêtres (grille régulière)
+                    var relX = buildingLocalX - buildingX;
+                    var relY = y - buildingTop;
+
+                    var windowW = buildingW / (building.windowCols * 2);
+                    var windowH = (skylineBaseY - buildingTop) / (building.windowRows * 2);
+
+                    var winCol = Math.floor(relX / (buildingW / building.windowCols));
+                    var winRow = Math.floor(relY / ((skylineBaseY - buildingTop) / building.windowRows));
+
+                    var inWindowX = (relX % (buildingW / building.windowCols)) > windowW * 0.3 &&
+                                    (relX % (buildingW / building.windowCols)) < windowW * 1.5;
+                    var inWindowY = (relY % ((skylineBaseY - buildingTop) / building.windowRows)) > windowH * 0.3 &&
+                                    (relY % ((skylineBaseY - buildingTop) / building.windowRows)) < windowH * 1.5;
+
+                    var windowLit = buildingRandom(b * 100 + winCol * 10 + winRow) > 0.4;
+
+                    if (inWindowX && inWindowY && windowLit) {
+                        return thisWindowColor;
+                    }
+
+                    return thisBuildingColor;
+                }
+            }
+        }
+    }
+
+    // Dessiner la colline rocheuse DERRIÈRE les bâtiments (sections 3 fin + 4)
+    if ((currentSpan === 3 && t > 0.85) || currentSpan === 4) {
+        if (y >= hillTop && y <= baseY) {
+            return rockDark;
+        }
+    }
+
+    return 0;
+}
+
+function getBridgeOpacity(x, y) {
+    var bridgeOffset = scrollPos;
+    var isMobile = canvas.width < 768;
+    var bridgeScale = isMobile ? 0.6 : 1;
+
+    var roadY = canvas.height * (isMobile ? 0.92 : 0.88);
+    var towerHeight = canvas.height * 0.38 * bridgeScale;
+    var towerTop = roadY - towerHeight;
+
+    var worldX = x + bridgeOffset;
+    var bridgeEnd = canvas.width * 5;
+    if (worldX > bridgeEnd) return {opacity: 0};
+
+    var spanWidth = canvas.width;
+    var localX = worldX % spanWidth;
+    if (localX < 0) localX += spanWidth;
+    var currentSpan = Math.floor(worldX / spanWidth);
+    var t = localX / spanWidth;
+
+    // === TRANSITIONS PROGRESSIVES DU PONT ===
+    // Le pont reste AU NIVEAU du sol (roadY), jamais en dessous
+
+    // CÔTÉ GAUCHE (section 0 → 1) : pont arrive au niveau du sol
+    var leftTransitionEnd = 0.15;  // Transition courte au début
+
+    // CÔTÉ DROIT (section 3 → 4) : pont rejoint le niveau du sol
+    var rightTransitionStart = 0.85;  // Transition commence à 85% de section 3
+
+    // Calculer le roadY ajusté pour les transitions (reste à roadY, pas en dessous)
+    var adjustedRoadY = roadY;
+    var adjustedTowerTop = towerTop;
+
+    // Transition GAUCHE : le câble descend progressivement vers le tablier
+    if (currentSpan === 1 && t < leftTransitionEnd) {
+        var transitionT = t / leftTransitionEnd;  // 0 à 1
+        // Courbe douce pour que le câble rejoigne sa courbe normale
+        var easeT = 1 - Math.pow(1 - transitionT, 2);
+        // Le tablier reste au niveau roadY, seul le câble s'ajuste
+        adjustedTowerTop = roadY - (roadY - towerTop) * easeT * 0.3;
+    }
+
+    // Transition DROITE : le câble converge vers le tablier
+    if (currentSpan === 3 && t > rightTransitionStart) {
+        var transitionT = (t - rightTransitionStart) / (1 - rightTransitionStart);  // 0 à 1
+        // Le tablier reste au niveau roadY
+        // Seul le câble converge doucement
+        adjustedTowerTop = towerTop + (roadY - towerTop) * transitionT * 0.5;
+    }
+
+    // Garder l'ancienne variable pour compatibilité
+    var transitionStart = rightTransitionStart;
+    var hillBaseY = roadY;  // Le sol est au niveau de la route
+
+    // Palette de couleurs style pixel art
+    var bridgeMain = isDay ? {r: 205, g: 92, b: 68} : {r: 160, g: 60, b: 45};
+    var bridgeLight = isDay ? {r: 225, g: 130, b: 95} : {r: 190, g: 90, b: 70};
+    var bridgeDark = isDay ? {r: 175, g: 62, b: 48} : {r: 130, g: 40, b: 30};
+    var bridgeDeep = isDay ? {r: 140, g: 45, b: 35} : {r: 100, g: 25, b: 20};
+
+    // === TOURS du Golden Gate - Style massif avec arches ===
+    var towerWidth = pixelSize * 8;
+    var towerGap = pixelSize * 2;
+
+    var tower1X = Math.round((spanWidth * 2) / pixelSize) * pixelSize;
+    var tower2X = Math.round((spanWidth * 3) / pixelSize) * pixelSize;
+
+    // Tours principales (au-dessus de la route)
+    if (y >= towerTop && y <= roadY + pixelSize * 2) {
+        // Arrondir worldX à la grille de pixels pour stabilité
+        var pixelWorldX = Math.round(worldX / pixelSize) * pixelSize;
+        var distToTower1 = Math.abs(pixelWorldX - tower1X);
+        var distToTower2 = Math.abs(pixelWorldX - tower2X);
+
+        if (distToTower1 < towerWidth || distToTower2 < towerWidth) {
+            var towerX = distToTower1 < distToTower2 ? tower1X : tower2X;
+            // Calculer la position relative en pixels entiers
+            var relPixels = Math.round((pixelWorldX - towerX) / pixelSize);
+            var relYPixels = Math.round((roadY - y) / pixelSize);
+            var towerHeightPixels = Math.round(towerHeight / pixelSize);
+
+            // Traverse au sommet (2 pixels de haut)
+            if (relYPixels >= towerHeightPixels - 2 && relYPixels <= towerHeightPixels) {
+                if (relPixels >= -3 && relPixels <= 3) {
+                    if (relPixels < 0) return {color: bridgeLight, opacity: 1};
+                    if (relPixels === 0) return {color: bridgeMain, opacity: 1};
+                    return {color: bridgeDark, opacity: 1};
+                }
+            }
+
+            // Traverse du milieu
+            var midHeight = Math.round(towerHeightPixels * 0.5);
+            if (relYPixels >= midHeight - 1 && relYPixels <= midHeight) {
+                if (relPixels >= -1 && relPixels <= 1) {
+                    return {color: bridgeDark, opacity: 1};
+                }
+            }
+
+            // Pilier gauche (pixels -3 à -1)
+            if (relPixels >= -3 && relPixels <= -1) {
+                if (relPixels === -3) return {color: bridgeLight, opacity: 1};
+                if (relPixels === -2) return {color: bridgeMain, opacity: 1};
+                return {color: bridgeDark, opacity: 1};
+            }
+
+            // Pilier droit (pixels 1 à 3)
+            if (relPixels >= 1 && relPixels <= 3) {
+                if (relPixels === 1) return {color: bridgeLight, opacity: 1};
+                if (relPixels === 2) return {color: bridgeMain, opacity: 1};
+                return {color: bridgeDark, opacity: 1};
+            }
+        }
+    }
+
+    // === PILIERS DE SOUTIEN sous les tours (descendent dans l'eau) ===
+    var pillarDepth = pixelSize * 8;  // Profondeur des piliers sous la route
+    if (y > roadY && y < roadY + pillarDepth) {
+        var distToTower1 = Math.abs(worldX - tower1X);
+        var distToTower2 = Math.abs(worldX - tower2X);
+
+        if (distToTower1 < towerWidth || distToTower2 < towerWidth) {
+            var towerX = distToTower1 < distToTower2 ? tower1X : tower2X;
+            var pixelWorldX = Math.round(worldX / pixelSize) * pixelSize;
+            var relPixels = Math.round((pixelWorldX - towerX) / pixelSize);
+
+            // Pilier gauche sous la route (pixels -3 à -1)
+            if (relPixels >= -3 && relPixels <= -1) {
+                if (relPixels === -3) return {color: bridgeMain, opacity: 0.9};
+                if (relPixels === -2) return {color: bridgeDark, opacity: 0.85};
+                return {color: bridgeDeep, opacity: 0.8};
+            }
+
+            // Pilier droit sous la route (pixels 1 à 3)
+            if (relPixels >= 1 && relPixels <= 3) {
+                if (relPixels === 1) return {color: bridgeMain, opacity: 0.9};
+                if (relPixels === 2) return {color: bridgeDark, opacity: 0.85};
+                return {color: bridgeDeep, opacity: 0.8};
+            }
+        }
+    }
+
+    // === CÂBLE PRINCIPAL ===
+    var mainSag = (roadY - towerTop) * 0.85;
+    var cableY = roadY + 1000;
+
+    if (currentSpan === 1) {
+        // Câble qui monte depuis le début (transition gauche)
+        var baseCableY = roadY - t * t * (roadY - towerTop);
+        if (t < leftTransitionEnd) {
+            var transitionT = t / leftTransitionEnd;
+            var easeT = 1 - Math.pow(1 - transitionT, 2);
+            // Câble monte depuis adjustedRoadY
+            cableY = adjustedRoadY + (baseCableY - adjustedRoadY) * easeT;
+        } else {
+            cableY = baseCableY;
+        }
+    } else if (currentSpan === 2) {
+        cableY = towerTop + 4 * t * (1 - t) * mainSag;
+    } else if (currentSpan === 3) {
+        // Câble qui descend vers la fin (transition droite)
+        var baseCableY = roadY - (1 - t) * (1 - t) * (roadY - towerTop);
+        if (t > transitionStart) {
+            var transitionT = (t - transitionStart) / (1 - transitionStart);
+            // Câble converge vers adjustedRoadY
+            cableY = baseCableY + (adjustedRoadY - baseCableY) * transitionT;
+        } else {
+            cableY = baseCableY;
+        }
+    }
+
+    // Ne pas dessiner le câble dans les zones de transition extrêmes
+    var showCable = currentSpan >= 1 && currentSpan <= 3;
+    if (currentSpan === 1 && t < 0.05) showCable = false;  // Câble commence progressivement
+    if (currentSpan === 3 && t > 0.95) showCable = false;  // Câble se termine
+
+    if (showCable) {
+        // Exclure la zone des poteaux
+        var distToTower1Cable = Math.abs(worldX - tower1X);
+        var distToTower2Cable = Math.abs(worldX - tower2X);
+        var nearTowerCable = distToTower1Cable < pixelSize * 4 || distToTower2Cable < pixelSize * 4;
+
+        if (!nearTowerCable) {
+            if (Math.abs(y - cableY) <= pixelSize * 0.6) {
+                return {color: bridgeMain, opacity: 1};
+            }
+        }
+    }
+
+    // === SUSPENTES ===
+    // Ne pas dessiner les suspentes dans les zones de transition extrêmes
+    var showSuspenders = currentSpan >= 1 && currentSpan <= 3;
+    if (currentSpan === 1 && t < 0.08) showSuspenders = false;  // Suspentes commencent progressivement
+    if (currentSpan === 3 && t > 0.92) showSuspenders = false;  // Suspentes se terminent avant le câble
+
+    if (showSuspenders) {
+        // Exclure la zone des poteaux (périmètre réduit)
+        var distToTower1 = Math.abs(worldX - tower1X);
+        var distToTower2 = Math.abs(worldX - tower2X);
+        var nearTower = distToTower1 < pixelSize * 4 || distToTower2 < pixelSize * 4;
+
+        if (!nearTower) {
+            var suspenderSpacing = isMobile ? pixelSize * 12 : pixelSize * 8;
+            var pixelLocalX = Math.round(localX / pixelSize) * pixelSize;
+            var suspenderIndex = Math.round(pixelLocalX / suspenderSpacing);
+            var suspenderX = suspenderIndex * suspenderSpacing;
+
+            if (Math.abs(pixelLocalX - suspenderX) < pixelSize * 0.6) {
+                var sT = suspenderX / spanWidth;
+                var sCableY;
+                if (currentSpan === 1) {
+                    sCableY = roadY - sT * sT * (roadY - towerTop);
+                } else if (currentSpan === 2) {
+                    sCableY = towerTop + 4 * sT * (1 - sT) * mainSag;
+                } else {
+                    sCableY = roadY - (1 - sT) * (1 - sT) * (roadY - towerTop);
+                }
+
+                // Les suspentes vont du câble jusqu'au tablier (roadY)
+                if (y > sCableY + pixelSize * 2 && y < roadY - pixelSize * 2) {
+                    return {color: bridgeDark, opacity: 0.7};
+                }
+            }
+        }
+    }
+
+    // === TABLIER (route) ===
+    // Le tablier reste toujours au niveau roadY (niveau du sol)
+    var showRoad = currentSpan >= 1 && currentSpan <= 3;
+    if (currentSpan === 1 && t < 0.02) showRoad = false;  // Route commence progressivement
+    if (currentSpan === 3 && t > 0.98) showRoad = false;  // Route se termine
+
+    if (showRoad) {
+        // Le tablier reste toujours au niveau roadY
+        var currentRoadY = roadY;
+        var roadRow = Math.round(currentRoadY / pixelSize);
+        var pixelRoadY = roadRow * pixelSize;
+
+        if (Math.abs(y - pixelRoadY) <= pixelSize * 0.5) {
+            return {color: bridgeMain, opacity: 1};
+        }
+        if (Math.abs(y - (pixelRoadY + pixelSize)) <= pixelSize * 0.5) {
+            return {color: bridgeDark, opacity: 1};
+        }
+        if (Math.abs(y - (pixelRoadY + pixelSize * 2)) <= pixelSize * 0.5) {
+            return {color: bridgeDeep, opacity: 0.9};
+        }
+    }
+
+    return {opacity: 0};
+}
+
+function getWaterOpacity(x, y) {
+    var isMobile = canvas.width < 768;
+    var roadY = canvas.height * (isMobile ? 0.94 : 0.90);
+    var bridgeOffset = scrollPos;
+    var worldX = x + bridgeOffset;
+    var waveGap = pixelSize * 2;
+    var waveThickness = pixelSize * 0.4;
+
+    // Eau sur toutes les sections
+    var bridgeEnd = canvas.width * 5;
+    if (worldX > bridgeEnd) return 0;
+
+    if (y > roadY + waveGap) {
+        var time = Date.now() * 0.0008;
+        var waveAmplitude = pixelSize * 0.3;
+        var wave1 = Math.sin((worldX * 0.015) + time) * waveAmplitude;
+        var wave2 = Math.sin((worldX * 0.02) + time * 1.3) * waveAmplitude;
+        var wave3 = Math.sin((worldX * 0.028) + time * 0.9) * waveAmplitude;
+
+        var waveY1 = roadY + waveGap * 1.5 + wave1;
+        var waveY2 = roadY + waveGap * 2.2 + wave2;
+        var waveY3 = roadY + waveGap * 2.9 + wave3;
+        var waveY4 = roadY + waveGap * 3.6 + wave1 * 0.8;
+        var waveY5 = roadY + waveGap * 4.3 + wave2 * 0.7;
+        var waveY6 = roadY + waveGap * 5.0 + wave3 * 0.6;
+
+        if (Math.abs(y - waveY1) < waveThickness) return 0.4;
+        if (Math.abs(y - waveY2) < waveThickness) return 0.35;
+        if (Math.abs(y - waveY3) < waveThickness) return 0.3;
+        if (Math.abs(y - waveY4) < waveThickness) return 0.25;
+        if (Math.abs(y - waveY5) < waveThickness) return 0.2;
+        if (Math.abs(y - waveY6) < waveThickness) return 0.15;
+    }
+    return 0;
+}
+
+// Calculer si c'est le jour ou la nuit en Europe (Paris)
+function isDayInEurope() {
+    var now = new Date();
+    var europeTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Paris' }));
+    var hour = europeTime.getHours();
+    var month = europeTime.getMonth();
+
+    // Mode jour de 8h à 19h
+    return hour >= 8 && hour < 19;
+}
+
+// Mode initial basé sur l'heure de Paris
+var isDay = isDayInEurope();
+var userOverride = false;
+
+// Position du soleil/lune pour détecter les clics
+var sunClickArea = { x: 0, y: 0, radius: 0 };
+
+// Vérifier toutes les minutes si l'heure a changé
+setInterval(function() {
+    if (!userOverride) {
+        isDay = isDayInEurope();
+    }
+}, 60000);
+
+
+function draw() {
+    // Les nuages sont statiques, pas besoin de mise à jour chaque frame
+
+    // Couleurs selon le mode jour/nuit
+    var bgColor, dotColor, dotColorAlpha;
+    var scrollProgress = scrollPos / maxScroll;
+
+    if (isDay) {
+        // Mode jour
+        bgColor = 'rgb(239, 236, 212)'; // #EFECD4
+        dotColor = 'rgb(30, 30, 30)';
+        dotColorAlpha = 'rgba(30, 30, 30,';
+    } else {
+        // Mode nuit
+        bgColor = 'rgb(30, 30, 30)';
+        dotColor = 'rgb(255, 255, 255)';
+        dotColorAlpha = 'rgba(255, 255, 255,';
+    }
+
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Mettre à jour le body aussi
+    document.body.style.backgroundColor = bgColor;
+    document.getElementById('content').style.color = dotColor;
+    // header-bg stays transparent so dots pattern shows through
+
+    // Ajouter/retirer la classe night-mode pour le hover du bouton
+    if (isDay) {
+        document.body.classList.remove('night-mode');
+    } else {
+        document.body.classList.add('night-mode');
+    }
+
+    // Mettre à jour les couleurs du header selon le mode
+    var navLinks = document.querySelectorAll('#nav-menu a');
+    navLinks.forEach(function(link) {
+        link.style.color = dotColor;
+    });
+    var applyBtn = document.getElementById('apply-btn');
+    applyBtn.style.color = dotColor;
+    applyBtn.style.borderColor = dotColor;
+
+    // Soleil ou Lune - position basée sur le scroll
+    var sunX = canvas.width * 0.1 + (canvas.width * 0.8) * scrollProgress;
+    var sunArc = Math.sin(scrollProgress * Math.PI);
+    // Arc moins prononcé sur mobile (ratio hauteur/largeur > 1.2 = portrait)
+    var arcHeight = (canvas.height / canvas.width > 1.2) ? canvas.height * 0.35 : canvas.height * 0.5;
+    var sunY = canvas.height * 0.7 - sunArc * arcHeight;
+    var sunRadius = Math.max(15, Math.min(canvas.width, canvas.height) * 0.03);
+
+    // Mettre à jour la zone cliquable du soleil/lune
+    sunClickArea.x = sunX;
+    sunClickArea.y = sunY;
+    sunClickArea.radius = sunRadius * 2.5; // Zone un peu plus grande pour faciliter le clic
+
+    // Couleur du soleil/lune selon le mode et la position
+    var sunR, sunG, sunB;
+    if (isDay) {
+        // Soleil coucher de soleil - orange chaud
+        if (scrollProgress < 0.2) {
+            var t = scrollProgress / 0.2;
+            sunR = 255;
+            sunG = 120 + Math.round(t * 60);
+            sunB = 40 + Math.round(t * 20);
+        } else if (scrollProgress < 0.5) {
+            var t = (scrollProgress - 0.2) / 0.3;
+            sunR = 255;
+            sunG = 180 + Math.round(t * 30);
+            sunB = 60 - Math.round(t * 30);
+        } else if (scrollProgress < 0.8) {
+            sunR = 255;
+            sunG = 210;
+            sunB = 30;
+        } else {
+            var t = (scrollProgress - 0.8) / 0.2;
+            sunR = 255;
+            sunG = 210 - Math.round(t * 80);
+            sunB = 30 + Math.round(t * 30);
+        }
+    } else {
+        // Lune - blanc/gris
+        sunR = 200;
+        sunG = 200;
+        sunB = 200;
+    }
+    var sunColorAlpha = 'rgba(' + sunR + ',' + sunG + ',' + sunB + ',';
+
+    // Précalculer les bornes pour éviter les calculs dans la boucle
+    var startCol = Math.floor(dotZone.x / pixelSize);
+    var endCol = Math.ceil((dotZone.x + dotZone.width) / pixelSize);
+    var startRow = Math.floor(dotZone.y / pixelSize);
+    var endRow = Math.ceil((dotZone.y + dotZone.height) / pixelSize);
+
+    // Précalculer le temps pour les étoiles
+    var starTime = Date.now() * 0.001;
+
+    for (var row = startRow; row <= endRow; row++) {
+        var y = row * pixelSize + pixelSize / 2;
+
+        for (var col = startCol; col <= endCol; col++) {
+            var x = col * pixelSize + pixelSize / 2;
+
+            // Calcul prioritaire : pont d'abord (le plus important visuellement)
+            var bridgeResult = getBridgeOpacity(x, y);
+
+            // Si c'est le pont, dessiner avec la couleur appropriée
+            if (bridgeResult.opacity > 0.1) {
+                if (bridgeResult.color) {
+                    ctx.fillStyle = 'rgba(' + bridgeResult.color.r + ',' + bridgeResult.color.g + ',' + bridgeResult.color.b + ',' + bridgeResult.opacity + ')';
+                } else {
+                    ctx.fillStyle = 'rgba(235,160,60,' + bridgeResult.opacity + ')';
+                }
+                ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                continue;
+            }
+
+            // Skyline (bâtiments)
+            var skylineOpacity = getSkylineOpacity(x, y);
+            if (skylineOpacity && typeof skylineOpacity === 'object') {
+                ctx.fillStyle = 'rgba(' + skylineOpacity.r + ',' + skylineOpacity.g + ',' + skylineOpacity.b + ',' + skylineOpacity.a + ')';
+                ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                continue;
+            }
+
+
+            // Soleil/Lune - dessiné en premier (passera DERRIÈRE les nuages)
+            var dx = x - sunX;
+            var dy = y - sunY;
+            var distToSunSq = dx * dx + dy * dy;
+            var sunRadiusSq = sunRadius * sunRadius;
+
+            // Dessiner le soleil/lune SANS continue pour permettre aux nuages de se superposer
+            if (distToSunSq < sunRadiusSq) {
+                ctx.fillStyle = sunColorAlpha + '1)';
+                ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                // Pas de continue - les nuages pourront se dessiner par-dessus
+            } else if (distToSunSq < sunRadiusSq * 4) {
+                var sunOpacity = Math.max(0, 1 - Math.sqrt(distToSunSq) / (sunRadius * 2)) * 0.5;
+                if (sunOpacity > 0.1) {
+                    ctx.fillStyle = sunColorAlpha + sunOpacity + ')';
+                    ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                    // Pas de continue - les nuages pourront se dessiner par-dessus
+                }
+            }
+
+            // Nuages (jour seulement) ou Étoiles (nuit)
+            if (isDay) {
+                // Mode jour : nuages
+                if (y > dotZone.y) {
+                    var cloudResult = getCloudOpacity(x, y, col, row);
+                    if (cloudResult && cloudResult.opacity > 0.03) {
+                        var inSunZone = distToSunSq < sunRadiusSq * 4;
+                        if (inSunZone) {
+                            ctx.fillStyle = 'rgb(239, 236, 212)';
+                            ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                        }
+                        if (cloudResult.type === 'white') {
+                            ctx.fillStyle = 'rgba(30, 30, 30, ' + (cloudResult.opacity * 0.35) + ')';
+                        } else {
+                            ctx.fillStyle = 'rgba(30, 30, 30, ' + (cloudResult.opacity * 0.5) + ')';
+                        }
+                        ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                        continue;
+                    }
+                }
+            } else {
+                // Mode nuit : étoiles random avec fade progressif
+                var starSeed = (col * 374761 + row * 668999) ^ (col * row * 97);
+                starSeed = ((starSeed >> 16) ^ starSeed) * 0x45d9f3b;
+                starSeed = (starSeed >> 16) ^ starSeed;
+
+                var skyRatio = y / canvas.height;
+                // Fade progressif : pleine intensité en haut, disparaît vers 80%
+                var fadeFactor = Math.max(0, 1 - (skyRatio / 0.8));
+
+                if (skyRatio < 0.8 && (Math.abs(starSeed) % 350) < 1) {
+                    var baseOpacity = 0.3 + (Math.abs(starSeed) % 50) / 70;
+                    var opacity = baseOpacity * fadeFactor;
+                    if (opacity > 0.1) {
+                        ctx.fillStyle = 'rgba(255, 255, 255, ' + opacity + ')';
+                        ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                    }
+                }
+            }
+
+            // Si on était dans le soleil/lune mais pas dans un nuage, on a déjà dessiné, on continue
+            if (distToSunSq < sunRadiusSq || (distToSunSq < sunRadiusSq * 4 && Math.max(0, 1 - Math.sqrt(distToSunSq) / (sunRadius * 2)) * 0.5 > 0.1)) {
+                continue;
+            }
+
+            // Eau
+            var waterOpacity = getWaterOpacity(x, y);
+            if (waterOpacity > 0.1) {
+                ctx.fillStyle = dotColorAlpha + waterOpacity + ')';
+                ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                continue;
+            }
+
+            // Fond par défaut - transparent (même couleur que le background)
+            // Ne rien dessiner pour laisser le background apparaître
+        }
+    }
+
+    // Mettre à jour la position des sections
+    sections.forEach(function(section, i) {
+        var offset = i * canvas.width - scrollPos;
+        section.style.transform = 'translateX(' + offset + 'px)';
+    });
+}
+
+function animate() {
+    draw();
+    requestAnimationFrame(animate);
+}
+
+function handleScroll(e) {
+    e.preventDefault();
+    // Scroll vertical (haut/bas) OU horizontal (gauche/droite)
+    var delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+    scrollPos += delta * 2;
+    if (scrollPos < 0) scrollPos = 0;
+    if (scrollPos > maxScroll) scrollPos = maxScroll;
+}
+
+// Events
+document.body.addEventListener('wheel', handleScroll, { passive: false });
+
+var touchStartX = 0;
+var touchStartY = 0;
+var touchStartScroll = 0;
+var touchLastX = 0;
+var touchLastY = 0;
+var touchLastTime = 0;
+var touchVelocity = 0;
+var momentumAnimationId = null;
+
+document.addEventListener('touchstart', function(e) {
+    // Arrêter l'animation d'inertie en cours
+    if (momentumAnimationId) {
+        cancelAnimationFrame(momentumAnimationId);
+        momentumAnimationId = null;
+    }
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchLastX = touchStartX;
+    touchLastY = touchStartY;
+    touchStartScroll = scrollPos;
+    touchLastTime = Date.now();
+    touchVelocity = 0;
+});
+
+document.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+    var currentX = e.touches[0].clientX;
+    var currentY = e.touches[0].clientY;
+    var currentTime = Date.now();
+    var deltaTime = currentTime - touchLastTime;
+
+    // Calculer le delta en X et Y
+    var deltaX = touchLastX - currentX;
+    var deltaY = touchLastY - currentY;
+
+    // Utiliser le delta le plus grand (horizontal ou vertical)
+    var delta = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY;
+
+    // Calculer la vélocité (pixels par milliseconde)
+    if (deltaTime > 0) {
+        touchVelocity = delta / deltaTime;
+    }
+
+    // Scroll basé sur X ou Y (le plus grand mouvement)
+    var diffX = touchStartX - currentX;
+    var diffY = touchStartY - currentY;
+    var diff = Math.abs(diffX) > Math.abs(diffY) ? diffX : diffY;
+
+    scrollPos = touchStartScroll + diff * 2;
+    if (scrollPos < 0) scrollPos = 0;
+    if (scrollPos > maxScroll) scrollPos = maxScroll;
+
+    touchLastX = currentX;
+    touchLastY = currentY;
+    touchLastTime = currentTime;
+}, { passive: false });
+
+document.addEventListener('touchend', function(e) {
+    // Appliquer l'inertie si la vélocité est suffisante
+    if (Math.abs(touchVelocity) > 0.1) {
+        var velocity = touchVelocity * 2000; // Convertir en pixels par seconde, amplifier
+        var friction = 0.95; // Coefficient de friction (plus proche de 1 = plus d'inertie)
+
+        function momentumScroll() {
+            velocity *= friction;
+            scrollPos += velocity * 0.016; // ~60fps, donc 16ms par frame
+
+            // Limites
+            if (scrollPos < 0) {
+                scrollPos = 0;
+                velocity = 0;
+            }
+            if (scrollPos > maxScroll) {
+                scrollPos = maxScroll;
+                velocity = 0;
+            }
+
+            // Continuer tant que la vélocité est significative
+            if (Math.abs(velocity) > 0.5) {
+                momentumAnimationId = requestAnimationFrame(momentumScroll);
+            } else {
+                momentumAnimationId = null;
+            }
+        }
+
+        momentumAnimationId = requestAnimationFrame(momentumScroll);
+    }
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight') {
+        scrollPos += 400;
+        if (scrollPos > maxScroll) scrollPos = maxScroll;
+    } else if (e.key === 'ArrowLeft') {
+        scrollPos -= 400;
+        if (scrollPos < 0) scrollPos = 0;
+    }
+});
+
+// Clic sur le soleil/lune pour changer de thème
+canvas.addEventListener('click', function(e) {
+    var rect = canvas.getBoundingClientRect();
+    var clickX = e.clientX - rect.left;
+    var clickY = e.clientY - rect.top;
+
+    var dist = Math.sqrt(
+        (clickX - sunClickArea.x) * (clickX - sunClickArea.x) +
+        (clickY - sunClickArea.y) * (clickY - sunClickArea.y)
+    );
+
+    if (dist < sunClickArea.radius) {
+        isDay = !isDay;
+        userOverride = true;
+        // Reset après 1 heure pour revenir au mode automatique
+        setTimeout(function() { userOverride = false; }, 3600000);
+    }
+});
+
+// Changer le curseur quand on survole le soleil/lune
+canvas.addEventListener('mousemove', function(e) {
+    var rect = canvas.getBoundingClientRect();
+    var mouseX = e.clientX - rect.left;
+    var mouseY = e.clientY - rect.top;
+
+    var dist = Math.sqrt(
+        (mouseX - sunClickArea.x) * (mouseX - sunClickArea.x) +
+        (mouseY - sunClickArea.y) * (mouseY - sunClickArea.y)
+    );
+
+    canvas.style.cursor = dist < sunClickArea.radius ? 'pointer' : 'default';
+});
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+animate();
+
+// Mobile menu toggle
+var menuToggle = document.getElementById('menu-toggle');
+var mobileMenu = document.getElementById('mobile-menu');
+
+menuToggle.addEventListener('click', function() {
+    menuToggle.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+});
+
+</script>
+
+</body>
+</html>

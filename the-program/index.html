@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Program - The Bridge</title>
+    <!-- Vercel Analytics -->
+    <script defer ></script>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M4JZJVEZE9"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-M4JZJVEZE9');
+    </script>
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #EFECD4;
+            overflow: hidden;
+            height: 100vh;
+            font-family: 'Courier New', monospace;
+            color: #1E1E1E;
+        }
+
+        #dots {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Video billboard */
+        #billboard-video {
+            position: fixed;
+            z-index: 2;
+            object-fit: cover;
+            pointer-events: none;
+            border: none;
+            display: none;
+            background-color: #1a1a1a;
+        }
+
+        /* Contrôles vidéo */
+        #video-controls {
+            position: fixed;
+            z-index: 3;
+            display: none;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 10px;
+            pointer-events: auto;
+            background: linear-gradient(transparent 0%, rgba(0,0,0,0.5) 100%);
+        }
+
+        #video-controls .controls-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #video-controls button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 5px;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        #video-controls button:hover {
+            opacity: 1;
+        }
+
+        #video-controls button svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+
+        #video-controls .progress-container {
+            flex: 1;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        #video-controls .progress-bar {
+            height: 100%;
+            background: white;
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        #video-controls .time {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: white;
+            opacity: 0.8;
+            min-width: 70px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            #video-controls {
+                padding: 6px;
+            }
+            #video-controls button svg {
+                width: 16px;
+                height: 16px;
+            }
+            #video-controls .time {
+                font-size: 9px;
+                min-width: 55px;
+            }
+            #video-controls .controls-bar {
+                gap: 6px;
+            }
+        }
+
+        #content {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* Zone de clipping pour le texte */
+        #text-container {
+            position: absolute;
+            overflow: hidden;
+            /* Sera défini dynamiquement */
+        }
+
+        /* Header */
+        #header {
+            position: fixed;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            pointer-events: auto;
+            /* top et padding seront définis en JS */
+        }
+
+        /* Header background to hide content scrolling underneath */
+        #header-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9;
+            pointer-events: none;
+            /* height sera défini en JS */
+        }
+
+        #header > a {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        #logo {
+            height: 24px;
+            filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(2041%) hue-rotate(344deg) brightness(91%) contrast(93%);
+        }
+
+        #apply-btn {
+            font-family: 'Lora', serif;
+            font-size: clamp(10px, 1vw, 13px);
+            font-style: italic;
+            font-weight: 400;
+            color: #1E1E1E;
+            background-color: transparent;
+            border: 1px solid #1E1E1E;
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            padding: 8px 20px;
+            border-radius: 50px;
+            transition: all 0.2s ease;
+        }
+
+        #apply-btn:hover {
+            opacity: 0.6;
+        }
+
+        body.night-mode #apply-btn:hover {
+            opacity: 0.6;
+        }
+
+        /* Header right side - nav + apply */
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: clamp(15px, 3vw, 40px);
+        }
+
+        #nav-menu {
+            display: flex;
+            gap: clamp(12px, 2.5vw, 30px);
+        }
+
+        #nav-menu a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(9px, 0.9vw, 12px);
+            color: #1E1E1E;
+            text-decoration: none;
+            letter-spacing: 0.05em;
+            transition: opacity 0.2s ease;
+        }
+
+        #nav-menu a:hover {
+            opacity: 0.6;
+        }
+
+        /* Mobile menu hamburger - dot matrix style */
+        #menu-toggle {
+            display: none;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            z-index: 101;
+            position: relative;
+        }
+
+        #menu-toggle .dot {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background-color: #1E1E1E;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        body.night-mode #menu-toggle .dot {
+            background-color: #FFFFFF;
+        }
+
+        /* Grille 3x3 de points */
+        #menu-toggle .dot:nth-child(1) { top: 0; left: 0; }
+        #menu-toggle .dot:nth-child(2) { top: 0; left: 50%; transform: translateX(-50%); }
+        #menu-toggle .dot:nth-child(3) { top: 0; right: 0; }
+        #menu-toggle .dot:nth-child(4) { top: 50%; left: 0; transform: translateY(-50%); }
+        #menu-toggle .dot:nth-child(5) { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        #menu-toggle .dot:nth-child(6) { top: 50%; right: 0; transform: translateY(-50%); }
+        #menu-toggle .dot:nth-child(7) { bottom: 0; left: 0; }
+        #menu-toggle .dot:nth-child(8) { bottom: 0; left: 50%; transform: translateX(-50%); }
+        #menu-toggle .dot:nth-child(9) { bottom: 0; right: 0; }
+
+        /* Animation vers X */
+        #menu-toggle.open .dot:nth-child(1) { top: 50%; left: 50%; transform: translate(-50%, -50%) translate(-6px, -6px); }
+        #menu-toggle.open .dot:nth-child(2) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(3) { top: 50%; right: auto; left: 50%; transform: translate(-50%, -50%) translate(6px, -6px); }
+        #menu-toggle.open .dot:nth-child(4) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(5) { transform: translate(-50%, -50%); }
+        #menu-toggle.open .dot:nth-child(6) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(7) { bottom: auto; top: 50%; left: 50%; transform: translate(-50%, -50%) translate(-6px, 6px); }
+        #menu-toggle.open .dot:nth-child(8) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(9) { bottom: auto; top: 50%; right: auto; left: 50%; transform: translate(-50%, -50%) translate(6px, 6px); }
+
+        /* Mobile overlay menu - terminal style */
+        #mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #EFECD4;
+            z-index: 100;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 0 15%;
+            gap: 0;
+        }
+
+        body.night-mode #mobile-menu {
+            background-color: #1E1E1E;
+        }
+
+        #mobile-menu.open {
+            display: flex;
+        }
+
+        #mobile-menu a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            color: #1E1E1E;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            padding: 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            border-bottom: 1px solid rgba(30, 30, 30, 0.1);
+        }
+
+        #mobile-menu a:first-child {
+            border-top: 1px solid rgba(30, 30, 30, 0.1);
+        }
+
+        #mobile-menu a::before {
+            content: attr(data-index);
+            font-size: 10px;
+            opacity: 0.4;
+            min-width: 20px;
+        }
+
+        body.night-mode #mobile-menu a {
+            color: #FFFFFF;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        #mobile-menu a:hover {
+            padding-left: 10px;
+        }
+
+        @media (max-width: 600px) {
+            #nav-menu {
+                display: none;
+            }
+
+            #menu-toggle {
+                display: flex;
+            }
+        }
+
+        /* Sections de texte */
+        .section {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding-bottom: 10%;
+            will-change: transform, opacity;
+        }
+
+        @media (max-width: 768px) {
+            .section {
+                padding-bottom: 5%;
+            }
+        }
+
+        .section h1 {
+            font-family: 'Lora', serif;
+            font-size: clamp(18px, 3vw, 36px);
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            line-height: 1.5;
+            text-transform: none;
+            padding: 0 20px;
+        }
+
+        .section h1 em {
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .section p {
+            font-family: 'Instrument Sans', sans-serif;
+            font-size: clamp(10px, 1.1vw, 14px);
+            margin-top: clamp(15px, 3vh, 35px);
+            letter-spacing: 0.08em;
+            padding: 0 20px;
+            text-transform: uppercase;
+        }
+
+        .section p.subtitle {
+            font-family: 'IBM Plex Mono', monospace;
+            text-transform: none;
+            letter-spacing: 0.03em;
+            font-size: clamp(10px, 1vw, 14px);
+            opacity: 0.6;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .section .small {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(10px, 1vw, 13px);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            opacity: 1;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        /* Hero section spéciale */
+        .section[data-section="0"] h1 {
+            font-size: clamp(32px, 6vw, 72px);
+            font-weight: 400;
+            line-height: 1.2;
+        }
+
+        /* Backed By section - founders cloud */
+        .founders-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: clamp(15px, 3vw, 40px);
+            max-width: 800px;
+            padding: 0 20px;
+            margin-top: clamp(15px, 3vh, 30px);
+        }
+
+        .founder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .founder em {
+            font-family: 'Lora', serif;
+            font-size: clamp(14px, 1.8vw, 22px);
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .founder small {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(8px, 0.7vw, 10px);
+            opacity: 0.5;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        @media (max-width: 768px) {
+            .founders-cloud {
+                gap: 12px;
+            }
+            .founder {
+                font-size: 13px;
+            }
+            .founder small {
+                font-size: 8px;
+            }
+        }
+
+        /* Backed by section - and many others */
+        .section p.and-more {
+            font-family: 'Lora', serif;
+            font-size: clamp(11px, 1.2vw, 16px);
+            font-style: italic;
+            font-weight: 400;
+            margin-top: 20px;
+            opacity: 1;
+            text-transform: none;
+            letter-spacing: 0.02em;
+        }
+
+        /* Apply section */
+        .section[data-section="4"] .ef-stats {
+            font-family: 'Lora', serif;
+            font-size: clamp(24px, 4vw, 48px);
+            font-style: italic;
+            font-weight: 400;
+            margin-top: 10px;
+            text-transform: none;
+            letter-spacing: 0.02em;
+        }
+
+        .section[data-section="4"] .ef-investors {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(10px, 1vw, 14px);
+            margin-top: 15px;
+            opacity: 0.6;
+            text-transform: none;
+            letter-spacing: 0.03em;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .section[data-section="4"] .faq-link {
+            font-family: 'Lora', serif;
+            font-style: italic;
+            font-size: clamp(12px, 1.1vw, 15px);
+            margin-top: 30px;
+            opacity: 0.7;
+            text-transform: none;
+            letter-spacing: 0.02em;
+        }
+
+        .section[data-section="4"] .faq-link a {
+            color: inherit;
+            text-decoration: underline;
+            pointer-events: auto;
+            transition: opacity 0.2s;
+        }
+
+        .section[data-section="4"] .faq-link a:hover {
+            opacity: 0.7;
+        }
+
+        .apply-big {
+            display: inline-block;
+            font-family: 'Lora', serif;
+            font-size: clamp(11px, 1.1vw, 14px);
+            font-style: italic;
+            font-weight: 400;
+            color: #1E1E1E;
+            background-color: transparent;
+            border: 1px solid #1E1E1E;
+            border-radius: 50px;
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            padding: 10px 28px;
+            margin-top: clamp(20px, 4vh, 40px);
+            transition: all 0.2s ease;
+            pointer-events: auto;
+        }
+
+        .apply-big:hover {
+            background-color: #1E1E1E;
+            color: #FFFFFF;
+        }
+
+        body.night-mode .apply-big {
+            color: #FFFFFF;
+            border-color: #FFFFFF;
+        }
+
+        body.night-mode .apply-big:hover {
+            background-color: #FFFFFF;
+            color: #1E1E1E;
+        }
+
+        @media (max-width: 768px) {
+            .apply-big {
+                padding: 8px 24px;
+                font-size: 10px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+<canvas id="dots"></canvas>
+
+<!-- Video sur le premier billboard -->
+<video id="billboard-video" autoplay muted loop playsinline>
+    <source src="../assets/TheBridge_Billboard.mp4" type="video/mp4">
+</video>
+
+<!-- Contrôles vidéo -->
+<div id="video-controls">
+    <div class="controls-bar">
+        <button id="play-pause-btn" title="Play/Pause">
+            <svg id="pause-icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+            <svg id="play-icon" style="display:none" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        </button>
+        <div class="progress-container" id="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <span class="time" id="time-display">0:00 / 0:00</span>
+        <button id="mute-btn" title="Sound">
+            <svg id="muted-icon" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+            <svg id="sound-icon" style="display:none" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+        </button>
+        <button id="fullscreen-btn" title="Fullscreen">
+            <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+        </button>
+    </div>
+</div>
+
+<div id="content">
+    <div id="text-container">
+        <!-- Contenu retiré - paysage uniquement -->
+    </div>
+</div>
+
+<!-- Header par-dessus tout -->
+<div id="header">
+    <a href="../"><img id="logo" src="../assets/logo.png" alt="The Bridge"></a>
+    <div class="header-right">
+        <nav id="nav-menu">
+            <a href="../faq">FAQ</a>
+            <a href="../meet-us">Meet Us</a>
+            <a href="../community">Community</a>
+            <a href="../residency">Residency</a>
+        </nav>
+        <a id="apply-btn" href="../apply">Apply</a>
+        <div id="menu-toggle">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile menu overlay -->
+<div id="mobile-menu">
+    <a href="../" data-index="01">Home</a>
+    <a href="../residency" data-index="02">Residency</a>
+    <a href="../faq" data-index="03">FAQ</a>
+    <a href="../meet-us" data-index="04">Meet Us</a>
+    <a href="../apply" data-index="05">Apply</a>
+</div>
+
+<!-- Header background overlay -->
+<div id="header-bg"></div>
+
+<script>
+var canvas = document.getElementById('dots');
+var ctx = canvas.getContext('2d');
+var textContainer = document.getElementById('text-container');
+var header = document.getElementById('header');
+var sections = document.querySelectorAll('.section');
+
+var scrollPos = 0;
+var maxScroll;
+var pixelSize, margin;
+
+// Calculer la zone des points
+var dotZone = { x: 0, y: 0, width: 0, height: 0 };
+
+// Position Y du pont (centre du pont où le texte doit être aligné)
+var bridgeCenterY = 0;
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    var baseSize = Math.min(canvas.width, canvas.height);
+    var isMobile = canvas.width < 768;
+
+    // Pixel size pour style 8-bit (pixels plus gros sur mobile)
+    pixelSize = isMobile ? Math.max(5, Math.floor(baseSize * 0.008)) : Math.max(4, Math.floor(baseSize * 0.005));
+
+    // Marge uniquement en haut (plus de marges latérales)
+    var marginSide = baseSize * 0.035;  // Gardé pour le header
+    var marginTop = Math.max(50, baseSize * 0.06);
+    margin = 0;
+
+    // Le terrain fait 5 écrans de large, donc maxScroll = 4 écrans
+    maxScroll = canvas.width * 4;
+
+    // Zone de rendu - pleine largeur
+    dotZone.x = 0;
+    dotZone.y = marginTop;
+    dotZone.width = canvas.width;
+    dotZone.height = canvas.height - marginTop;
+
+    // Position Y du centre du pont
+    var isMobile = canvas.width < 768;
+    var roadY = canvas.height * (isMobile ? 0.92 : 0.88);
+    var bridgeScale = isMobile ? 0.6 : 1;
+    var towerHeight = canvas.height * 0.25 * bridgeScale;
+    var towerTop = roadY - towerHeight;
+    bridgeCenterY = towerTop + towerHeight * 0.3;
+
+    // Appliquer la zone au container de texte
+    textContainer.style.left = dotZone.x + 'px';
+    textContainer.style.top = dotZone.y + 'px';
+    textContainer.style.width = dotZone.width + 'px';
+    textContainer.style.height = dotZone.height + 'px';
+
+    // Positionner le header (aligné comme les autres pages)
+    // Calculer dotZoneX comme dans manifesto/faq/etc
+    var dotSpacing = Math.max(8, baseSize * 0.01);
+    var cols = Math.ceil(canvas.width / dotSpacing) + 1;
+    var rows = Math.ceil(canvas.height / dotSpacing) + 1;
+    var firstDotX, lastDotX, firstDotY;
+    for (var c = 0; c < cols; c++) {
+        var px = c * dotSpacing + dotSpacing / 2;
+        if (px >= marginSide && firstDotX === undefined) firstDotX = px;
+        if (px <= canvas.width - marginSide) lastDotX = px;
+    }
+    for (var r = 0; r < rows; r++) {
+        var py = r * dotSpacing + dotSpacing / 2;
+        if (py >= marginTop && firstDotY === undefined) firstDotY = py;
+    }
+    var dotZoneX = firstDotX;
+    var dotZoneY = firstDotY;
+    var dotZoneWidth = lastDotX - firstDotX;
+
+    var headerTopMargin = marginSide * 0.5;
+    header.style.top = headerTopMargin + 'px';
+    header.style.height = (dotZoneY - headerTopMargin - 10) + 'px';
+    header.style.paddingLeft = dotZoneX + 'px';
+    header.style.paddingRight = (canvas.width - dotZoneX - dotZoneWidth) + 'px';
+
+    var headerBg = document.getElementById('header-bg');
+    headerBg.style.height = (dotZone.y - pixelSize / 2) + 'px';
+
+    var logo = document.getElementById('logo');
+    logo.style.height = Math.max(18, baseSize * 0.03) + 'px';
+
+    sections.forEach(function(section, i) {
+        section.style.width = dotZone.width + 'px';
+        section.style.left = '0px';
+    });
+
+    // Régénérer nuages et bâtiments selon la taille d'écran
+    if (typeof generateClouds === 'function') {
+        generateClouds();
+    }
+    if (typeof generateBuildings === 'function') {
+        generateBuildings();
+    }
+    if (typeof generateCityBuildings === 'function') {
+        generateCityBuildings();
+    }
+    // Précalculer les nuages statiques
+    if (typeof updateStaticCloudPositions === 'function') {
+        updateStaticCloudPositions();
+    }
+}
+
+// Générateur de nombres pseudo-aléatoires avec seed pour consistance
+function seededRandom(seed) {
+    var x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+}
+
+// Nuages pixel art - gros nuages allongés avec volume (blanc = lumière en haut, gris = ombre en bas)
+// Valeurs: 0 = vide, 1 = gris (ombre/bords), 2 = blanc pur (centre lumineux)
+var cloudPatterns = [
+    // Très gros nuage allongé 1 (30x7) - fluffy avec volume
+    [
+        [0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0],
+        [0, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0],
+        [0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0],
+        [0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 0],
+        [1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 0],
+        [0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 0, 0],
+        [0, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+    ],
+    // Très gros nuage allongé 2 (28x6) - plus plat avec volume
+    [
+        [0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0],
+        [0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0],
+        [0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 0],
+        [1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 0],
+        [0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 0, 0],
+    ],
+    // Gros nuage allongé 3 (24x6) - ondulé avec volume
+    [
+        [0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0],
+        [0, 0, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0],
+        [0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 0],
+        [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 0],
+        [1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1],
+        [0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 0, 0],
+    ],
+    // Gros nuage allongé 4 (22x5) - simple et long avec volume
+    [
+        [0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0],
+        [0, 0, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 0, 0, 0],
+        [0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 0],
+        [1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 0],
+        [0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 0, 0],
+    ],
+    // Gros nuage très allongé 5 (26x5) - stratus doux avec volume
+    [
+        [0, 0, 2, 2, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 2, 0, 0],
+        [0, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 0],
+        [1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
+        [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1],
+        [0, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 0, 0],
+    ],
+];
+
+// === NUAGES STATIQUES - bien espacés sans chevauchement ===
+var clouds = [];
+var numClouds = 40;  // Plus de nuages en desktop
+
+function generateClouds() {
+    clouds = [];
+    var isMobile = window.innerWidth < 768;
+
+    if (isMobile) {
+        // Mobile : 5 GROS nuages bien espacés (pas de chevauchement)
+        var mobilePositions = [
+            {x: 0.10, y: 0.11},   // Haut gauche
+            {x: 0.75, y: 0.14},   // Haut droite
+            {x: 0.40, y: 0.20},   // Milieu centre
+            {x: 0.15, y: 0.28},   // Bas gauche
+            {x: 0.70, y: 0.26},   // Bas droite
+        ];
+
+        for (var i = 0; i < mobilePositions.length; i++) {
+            var pos = mobilePositions[i];
+
+            // GROS nuages - patterns 0-1 (les plus gros)
+            var patternIndex = Math.floor(seededRandom(i * 999.999) * 2);
+            var cloudSize = 1.0 + seededRandom(i * 333.333) * 0.4;
+
+            clouds.push({
+                xRatio: pos.x,
+                yRatio: pos.y,
+                size: cloudSize,
+                pattern: patternIndex,
+                opacity: 0.22 + seededRandom(i * 555.555) * 0.10
+            });
+        }
+        return;
+    }
+
+    // Desktop : beaucoup de nuages HAUTS dans le ciel (au-dessus du billboard)
+    var count = numClouds;
+    var cols = 10;  // Plus de colonnes pour mieux répartir
+    var rows = 4;   // 4 rangées dans la partie haute du ciel
+
+    for (var i = 0; i < count; i++) {
+        var rand = seededRandom(i * 777.777);
+        var patternIndex, cloudSize;
+
+        // Mix de gros et petits nuages
+        if (rand < 0.35) {
+            // Gros nuages (35%)
+            patternIndex = Math.floor(seededRandom(i * 888.888) * 2);
+            cloudSize = 1.2 + seededRandom(i * 333.333) * 0.5;
+        } else if (rand < 0.7) {
+            // Nuages moyens (35%)
+            patternIndex = 2 + Math.floor(seededRandom(i * 999.999) * 2);
+            cloudSize = 0.8 + seededRandom(i * 333.333) * 0.4;
+        } else {
+            // Petits nuages (30%)
+            patternIndex = 3 + Math.floor(seededRandom(i * 999.999) * 2);
+            cloudSize = 0.5 + seededRandom(i * 333.333) * 0.3;
+        }
+
+        // Position en grille avec décalage aléatoire
+        var col = i % cols;
+        var rowInCol = Math.floor(i / cols) % rows;
+
+        // Position X: bien répartie sur toute la largeur
+        var xBase = (col / cols) + seededRandom(i * 444.444) * (1 / cols) * 0.7;
+        var xRatio = xBase;
+
+        // Position Y: sous le header (0.10 à 0.22) - bien au-dessus du billboard
+        var yLevels = [0.10, 0.14, 0.18, 0.22];
+        var yBase = yLevels[rowInCol];
+        var yOffset = seededRandom(i * 222.222) * 0.03;
+        var yRatio = yBase + yOffset;
+
+        clouds.push({
+            xRatio: xRatio,
+            yRatio: yRatio,
+            size: cloudSize,
+            pattern: patternIndex,
+            opacity: 0.20 + seededRandom(i * 555.555) * 0.15
+        });
+    }
+}
+
+generateClouds();
+
+// Cache pour positions des nuages (calculé une fois au resize)
+var cloudPositions = [];
+
+// Précalculer les nuages (appelé une seule fois au resize)
+function updateStaticCloudPositions() {
+    cloudPositions = [];
+    for (var i = 0; i < clouds.length; i++) {
+        var cloud = clouds[i];
+        var cloudY = cloud.yRatio * canvas.height;
+        var cloudRow = Math.floor(cloudY / pixelSize);
+        var pattern = cloudPatterns[cloud.pattern];
+        var patternHeight = Math.ceil(pattern.length * cloud.size);
+
+        cloudPositions.push({
+            xRatio: cloud.xRatio,
+            row: cloudRow,
+            size: cloud.size,
+            pattern: cloud.pattern,
+            opacity: cloud.opacity,
+            maxRow: cloudRow + patternHeight,
+            minRow: cloudRow
+        });
+    }
+}
+
+function getCloudOpacity(x, y, col, row) {
+    // Early exit si trop bas (nuages jusqu'à 35% de l'écran - sous le header, au-dessus du billboard)
+    if (y > canvas.height * 0.35) return 0;
+
+    for (var i = 0; i < cloudPositions.length; i++) {
+        var cp = cloudPositions[i];
+
+        // Early exit si hors zone verticale
+        if (row < cp.minRow || row > cp.maxRow) continue;
+
+        // Position en colonne basée sur xRatio et scroll (parallax léger)
+        var cloudCol = Math.floor((cp.xRatio * canvas.width - scrollPos * 0.2) / pixelSize);
+
+        var relCol = col - cloudCol;
+        var relRow = row - cp.row;
+
+        var scaledCol = Math.floor(relCol / cp.size);
+        var scaledRow = Math.floor(relRow / cp.size);
+
+        var pattern = cloudPatterns[cp.pattern];
+        if (scaledRow >= 0 && scaledRow < pattern.length) {
+            var patternRow = pattern[scaledRow];
+            if (scaledCol >= 0 && scaledCol < patternRow.length) {
+                var pixelValue = patternRow[scaledCol];
+                if (pixelValue === 2) {
+                    // Blanc pur (centre lumineux) - opacité normale
+                    return { type: 'white', opacity: cp.opacity };
+                } else if (pixelValue === 1) {
+                    // Gris (ombre/bords) - opacité plus forte pour contraste
+                    return { type: 'gray', opacity: cp.opacity * 1.3 };
+                }
+            }
+        }
+    }
+
+    return 0;
+}
+
+// Générateur pseudo-aléatoire pour bâtiments consistants
+function buildingRandom(seed) {
+    var x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
+    return x - Math.floor(x);
+}
+
+// Skyline de bâtiments style 8-bit
+var cityBuildings = [];
+var numBuildings = 60;
+
+function generateBuildings() {
+    cityBuildings = [];
+    var isMobile = window.innerWidth < 768;
+    var count = isMobile ? 25 : numBuildings;
+
+    for (var b = 0; b < count; b++) {
+        cityBuildings.push({
+            xRatio: b / count + buildingRandom(b * 11) * 0.02,
+            widthRatio: isMobile ? 0.025 + buildingRandom(b * 22) * 0.025 : 0.012 + buildingRandom(b * 22) * 0.018,
+            heightRatio: isMobile ? 0.06 + buildingRandom(b * 33) * 0.12 : 0.08 + buildingRandom(b * 33) * 0.18,
+            hasAntenna: buildingRandom(b * 44) > 0.7,
+            windowRows: Math.floor(isMobile ? 2 + buildingRandom(b * 55) * 3 : 3 + buildingRandom(b * 55) * 6),
+            windowCols: Math.floor(2 + buildingRandom(b * 66) * 2),
+            depth: buildingRandom(b * 77)
+        });
+    }
+}
+
+// Générer les bâtiments une seule fois
+generateBuildings();
+
+// === CITY PIXEL ART ===
+// Couleurs simples et vives - style pixel art clair
+var frontBuildingColors = [
+    {wall: {r: 220, g: 90, b: 80}},    // Rouge corail
+    {wall: {r: 90, g: 150, b: 180}},   // Bleu ciel
+    {wall: {r: 230, g: 180, b: 80}},   // Jaune moutarde
+    {wall: {r: 180, g: 120, b: 160}},  // Mauve
+    {wall: {r: 120, g: 170, b: 130}},  // Vert menthe
+    {wall: {r: 220, g: 160, b: 130}},  // Pêche
+];
+
+// Générer les bâtiments de la ville (premier plan + arrière-plan)
+var cityFrontBuildings = [];
+var cityBackBuildings = [];
+var cityBillboards = [];
+
+// Couleurs des billboards - Palette "The Bridge" (tons chauds, rouge, beige)
+var billboardColors = [
+    {bg: {r: 228, g: 53, b: 53}, accent: {r: 235, g: 228, b: 195}},    // Rouge signature + beige
+    {bg: {r: 205, g: 92, b: 68}, accent: {r: 255, g: 255, b: 255}},    // Rouge Golden Gate
+    {bg: {r: 140, g: 45, b: 35}, accent: {r: 235, g: 228, b: 195}},    // Rouge très foncé
+    {bg: {r: 95, g: 125, b: 75}, accent: {r: 235, g: 228, b: 195}},    // Vert lande sauvage
+    {bg: {r: 95, g: 90, b: 82}, accent: {r: 255, g: 255, b: 255}},     // Granit
+    {bg: {r: 225, g: 130, b: 95}, accent: {r: 30, g: 30, b: 30}},      // Rouge clair
+];
+
+function generateCityBuildings() {
+    cityFrontBuildings = [];
+    cityBackBuildings = [];
+    cityBillboards = [];
+
+    var isMobile = canvas.width < 768;
+
+    // Gratte-ciels arrière-plan
+    var numBackBuildings = isMobile ? 25 : 80;
+    for (var i = 0; i < numBackBuildings; i++) {
+        var seed = i * 123.456;
+        cityBackBuildings.push({
+            x: seededRandom(seed) * canvas.width,
+            width: (isMobile ? 30 : 80) + seededRandom(seed + 1) * (isMobile ? 25 : 70),
+            height: (isMobile ? 0.15 : 0.25) + seededRandom(seed + 2) * (isMobile ? 0.20 : 0.35),
+            shade: 0.6 + seededRandom(seed + 3) * 0.3
+        });
+    }
+    cityBackBuildings.sort(function(a, b) { return a.x - b.x; });
+
+    // UN SEUL BILLBOARD VIDÉO - CENTRÉ ET RESPONSIVE
+    var bbWidth, bbHeight, poleHeight;
+
+    if (isMobile) {
+        // Sur mobile : 90% de la largeur de l'écran, ratio 16:9
+        bbWidth = canvas.width * 0.9;
+        bbHeight = (bbWidth * 9 / 16) / canvas.height;  // Ratio 16:9
+        poleHeight = 0.03;
+    } else {
+        // Sur desktop : taille fixe
+        bbWidth = 960;
+        bbHeight = 540 / canvas.height;
+        poleHeight = 0.06;
+    }
+
+    // Centré horizontalement sur l'écran
+    var xPosition = (canvas.width - bbWidth) / 2;
+
+    cityBillboards.push({
+        x: xPosition,
+        width: bbWidth,
+        height: bbHeight,
+        poleHeight: poleHeight,
+        colorIndex: 0,
+        pattern: 0,
+        format: 0
+    });
+}
+
+generateCityBuildings();
+
+function getSkylineOpacity(x, y) {
+    var isMobile = canvas.width < 768;
+    var h = canvas.height;
+
+    // Zones verticales - ajustées pour mobile
+    var roadY = h * (isMobile ? 0.95 : 0.88);
+    var sidewalkY = roadY - h * (isMobile ? 0.02 : 0.04);
+    var frontBuildingY = sidewalkY;
+
+    // === ROUTE ===
+    if (y >= roadY && y <= h) {
+        // Marquages beige
+        var markingY = roadY + h * 0.04;
+        var markingHeight = pixelSize * 2;
+
+        if (y >= markingY && y <= markingY + markingHeight) {
+            var markingWidth = 40;
+            var markingGap = 30;
+            var inMarking = (x % (markingWidth + markingGap)) < markingWidth;
+
+            if (inMarking) {
+                return isDay
+                    ? {r: 235, g: 228, b: 195, a: 0.95}
+                    : {r: 180, g: 175, b: 155, a: 0.85};
+            }
+        }
+
+        // Asphalte
+        return isDay
+            ? {r: 85, g: 75, b: 70, a: 0.95}
+            : {r: 35, g: 32, b: 30, a: 0.95};
+    }
+
+    // === TROTTOIR ===
+    if (y >= sidewalkY && y < roadY) {
+        if (y >= roadY - pixelSize * 2) {
+            return isDay
+                ? {r: 140, g: 135, b: 125, a: 0.9}
+                : {r: 70, g: 65, b: 60, a: 0.9};
+        }
+        return isDay
+            ? {r: 200, g: 190, b: 170, a: 0.9}
+            : {r: 55, g: 52, b: 48, a: 0.9};
+    }
+
+    // === BILLBOARD VIDÉO CENTRÉ ===
+    if (cityBillboards.length > 0) {
+        var bb = cityBillboards[0];
+        var panelWidth = bb.width;
+        var panelHeight = h * bb.height;
+        var panelBottom = frontBuildingY - h * bb.poleHeight;
+        var panelTop = panelBottom - panelHeight;
+        var panelLeft = bb.x;
+        var panelRight = bb.x + panelWidth;
+        var panelCenterX = bb.x + panelWidth / 2;
+
+        // Structure métallique (2 poteaux)
+        var poleWidth = pixelSize * 3;
+        var poleSpacing = panelWidth * 0.3;
+        var pole1X = panelCenterX - poleSpacing;
+        var pole2X = panelCenterX + poleSpacing;
+
+        // Poteau gauche
+        if (x >= pole1X - poleWidth && x <= pole1X + poleWidth) {
+            if (y >= panelBottom && y < frontBuildingY) {
+                return isDay
+                    ? {r: 70, g: 70, b: 75, a: 0.95}
+                    : {r: 40, g: 40, b: 45, a: 0.95};
+            }
+        }
+        // Poteau droit
+        if (x >= pole2X - poleWidth && x <= pole2X + poleWidth) {
+            if (y >= panelBottom && y < frontBuildingY) {
+                return isDay
+                    ? {r: 70, g: 70, b: 75, a: 0.95}
+                    : {r: 40, g: 40, b: 45, a: 0.95};
+            }
+        }
+
+        // Barre horizontale sous le panneau
+        var barHeight = pixelSize * 2;
+        if (x >= panelLeft && x < panelRight) {
+            if (y >= panelBottom && y < panelBottom + barHeight) {
+                return isDay
+                    ? {r: 60, g: 60, b: 65, a: 0.95}
+                    : {r: 35, g: 35, b: 40, a: 0.95};
+            }
+        }
+
+        // Panneau publicitaire
+        if (x >= panelLeft && x < panelRight && y >= panelTop && y < panelBottom) {
+            var relX = x - panelLeft;
+            var relY = y - panelTop;
+
+            // Cadre métallique (plus fin sur mobile)
+            var frameSize = isMobile ? pixelSize * 1.5 : pixelSize * 3;
+            if (relX < frameSize || relX > panelWidth - frameSize ||
+                relY < frameSize || relY > panelHeight - frameSize) {
+                return isDay
+                    ? {r: 50, g: 50, b: 55, a: 0.95}
+                    : {r: 30, g: 30, b: 35, a: 0.95};
+            }
+
+            // Vidéo = transparent
+            return 0;
+        }
+    }
+
+    // === GRATTE-CIELS ARRIÈRE-PLAN ===
+    for (var i = 0; i < cityBackBuildings.length; i++) {
+        var b = cityBackBuildings[i];
+        if (x >= b.x && x < b.x + b.width) {
+            var buildingTop = frontBuildingY - h * b.height;
+
+            if (y >= buildingTop && y < frontBuildingY) {
+                var relX = x - b.x;
+                var relY = y - buildingTop;
+
+                // Fenêtres
+                var windowSize = pixelSize * 2;
+                var windowGap = pixelSize * 3;
+                var windowPattern = windowSize + windowGap;
+
+                var inWindowX = (relX % windowPattern) < windowSize;
+                var inWindowY = (relY % windowPattern) < windowSize;
+
+                if (inWindowX && inWindowY && relY > pixelSize * 2) {
+                    var lit = seededRandom(i * 50 + Math.floor(relX/windowPattern) + Math.floor(relY/windowPattern) * 10) > 0.4;
+                    if (!isDay && lit) {
+                        return {r: 255, g: 200, b: 100, a: 0.7};
+                    }
+                    return isDay
+                        ? {r: Math.floor(140 * b.shade), g: Math.floor(135 * b.shade), b: Math.floor(125 * b.shade), a: 0.8}
+                        : {r: Math.floor(35 * b.shade), g: Math.floor(33 * b.shade), b: Math.floor(30 * b.shade), a: 0.9};
+                }
+
+                // Mur
+                var shade = b.shade;
+                return isDay
+                    ? {r: Math.floor(120 * shade), g: Math.floor(115 * shade), b: Math.floor(108 * shade), a: 0.85}
+                    : {r: Math.floor(30 * shade), g: Math.floor(28 * shade), b: Math.floor(25 * shade), a: 0.95};
+            }
+        }
+    }
+
+    return 0;
+}
+
+function getBridgeOpacity(x, y) {
+    // Pont désactivé - retourne toujours opacity 0
+    return {opacity: 0};
+}
+
+function getWaterOpacity(x, y) {
+    // Eau désactivée - terrain continu sans mer
+    return 0;
+}
+
+
+
+// Calculer si c'est le jour ou la nuit en Europe (Paris)
+function isDayInEurope() {
+    var now = new Date();
+    var europeTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Paris' }));
+    var hour = europeTime.getHours();
+    var month = europeTime.getMonth();
+
+    // Mode jour de 8h à 19h
+    return hour >= 8 && hour < 19;
+}
+
+// Mode initial basé sur l'heure de Paris
+var isDay = isDayInEurope();
+var userOverride = false;
+
+// Position du soleil/lune pour détecter les clics
+var sunClickArea = { x: 0, y: 0, radius: 0 };
+
+// Position aléatoire du soleil/lune dans le ciel (générée une seule fois)
+var sunRandomX = 0.15 + Math.random() * 0.7;  // Entre 15% et 85% horizontalement
+var sunRandomY = 0.1 + Math.random() * 0.4;   // Entre 10% et 50% dans la zone du ciel
+
+// Vérifier toutes les minutes si l'heure a changé
+setInterval(function() {
+    if (!userOverride) {
+        isDay = isDayInEurope();
+    }
+}, 60000);
+
+
+function draw() {
+    // Les nuages sont statiques, pas besoin de mise à jour chaque frame
+
+    // Couleurs selon le mode jour/nuit
+    var bgColor, dotColor, dotColorAlpha;
+
+    if (isDay) {
+        // Mode jour
+        bgColor = 'rgb(239, 236, 212)'; // Beige plus contrasté
+        dotColor = 'rgb(30, 30, 30)';
+        dotColorAlpha = 'rgba(30, 30, 30,';
+    } else {
+        // Mode nuit
+        bgColor = 'rgb(30, 30, 30)';
+        dotColor = 'rgb(255, 255, 255)';
+        dotColorAlpha = 'rgba(255, 255, 255,';
+    }
+
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Mettre à jour le body aussi
+    document.body.style.backgroundColor = bgColor;
+    document.getElementById('content').style.color = dotColor;
+    // header-bg stays transparent so dots pattern shows through
+
+    // Ajouter/retirer la classe night-mode pour le hover du bouton
+    if (isDay) {
+        document.body.classList.remove('night-mode');
+    } else {
+        document.body.classList.add('night-mode');
+    }
+
+    // Mettre à jour les couleurs du header selon le mode
+    var navLinks = document.querySelectorAll('#nav-menu a');
+    navLinks.forEach(function(link) {
+        link.style.color = dotColor;
+    });
+    var applyBtn = document.getElementById('apply-btn');
+    applyBtn.style.color = dotColor;
+    applyBtn.style.borderColor = dotColor;
+
+    // Soleil ou Lune - position aléatoire fixe dans le ciel
+    var sunRadius = Math.max(15, Math.min(canvas.width, canvas.height) * 0.03);
+    var sunX = sunRandomX * canvas.width;
+    var sunY = dotZone.y + sunRandomY * (canvas.height * 0.35);
+
+    // Mettre à jour la zone cliquable du soleil/lune
+    sunClickArea.x = sunX;
+    sunClickArea.y = sunY;
+    sunClickArea.radius = sunRadius * 2.5; // Zone un peu plus grande pour faciliter le clic
+
+    // Couleur du soleil/lune selon le mode
+    var sunR, sunG, sunB;
+    if (isDay) {
+        // Soleil - jaune doré
+        sunR = 255;
+        sunG = 200;
+        sunB = 50;
+    } else {
+        // Lune - blanc/gris
+        sunR = 200;
+        sunG = 200;
+        sunB = 200;
+    }
+    var sunColorAlpha = 'rgba(' + sunR + ',' + sunG + ',' + sunB + ',';
+
+    // Précalculer les bornes pour éviter les calculs dans la boucle
+    var startCol = Math.floor(dotZone.x / pixelSize);
+    var endCol = Math.ceil((dotZone.x + dotZone.width) / pixelSize);
+    var startRow = Math.floor(dotZone.y / pixelSize);
+    var endRow = Math.ceil((dotZone.y + dotZone.height) / pixelSize);
+
+    // Précalculer le temps pour les étoiles
+    var starTime = Date.now() * 0.001;
+
+    for (var row = startRow; row <= endRow; row++) {
+        var y = row * pixelSize + pixelSize / 2;
+
+        for (var col = startCol; col <= endCol; col++) {
+            var x = col * pixelSize + pixelSize / 2;
+
+            // Calcul prioritaire : pont d'abord (le plus important visuellement)
+            var bridgeResult = getBridgeOpacity(x, y);
+
+            // Si c'est le pont, dessiner avec la couleur appropriée
+            if (bridgeResult.opacity > 0.1) {
+                if (bridgeResult.color) {
+                    ctx.fillStyle = 'rgba(' + bridgeResult.color.r + ',' + bridgeResult.color.g + ',' + bridgeResult.color.b + ',' + bridgeResult.opacity + ')';
+                } else {
+                    ctx.fillStyle = 'rgba(228,53,53,' + bridgeResult.opacity + ')';
+                }
+                ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                continue;
+            }
+
+            // City (bâtiments, route, etc.)
+            var skylineOpacity = getSkylineOpacity(x, y);
+            if (skylineOpacity && typeof skylineOpacity === 'object') {
+                ctx.fillStyle = 'rgba(' + skylineOpacity.r + ',' + skylineOpacity.g + ',' + skylineOpacity.b + ',' + skylineOpacity.a + ')';
+                ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                continue;
+            }
+
+
+            // Soleil/Lune - dessiné en premier (passera DERRIÈRE les nuages)
+            var dx = x - sunX;
+            var dy = y - sunY;
+            var distToSunSq = dx * dx + dy * dy;
+            var sunRadiusSq = sunRadius * sunRadius;
+
+            // Dessiner le soleil/lune SANS continue pour permettre aux nuages de se superposer
+            if (distToSunSq < sunRadiusSq) {
+                ctx.fillStyle = sunColorAlpha + '1)';
+                ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                // Pas de continue - les nuages pourront se dessiner par-dessus
+            } else if (distToSunSq < sunRadiusSq * 4) {
+                var sunOpacity = Math.max(0, 1 - Math.sqrt(distToSunSq) / (sunRadius * 2)) * 0.5;
+                if (sunOpacity > 0.1) {
+                    ctx.fillStyle = sunColorAlpha + sunOpacity + ')';
+                    ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                    // Pas de continue - les nuages pourront se dessiner par-dessus
+                }
+            }
+
+            // Nuages (jour seulement) ou Étoiles (nuit)
+            if (isDay) {
+                // Mode jour : nuages
+                var cloudResult = getCloudOpacity(x, y, col, row);
+                if (cloudResult && cloudResult.opacity > 0.03) {
+                    var inSunZone = distToSunSq < sunRadiusSq * 4;
+                    if (inSunZone) {
+                        ctx.fillStyle = 'rgb(239, 236, 212)';
+                        ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                    }
+                    if (cloudResult.type === 'white') {
+                        ctx.fillStyle = 'rgba(30, 30, 30, ' + (cloudResult.opacity * 0.35) + ')';
+                    } else {
+                        ctx.fillStyle = 'rgba(30, 30, 30, ' + (cloudResult.opacity * 0.5) + ')';
+                    }
+                    ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                    continue;
+                }
+            } else {
+                // Mode nuit : étoiles random avec fade progressif
+                var starSeed = (col * 374761 + row * 668999) ^ (col * row * 97);
+                starSeed = ((starSeed >> 16) ^ starSeed) * 0x45d9f3b;
+                starSeed = (starSeed >> 16) ^ starSeed;
+
+                var skyRatio = y / canvas.height;
+                // Fade progressif : pleine intensité en haut, disparaît vers 80%
+                var fadeFactor = Math.max(0, 1 - (skyRatio / 0.8));
+
+                if (skyRatio < 0.8 && (Math.abs(starSeed) % 350) < 1) {
+                    var baseOpacity = 0.3 + (Math.abs(starSeed) % 50) / 70;
+                    var opacity = baseOpacity * fadeFactor;
+                    if (opacity > 0.1) {
+                        ctx.fillStyle = 'rgba(255, 255, 255, ' + opacity + ')';
+                        ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                    }
+                }
+            }
+
+            // Si on était dans le soleil/lune mais pas dans un nuage, on a déjà dessiné, on continue
+            if (distToSunSq < sunRadiusSq || (distToSunSq < sunRadiusSq * 4 && Math.max(0, 1 - Math.sqrt(distToSunSq) / (sunRadius * 2)) * 0.5 > 0.1)) {
+                continue;
+            }
+
+            // Eau
+            var waterOpacity = getWaterOpacity(x, y);
+            if (waterOpacity > 0.1) {
+                ctx.fillStyle = dotColorAlpha + waterOpacity + ')';
+                ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                continue;
+            }
+
+            // Fond par défaut - transparent (même couleur que le background)
+            // Ne rien dessiner pour laisser le background apparaître
+        }
+    }
+
+    // Mettre à jour la position des sections
+    sections.forEach(function(section, i) {
+        var offset = i * canvas.width - scrollPos;
+        section.style.transform = 'translateX(' + offset + 'px)';
+    });
+
+    // Positionner la vidéo sur le premier billboard
+    updateBillboardVideo();
+}
+
+// Référence à l'élément vidéo
+var billboardVideo = document.getElementById('billboard-video');
+
+function updateBillboardVideo() {
+    if (cityBillboards.length === 0) return;
+
+    var bb = cityBillboards[0];  // Billboard vidéo centré
+    var h = canvas.height;
+    var isMobile = canvas.width < 768;
+
+    // Même position que dans getSkylineOpacity
+    var roadY = h * (isMobile ? 0.95 : 0.88);
+    var sidewalkY = roadY - h * (isMobile ? 0.02 : 0.04);
+    var frontBuildingY = sidewalkY;
+
+    var panelWidth = bb.width;
+    var panelHeight = h * bb.height;
+    var panelBottom = frontBuildingY - h * bb.poleHeight;
+    var panelTop = panelBottom - panelHeight;
+    var panelLeft = bb.x;  // Centré, pas de scroll
+
+    // Marge du cadre métallique (même calcul que dans getSkylineOpacity - plus fin sur mobile)
+    var frameSize = isMobile ? pixelSize * 1.5 : pixelSize * 3;
+
+    // Position de la zone vidéo - légèrement agrandie pour couvrir les gaps entre pixels
+    var overlap = pixelSize * 0.5;  // Petit chevauchement pour éviter les espaces
+    var videoLeft = panelLeft + frameSize - overlap;
+    var videoTop = panelTop + frameSize - overlap;
+    var videoWidth = panelWidth - frameSize * 2 + overlap * 2;
+    var videoHeight = panelHeight - frameSize * 2 + overlap * 2;
+
+    // Toujours visible (centré)
+    billboardVideo.style.display = 'block';
+    billboardVideo.style.left = videoLeft + 'px';
+    billboardVideo.style.top = videoTop + 'px';
+    billboardVideo.style.width = videoWidth + 'px';
+    billboardVideo.style.height = videoHeight + 'px';
+}
+
+function animate() {
+    draw();
+    requestAnimationFrame(animate);
+}
+
+// Scroll désactivé - page statique
+// (pas de handleScroll, pas d'événements wheel/touch/keydown pour le scroll)
+
+// Clic sur le soleil/lune pour changer de thème
+canvas.addEventListener('click', function(e) {
+    var rect = canvas.getBoundingClientRect();
+    var clickX = e.clientX - rect.left;
+    var clickY = e.clientY - rect.top;
+
+    var dist = Math.sqrt(
+        (clickX - sunClickArea.x) * (clickX - sunClickArea.x) +
+        (clickY - sunClickArea.y) * (clickY - sunClickArea.y)
+    );
+
+    if (dist < sunClickArea.radius) {
+        isDay = !isDay;
+        userOverride = true;
+        // Reset après 1 heure pour revenir au mode automatique
+        setTimeout(function() { userOverride = false; }, 3600000);
+    }
+});
+
+// Changer le curseur quand on survole le soleil/lune
+canvas.addEventListener('mousemove', function(e) {
+    var rect = canvas.getBoundingClientRect();
+    var mouseX = e.clientX - rect.left;
+    var mouseY = e.clientY - rect.top;
+
+    var dist = Math.sqrt(
+        (mouseX - sunClickArea.x) * (mouseX - sunClickArea.x) +
+        (mouseY - sunClickArea.y) * (mouseY - sunClickArea.y)
+    );
+
+    canvas.style.cursor = dist < sunClickArea.radius ? 'pointer' : 'default';
+});
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+animate();
+
+// Mobile menu toggle
+var menuToggle = document.getElementById('menu-toggle');
+var mobileMenu = document.getElementById('mobile-menu');
+
+menuToggle.addEventListener('click', function() {
+    menuToggle.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+});
+
+// === CONTRÔLES VIDÉO ===
+var videoControls = document.getElementById('video-controls');
+var playPauseBtn = document.getElementById('play-pause-btn');
+var playIcon = document.getElementById('play-icon');
+var pauseIcon = document.getElementById('pause-icon');
+var progressContainer = document.getElementById('progress-container');
+var progressBar = document.getElementById('progress-bar');
+var timeDisplay = document.getElementById('time-display');
+var fullscreenBtn = document.getElementById('fullscreen-btn');
+
+// Formater le temps en mm:ss
+function formatTime(seconds) {
+    var mins = Math.floor(seconds / 60);
+    var secs = Math.floor(seconds % 60);
+    return mins + ':' + (secs < 10 ? '0' : '') + secs;
+}
+
+// Play/Pause
+playPauseBtn.addEventListener('click', function() {
+    if (billboardVideo.paused) {
+        billboardVideo.play();
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'block';
+    } else {
+        billboardVideo.pause();
+        playIcon.style.display = 'block';
+        pauseIcon.style.display = 'none';
+    }
+});
+
+// Mise à jour de la barre de progression
+billboardVideo.addEventListener('timeupdate', function() {
+    var progress = (billboardVideo.currentTime / billboardVideo.duration) * 100;
+    progressBar.style.width = progress + '%';
+    timeDisplay.textContent = formatTime(billboardVideo.currentTime) + ' / ' + formatTime(billboardVideo.duration || 0);
+});
+
+// Clic sur la barre de progression pour naviguer
+progressContainer.addEventListener('click', function(e) {
+    var rect = progressContainer.getBoundingClientRect();
+    var clickX = e.clientX - rect.left;
+    var width = rect.width;
+    var percentage = clickX / width;
+    billboardVideo.currentTime = percentage * billboardVideo.duration;
+});
+
+// Mute/Unmute
+var muteBtn = document.getElementById('mute-btn');
+var mutedIcon = document.getElementById('muted-icon');
+var soundIcon = document.getElementById('sound-icon');
+
+muteBtn.addEventListener('click', function() {
+    if (billboardVideo.muted) {
+        billboardVideo.muted = false;
+        mutedIcon.style.display = 'none';
+        soundIcon.style.display = 'block';
+    } else {
+        billboardVideo.muted = true;
+        mutedIcon.style.display = 'block';
+        soundIcon.style.display = 'none';
+    }
+});
+
+// Fullscreen
+fullscreenBtn.addEventListener('click', function() {
+    if (billboardVideo.requestFullscreen) {
+        billboardVideo.requestFullscreen();
+    } else if (billboardVideo.webkitRequestFullscreen) {
+        billboardVideo.webkitRequestFullscreen();
+    } else if (billboardVideo.webkitEnterFullscreen) {
+        billboardVideo.webkitEnterFullscreen();  // iOS
+    }
+});
+
+// Positionner les contrôles avec la vidéo
+function updateVideoControls() {
+    if (cityBillboards.length === 0) return;
+
+    var bb = cityBillboards[0];
+    var h = canvas.height;
+    var isMobile = canvas.width < 768;
+
+    var roadY = h * (isMobile ? 0.95 : 0.88);
+    var sidewalkY = roadY - h * (isMobile ? 0.02 : 0.04);
+    var frontBuildingY = sidewalkY;
+
+    var panelWidth = bb.width;
+    var panelHeight = h * bb.height;
+    var panelBottom = frontBuildingY - h * bb.poleHeight;
+    var panelTop = panelBottom - panelHeight;
+    var panelLeft = bb.x;
+
+    var frameSize = isMobile ? pixelSize * 1.5 : pixelSize * 3;
+    var overlap = pixelSize * 0.5;
+
+    var controlsLeft = panelLeft + frameSize - overlap;
+    var controlsWidth = panelWidth - frameSize * 2 + overlap * 2;
+    var controlsHeight = isMobile ? 40 : 50;
+    var controlsTop = panelBottom - frameSize - controlsHeight;
+
+    videoControls.style.display = 'flex';
+    videoControls.style.left = controlsLeft + 'px';
+    videoControls.style.top = (panelTop + frameSize - overlap) + 'px';
+    videoControls.style.width = controlsWidth + 'px';
+    videoControls.style.height = (panelHeight - frameSize * 2 + overlap * 2) + 'px';
+}
+
+// Appeler updateVideoControls dans la boucle d'animation
+var originalUpdateBillboardVideo = updateBillboardVideo;
+updateBillboardVideo = function() {
+    originalUpdateBillboardVideo();
+    updateVideoControls();
+};
+
+</script>
+
+</body>
+</html>

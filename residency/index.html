@@ -1,0 +1,2295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Residency</title>
+    <!-- Vercel Analytics -->
+    <script defer ></script>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M4JZJVEZE9"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-M4JZJVEZE9');
+    </script>
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #EFECD4;
+            overflow: hidden;
+            height: 100vh;
+            font-family: 'Courier New', monospace;
+            color: #1E1E1E;
+        }
+
+        #dots {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        #skater-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 6;
+            pointer-events: none;
+        }
+
+        #road-sign {
+            position: fixed;
+            z-index: 5;
+            display: none;
+            pointer-events: none;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        #road-sign-inner {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            background-color: #006543;
+            border: 4px solid white;
+            border-radius: 8px;
+            padding: 12px 40px 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        #road-sign .sign-welcome {
+            font-family: 'Lora', serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: clamp(12px, 1.7vw, 19px);
+            color: white;
+            letter-spacing: 0.04em;
+            margin: 0 0 2px 0;
+        }
+
+        #road-sign h1 {
+            font-family: 'Lora', serif;
+            font-weight: 400;
+            font-size: clamp(38px, 7.2vw, 86px);
+            color: white;
+            letter-spacing: 0.02em;
+            margin: 0;
+            white-space: nowrap;
+            line-height: 1.1;
+        }
+
+        #road-sign .sign-text-group {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #road-sign .sign-bottom {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 32px;
+        }
+
+        #road-sign .sign-bottom span {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 500;
+            font-size: clamp(10px, 1.2vw, 16px);
+            color: white;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        #road-sign .sign-arrow {
+            position: absolute;
+            bottom: 14px;
+            right: 18px;
+            width: clamp(30px, 4vw, 55px);
+            height: auto;
+        }
+
+        body.night-mode #road-sign-inner {
+            background-color: transparent;
+            border-color: rgba(255,255,255,0.5);
+        }
+        body.night-mode #road-sign h1,
+        body.night-mode #road-sign .sign-welcome,
+        body.night-mode #road-sign .sign-bottom span {
+            text-shadow: 0 0 8px rgba(255,255,220,0.4);
+        }
+
+        #content {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* Zone de clipping pour le texte */
+        #text-container {
+            position: absolute;
+            overflow: hidden;
+            /* Sera défini dynamiquement */
+        }
+
+        /* Header */
+        #header {
+            position: fixed;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            pointer-events: auto;
+            /* top et padding seront définis en JS */
+        }
+
+        /* Header background to hide content scrolling underneath */
+        #header-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9;
+            pointer-events: none;
+            /* height sera défini en JS */
+        }
+
+        #header > a {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        #logo {
+            height: 24px;
+            filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(2041%) hue-rotate(344deg) brightness(91%) contrast(93%);
+        }
+
+        #apply-btn {
+            font-family: 'Lora', serif;
+            font-size: clamp(10px, 1vw, 13px);
+            font-style: italic;
+            font-weight: 400;
+            color: #1E1E1E;
+            background-color: transparent;
+            border: 1px solid #1E1E1E;
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            padding: 8px 20px;
+            border-radius: 50px;
+            transition: all 0.2s ease;
+        }
+
+        #apply-btn:hover {
+            opacity: 0.6;
+        }
+
+        body.night-mode #apply-btn:hover {
+            opacity: 0.6;
+        }
+
+        /* Header right side - nav + apply */
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: clamp(15px, 3vw, 40px);
+        }
+
+        #nav-menu {
+            display: flex;
+            gap: clamp(12px, 2.5vw, 30px);
+        }
+
+        #nav-menu a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(9px, 0.9vw, 12px);
+            color: #1E1E1E;
+            text-decoration: none;
+            letter-spacing: 0.05em;
+            transition: opacity 0.2s ease;
+        }
+
+        #nav-menu a:hover {
+            opacity: 0.6;
+        }
+
+        /* Mobile menu hamburger - dot matrix style */
+        #menu-toggle {
+            display: none;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            z-index: 101;
+            position: relative;
+        }
+
+        #menu-toggle .dot {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background-color: #1E1E1E;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        body.night-mode #menu-toggle .dot {
+            background-color: #FFFFFF;
+        }
+
+        /* Grille 3x3 de points */
+        #menu-toggle .dot:nth-child(1) { top: 0; left: 0; }
+        #menu-toggle .dot:nth-child(2) { top: 0; left: 50%; transform: translateX(-50%); }
+        #menu-toggle .dot:nth-child(3) { top: 0; right: 0; }
+        #menu-toggle .dot:nth-child(4) { top: 50%; left: 0; transform: translateY(-50%); }
+        #menu-toggle .dot:nth-child(5) { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        #menu-toggle .dot:nth-child(6) { top: 50%; right: 0; transform: translateY(-50%); }
+        #menu-toggle .dot:nth-child(7) { bottom: 0; left: 0; }
+        #menu-toggle .dot:nth-child(8) { bottom: 0; left: 50%; transform: translateX(-50%); }
+        #menu-toggle .dot:nth-child(9) { bottom: 0; right: 0; }
+
+        /* Animation vers X */
+        #menu-toggle.open .dot:nth-child(1) { top: 50%; left: 50%; transform: translate(-50%, -50%) translate(-6px, -6px); }
+        #menu-toggle.open .dot:nth-child(2) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(3) { top: 50%; right: auto; left: 50%; transform: translate(-50%, -50%) translate(6px, -6px); }
+        #menu-toggle.open .dot:nth-child(4) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(5) { transform: translate(-50%, -50%); }
+        #menu-toggle.open .dot:nth-child(6) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(7) { bottom: auto; top: 50%; left: 50%; transform: translate(-50%, -50%) translate(-6px, 6px); }
+        #menu-toggle.open .dot:nth-child(8) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(9) { bottom: auto; top: 50%; right: auto; left: 50%; transform: translate(-50%, -50%) translate(6px, 6px); }
+
+        /* Mobile overlay menu - terminal style */
+        #mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #EFECD4;
+            z-index: 100;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 0 15%;
+            gap: 0;
+        }
+
+        body.night-mode #mobile-menu {
+            background-color: #1E1E1E;
+        }
+
+        #mobile-menu.open {
+            display: flex;
+        }
+
+        #mobile-menu a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            color: #1E1E1E;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            padding: 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            border-bottom: 1px solid rgba(30, 30, 30, 0.1);
+        }
+
+        #mobile-menu a:first-child {
+            border-top: 1px solid rgba(30, 30, 30, 0.1);
+        }
+
+        #mobile-menu a::before {
+            content: attr(data-index);
+            font-size: 10px;
+            opacity: 0.4;
+            min-width: 20px;
+        }
+
+        body.night-mode #mobile-menu a {
+            color: #FFFFFF;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        #mobile-menu a:hover {
+            padding-left: 10px;
+        }
+
+        @media (max-width: 600px) {
+            #nav-menu {
+                display: none;
+            }
+
+            #menu-toggle {
+                display: flex;
+            }
+        }
+
+        /* Sections de texte */
+        .section {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding-bottom: 10%;
+            will-change: transform, opacity;
+        }
+
+        @media (max-width: 768px) {
+            .section {
+                padding-bottom: 5%;
+            }
+        }
+
+        .section h1 {
+            font-family: 'Lora', serif;
+            font-size: clamp(18px, 3vw, 36px);
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            line-height: 1.5;
+            text-transform: none;
+            padding: 0 20px;
+        }
+
+        .section h1 em {
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .section p {
+            font-family: 'Instrument Sans', sans-serif;
+            font-size: clamp(10px, 1.1vw, 14px);
+            margin-top: clamp(15px, 3vh, 35px);
+            letter-spacing: 0.08em;
+            padding: 0 20px;
+            text-transform: uppercase;
+        }
+
+        .section p.subtitle {
+            font-family: 'IBM Plex Mono', monospace;
+            text-transform: none;
+            letter-spacing: 0.03em;
+            font-size: clamp(10px, 1vw, 14px);
+            opacity: 0.6;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .section .small {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(10px, 1vw, 13px);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            opacity: 1;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        /* Hero section spéciale */
+        .section[data-section="0"] h1 {
+            font-size: clamp(32px, 6vw, 72px);
+            font-weight: 400;
+            line-height: 1.2;
+        }
+
+        /* Backed By section - founders cloud */
+        .founders-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: clamp(15px, 3vw, 40px);
+            max-width: 800px;
+            padding: 0 20px;
+            margin-top: clamp(15px, 3vh, 30px);
+        }
+
+        .founder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .founder em {
+            font-family: 'Lora', serif;
+            font-size: clamp(14px, 1.8vw, 22px);
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .founder small {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(8px, 0.7vw, 10px);
+            opacity: 0.5;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        @media (max-width: 768px) {
+            .founders-cloud {
+                gap: 12px;
+            }
+            .founder {
+                font-size: 13px;
+            }
+            .founder small {
+                font-size: 8px;
+            }
+        }
+
+        /* Backed by section - and many others */
+        .section p.and-more {
+            font-family: 'Lora', serif;
+            font-size: clamp(11px, 1.2vw, 16px);
+            font-style: italic;
+            font-weight: 400;
+            margin-top: 20px;
+            opacity: 1;
+            text-transform: none;
+            letter-spacing: 0.02em;
+        }
+
+        /* Apply section */
+        .section[data-section="4"] .ef-stats {
+            font-family: 'Lora', serif;
+            font-size: clamp(24px, 4vw, 48px);
+            font-style: italic;
+            font-weight: 400;
+            margin-top: 10px;
+            text-transform: none;
+            letter-spacing: 0.02em;
+        }
+
+        .section[data-section="4"] .ef-investors {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(10px, 1vw, 14px);
+            margin-top: 15px;
+            opacity: 0.6;
+            text-transform: none;
+            letter-spacing: 0.03em;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+
+        .section[data-section="4"] .faq-link {
+            font-family: 'Lora', serif;
+            font-style: italic;
+            font-size: clamp(12px, 1.1vw, 15px);
+            margin-top: 30px;
+            opacity: 0.7;
+            text-transform: none;
+            letter-spacing: 0.02em;
+        }
+
+        .section[data-section="4"] .faq-link a {
+            color: inherit;
+            text-decoration: underline;
+            pointer-events: auto;
+            transition: opacity 0.2s;
+        }
+
+        .section[data-section="4"] .faq-link a:hover {
+            opacity: 0.7;
+        }
+
+        .apply-big {
+            display: inline-block;
+            font-family: 'Lora', serif;
+            font-size: clamp(11px, 1.1vw, 14px);
+            font-style: italic;
+            font-weight: 400;
+            color: #1E1E1E;
+            background-color: transparent;
+            border: 1px solid #1E1E1E;
+            border-radius: 50px;
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            padding: 10px 28px;
+            margin-top: clamp(20px, 4vh, 40px);
+            transition: all 0.2s ease;
+            pointer-events: auto;
+        }
+
+        .apply-big:hover {
+            background-color: #1E1E1E;
+            color: #FFFFFF;
+        }
+
+        body.night-mode .apply-big {
+            color: #FFFFFF;
+            border-color: #FFFFFF;
+        }
+
+        body.night-mode .apply-big:hover {
+            background-color: #FFFFFF;
+            color: #1E1E1E;
+        }
+
+        @media (max-width: 768px) {
+            .apply-big {
+                padding: 8px 24px;
+                font-size: 10px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+<canvas id="dots"></canvas>
+
+<div id="content">
+    <div id="text-container">
+        <!-- Contenu retiré - paysage uniquement -->
+    </div>
+</div>
+
+<!-- Road sign HTML element -->
+<div id="road-sign">
+    <div id="road-sign-inner">
+        <div class="sign-text-group">
+            <p class="sign-welcome">Welcome to</p>
+            <h1>The Residency</h1>
+            <div class="sign-bottom">
+                <span>Pop 40</span>
+                <span>8 Weeks</span>
+            </div>
+        </div>
+        <svg class="sign-arrow" viewBox="0 0 60 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0" y="10" width="42" height="4" fill="white"/>
+            <polygon points="38,0 60,12 38,24" fill="white"/>
+        </svg>
+    </div>
+</div>
+
+<canvas id="skater-canvas"></canvas>
+
+<!-- Header par-dessus tout -->
+<div id="header">
+    <a href="../"><img id="logo" src="../assets/logo.png" alt="The Bridge"></a>
+    <div class="header-right">
+        <nav id="nav-menu">
+            <a href="../faq">FAQ</a>
+            <a href="../meet-us">Meet Us</a>
+            <a href="../community">Community</a>
+            <a href="../residency">Residency</a>
+        </nav>
+        <a id="apply-btn" href="../apply">Apply</a>
+        <div id="menu-toggle">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile menu overlay -->
+<div id="mobile-menu">
+    <a href="../" data-index="01">Home</a>
+    <a href="../residency" data-index="02">Residency</a>
+    <a href="../faq" data-index="03">FAQ</a>
+    <a href="../meet-us" data-index="04">Meet Us</a>
+    <a href="../apply" data-index="05">Apply</a>
+</div>
+
+<!-- Header background overlay -->
+<div id="header-bg"></div>
+
+<script>
+var canvas = document.getElementById('dots');
+var ctx = canvas.getContext('2d');
+var skaterCanvas = document.getElementById('skater-canvas');
+var skaterCtx = skaterCanvas.getContext('2d');
+var textContainer = document.getElementById('text-container');
+var header = document.getElementById('header');
+var sections = document.querySelectorAll('.section');
+
+var scrollPos = 0;
+var maxScroll;
+var pixelSize, margin;
+
+// Calculer la zone des points
+var dotZone = { x: 0, y: 0, width: 0, height: 0 };
+
+// Position Y du pont (centre du pont où le texte doit être aligné)
+var bridgeCenterY = 0;
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    skaterCanvas.width = window.innerWidth;
+    skaterCanvas.height = window.innerHeight;
+
+    var baseSize = Math.min(canvas.width, canvas.height);
+    var isMobile = canvas.width < 768;
+
+    // Pixel size pour style 8-bit (pixels plus gros sur mobile)
+    pixelSize = isMobile ? Math.max(5, Math.floor(baseSize * 0.008)) : Math.max(4, Math.floor(baseSize * 0.005));
+
+    // Marge uniquement en haut (plus de marges latérales)
+    var marginSide = baseSize * 0.035;  // Gardé pour le header
+    var marginTop = Math.max(50, baseSize * 0.06);
+    margin = 0;
+
+    // Le terrain fait 5 écrans de large, donc maxScroll = 4 écrans
+    maxScroll = canvas.width * 4;
+
+    // Zone de rendu - pleine largeur
+    dotZone.x = 0;
+    dotZone.y = marginTop;
+    dotZone.width = canvas.width;
+    dotZone.height = canvas.height - marginTop;
+
+    // Position Y du centre du pont
+    var isMobile = canvas.width < 768;
+    var roadY = canvas.height * (isMobile ? 0.92 : 0.88);
+    var bridgeScale = isMobile ? 0.6 : 1;
+    var towerHeight = canvas.height * 0.25 * bridgeScale;
+    var towerTop = roadY - towerHeight;
+    bridgeCenterY = towerTop + towerHeight * 0.3;
+
+    // Appliquer la zone au container de texte
+    textContainer.style.left = dotZone.x + 'px';
+    textContainer.style.top = dotZone.y + 'px';
+    textContainer.style.width = dotZone.width + 'px';
+    textContainer.style.height = dotZone.height + 'px';
+
+    // Positionner le header (aligné comme les autres pages)
+    // Calculer dotZoneX comme dans manifesto/faq/etc
+    var dotSpacing = Math.max(8, baseSize * 0.01);
+    var cols = Math.ceil(canvas.width / dotSpacing) + 1;
+    var rows = Math.ceil(canvas.height / dotSpacing) + 1;
+    var firstDotX, lastDotX, firstDotY;
+    for (var c = 0; c < cols; c++) {
+        var px = c * dotSpacing + dotSpacing / 2;
+        if (px >= marginSide && firstDotX === undefined) firstDotX = px;
+        if (px <= canvas.width - marginSide) lastDotX = px;
+    }
+    for (var r = 0; r < rows; r++) {
+        var py = r * dotSpacing + dotSpacing / 2;
+        if (py >= marginTop && firstDotY === undefined) firstDotY = py;
+    }
+    var dotZoneX = firstDotX;
+    var dotZoneY = firstDotY;
+    var dotZoneWidth = lastDotX - firstDotX;
+
+    var headerTopMargin = marginSide * 0.5;
+    header.style.top = headerTopMargin + 'px';
+    header.style.height = (dotZoneY - headerTopMargin - 10) + 'px';
+    header.style.paddingLeft = dotZoneX + 'px';
+    header.style.paddingRight = (canvas.width - dotZoneX - dotZoneWidth) + 'px';
+
+    var headerBg = document.getElementById('header-bg');
+    headerBg.style.height = (dotZone.y - pixelSize / 2) + 'px';
+
+    var logo = document.getElementById('logo');
+    logo.style.height = Math.max(18, baseSize * 0.03) + 'px';
+
+    sections.forEach(function(section, i) {
+        section.style.width = dotZone.width + 'px';
+        section.style.left = '0px';
+    });
+
+    // Régénérer nuages et bâtiments selon la taille d'écran
+    if (typeof generateClouds === 'function') {
+        generateClouds();
+    }
+    if (typeof generateBuildings === 'function') {
+        generateBuildings();
+    }
+    if (typeof generateCityBuildings === 'function') {
+        generateCityBuildings();
+    }
+    // Précalculer les nuages statiques
+    if (typeof updateStaticCloudPositions === 'function') {
+        updateStaticCloudPositions();
+    }
+
+}
+
+// Générateur de nombres pseudo-aléatoires avec seed pour consistance
+function seededRandom(seed) {
+    var x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+}
+
+// Nuages pixel art - gros nuages allongés avec volume (blanc = lumière en haut, gris = ombre en bas)
+// Valeurs: 0 = vide, 1 = gris (ombre/bords), 2 = blanc pur (centre lumineux)
+var cloudPatterns = [
+    // Très gros nuage allongé 1 (30x7) - fluffy avec volume
+    [
+        [0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0],
+        [0, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0],
+        [0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0],
+        [0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 0],
+        [1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 0],
+        [0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 0, 0],
+        [0, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+    ],
+    // Très gros nuage allongé 2 (28x6) - plus plat avec volume
+    [
+        [0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0],
+        [0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0],
+        [0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 0],
+        [1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 0],
+        [0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 0, 0],
+    ],
+    // Gros nuage allongé 3 (24x6) - ondulé avec volume
+    [
+        [0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0],
+        [0, 0, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0],
+        [0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 0],
+        [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 0],
+        [1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1],
+        [0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 0, 0],
+    ],
+    // Gros nuage allongé 4 (22x5) - simple et long avec volume
+    [
+        [0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0],
+        [0, 0, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 0, 0, 0],
+        [0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 0, 0],
+        [1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 0],
+        [0, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 0, 0],
+    ],
+    // Gros nuage très allongé 5 (26x5) - stratus doux avec volume
+    [
+        [0, 0, 2, 2, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 2, 0, 0],
+        [0, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 0],
+        [1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
+        [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1],
+        [0, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 0, 0],
+    ],
+];
+
+// === NUAGES STATIQUES - bien espacés sans chevauchement ===
+var clouds = [];
+var numClouds = 40;  // Plus de nuages en desktop
+
+function generateClouds() {
+    clouds = [];
+    var isMobile = window.innerWidth < 768;
+
+    if (isMobile) {
+        // Mobile : clouds spread across scrollable sky
+        for (var i = 0; i < 20; i++) {
+            var patternIndex = Math.floor(seededRandom(i * 999.999) * 2);
+            var cloudSize = 1.0 + seededRandom(i * 333.333) * 0.4;
+
+            clouds.push({
+                xRatio: -1 + seededRandom(i * 444.444) * 7,
+                yRatio: 0.10 + seededRandom(i * 222.222) * 0.18,
+                size: cloudSize,
+                pattern: patternIndex,
+                opacity: 0.22 + seededRandom(i * 555.555) * 0.10
+            });
+        }
+        return;
+    }
+
+    // Desktop : clouds spread across entire scrollable sky
+    var count = 100;
+    var rows = 4;
+
+    for (var i = 0; i < count; i++) {
+        var rand = seededRandom(i * 777.777);
+        var patternIndex, cloudSize;
+
+        // Mix de gros et petits nuages
+        if (rand < 0.35) {
+            patternIndex = Math.floor(seededRandom(i * 888.888) * 2);
+            cloudSize = 1.2 + seededRandom(i * 333.333) * 0.5;
+        } else if (rand < 0.7) {
+            patternIndex = 2 + Math.floor(seededRandom(i * 999.999) * 2);
+            cloudSize = 0.8 + seededRandom(i * 333.333) * 0.4;
+        } else {
+            patternIndex = 3 + Math.floor(seededRandom(i * 999.999) * 2);
+            cloudSize = 0.5 + seededRandom(i * 333.333) * 0.3;
+        }
+
+        // Spread across full terrain (-1 to +6 screen widths to cover scroll range with parallax)
+        var xRatio = -1 + seededRandom(i * 444.444) * 7;
+
+        // Position Y: sous le header (0.10 à 0.25)
+        var yLevels = [0.10, 0.14, 0.18, 0.22];
+        var rowInCol = i % rows;
+        var yBase = yLevels[rowInCol];
+        var yOffset = seededRandom(i * 222.222) * 0.03;
+        var yRatio = yBase + yOffset;
+
+        clouds.push({
+            xRatio: xRatio,
+            yRatio: yRatio,
+            size: cloudSize,
+            pattern: patternIndex,
+            opacity: 0.20 + seededRandom(i * 555.555) * 0.15
+        });
+    }
+}
+
+generateClouds();
+
+// Cache pour positions des nuages (calculé une fois au resize)
+var cloudPositions = [];
+
+// Précalculer les nuages (appelé une seule fois au resize)
+function updateStaticCloudPositions() {
+    cloudPositions = [];
+    for (var i = 0; i < clouds.length; i++) {
+        var cloud = clouds[i];
+        var cloudY = cloud.yRatio * canvas.height;
+        var cloudRow = Math.floor(cloudY / pixelSize);
+        var pattern = cloudPatterns[cloud.pattern];
+        var patternHeight = Math.ceil(pattern.length * cloud.size);
+
+        cloudPositions.push({
+            xRatio: cloud.xRatio,
+            row: cloudRow,
+            size: cloud.size,
+            pattern: cloud.pattern,
+            opacity: cloud.opacity,
+            maxRow: cloudRow + patternHeight,
+            minRow: cloudRow
+        });
+    }
+}
+
+function getCloudOpacity(x, y, col, row) {
+    // Early exit si trop bas (nuages jusqu'à 35% de l'écran - sous le header, au-dessus du billboard)
+    if (y > canvas.height * 0.35) return 0;
+
+    for (var i = 0; i < cloudPositions.length; i++) {
+        var cp = cloudPositions[i];
+
+        // Early exit si hors zone verticale
+        if (row < cp.minRow || row > cp.maxRow) continue;
+
+        // Position en colonne basée sur xRatio et scroll (parallax léger)
+        var cloudCol = Math.floor((cp.xRatio * canvas.width - scrollPos * 0.2) / pixelSize);
+
+        var relCol = col - cloudCol;
+        var relRow = row - cp.row;
+
+        var scaledCol = Math.floor(relCol / cp.size);
+        var scaledRow = Math.floor(relRow / cp.size);
+
+        var pattern = cloudPatterns[cp.pattern];
+        if (scaledRow >= 0 && scaledRow < pattern.length) {
+            var patternRow = pattern[scaledRow];
+            if (scaledCol >= 0 && scaledCol < patternRow.length) {
+                var pixelValue = patternRow[scaledCol];
+                if (pixelValue === 2) {
+                    // Blanc pur (centre lumineux) - opacité normale
+                    return { type: 'white', opacity: cp.opacity };
+                } else if (pixelValue === 1) {
+                    // Gris (ombre/bords) - opacité plus forte pour contraste
+                    return { type: 'gray', opacity: cp.opacity * 1.3 };
+                }
+            }
+        }
+    }
+
+    return 0;
+}
+
+// Générateur pseudo-aléatoire pour bâtiments consistants
+function buildingRandom(seed) {
+    var x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
+    return x - Math.floor(x);
+}
+
+// Skyline de bâtiments style 8-bit
+var cityBuildings = [];
+var numBuildings = 60;
+
+function generateBuildings() {
+    cityBuildings = [];
+    var isMobile = window.innerWidth < 768;
+    var count = isMobile ? 25 : numBuildings;
+
+    for (var b = 0; b < count; b++) {
+        cityBuildings.push({
+            xRatio: b / count + buildingRandom(b * 11) * 0.02,
+            widthRatio: isMobile ? 0.025 + buildingRandom(b * 22) * 0.025 : 0.012 + buildingRandom(b * 22) * 0.018,
+            heightRatio: isMobile ? 0.06 + buildingRandom(b * 33) * 0.12 : 0.08 + buildingRandom(b * 33) * 0.18,
+            hasAntenna: buildingRandom(b * 44) > 0.7,
+            windowRows: Math.floor(isMobile ? 2 + buildingRandom(b * 55) * 3 : 3 + buildingRandom(b * 55) * 6),
+            windowCols: Math.floor(2 + buildingRandom(b * 66) * 2),
+            depth: buildingRandom(b * 77)
+        });
+    }
+}
+
+// Générer les bâtiments une seule fois
+generateBuildings();
+
+// === CITY PIXEL ART ===
+// Couleurs simples et vives - style pixel art clair
+var frontBuildingColors = [
+    {wall: {r: 220, g: 90, b: 80}},    // Rouge corail
+    {wall: {r: 90, g: 150, b: 180}},   // Bleu ciel
+    {wall: {r: 230, g: 180, b: 80}},   // Jaune moutarde
+    {wall: {r: 180, g: 120, b: 160}},  // Mauve
+    {wall: {r: 120, g: 170, b: 130}},  // Vert menthe
+    {wall: {r: 220, g: 160, b: 130}},  // Pêche
+];
+
+// Générer les bâtiments de la ville (premier plan + arrière-plan)
+var cityFrontBuildings = [];
+var cityBackBuildings = [];
+var cityBillboards = [];
+
+function generateCityBuildings() {
+    cityFrontBuildings = [];
+    cityBackBuildings = [];
+    cityBillboards = [];
+
+    var isMobile = canvas.width < 768;
+
+    // Gratte-ciels arrière-plan - spread across wide terrain for scrolling
+    var terrainWidth = canvas.width * 9; // covers -4 to +4 screens worth of parallax
+    var numBackBuildings = isMobile ? 60 : 200;
+    for (var i = 0; i < numBackBuildings; i++) {
+        var seed = i * 123.456;
+        cityBackBuildings.push({
+            x: -terrainWidth * 0.4 + seededRandom(seed) * terrainWidth,
+            width: (isMobile ? 30 : 80) + seededRandom(seed + 1) * (isMobile ? 25 : 70),
+            height: (isMobile ? 0.15 : 0.25) + seededRandom(seed + 2) * (isMobile ? 0.20 : 0.35),
+            shade: 0.6 + seededRandom(seed + 3) * 0.3
+        });
+    }
+    cityBackBuildings.sort(function(a, b) { return a.x - b.x; });
+
+    // GREEN ROAD SIGN - US highway style
+    var bbWidth, bbHeight, poleHeight;
+
+    if (isMobile) {
+        bbWidth = canvas.width * 0.85;
+        bbHeight = (bbWidth * 0.5) / canvas.height;
+        poleHeight = 0.06;
+    } else {
+        bbWidth = 800;
+        bbHeight = 400 / canvas.height;
+        poleHeight = 0.10;
+    }
+
+    // Centré horizontalement sur l'écran
+    var xPosition = (canvas.width - bbWidth) / 2;
+
+    cityBillboards.push({
+        x: xPosition,
+        width: bbWidth,
+        height: bbHeight,
+        poleHeight: poleHeight,
+        colorIndex: 0,
+        pattern: 0,
+        format: 0
+    });
+}
+
+generateCityBuildings();
+
+// Skateboarder sprite matching reference: leaning forward, pushing, backwards red cap
+// Facing right on a longboard. Body tilted forward, back leg extended pushing.
+// R=red cap, r=dark red, S=skin, s=skin shadow, k=skin dark,
+// W=white tee, w=tee shadow, V=tee bright,
+// B=black shorts, b=shorts edge,
+// G=white shoe, g=shoe gray, H=sole,
+// D=red deck, d=dark deck, Y=yellow wheel, y=wheel dark, T=truck
+// A=arm right(behind), C=cap brim
+// Upper body shared across all frames
+var skaterUpperBody = [
+    // Cap backwards on head - rounded top, brim left (small)
+    '................reRRrrr.................',
+    '...............RReRRRRRR................',
+    '...........CCCCRRRRRRRRRf...............',
+    '...........CCCrrrrrrrrrf................',
+    // Head - facing right (profile) + surfer mid-length hair
+    '.............qQqqqqSSSSSL...............',
+    '............qQQqqqqSSSSSSL..............',
+    '............qQQqqqqSSSSSLS..............',
+    '...........qQQQqqqsSSSSSL..............',
+    '...........qQQqqqqskSSSLk..............',
+    '...........qqQQqqqs.sSLs...............',
+    // Neck + surfer hair stops quick
+    '............qqQQq.ssks.................',
+    '..............qqssVWWWss...............',
+    '..............sVWWWWWWWWss.............',
+    '..............sSVWWWWWWnSs.............',
+    '..............sSVWWWWWWnSs.............',
+    '..............sSWWWWWWWWnSs............',
+    '..............SSWWWWWWWWWSS............',
+    '..............SS.VWWWWWWn.SS...........',
+    '..............SS.EWWWWWWw.SS...........',
+    '..............SS.wWWWWWWn.SS...........',
+    '..............SS.wWWWWWWn.SS...........',
+    '..............SS.wWWWWWWn.SS...........',
+    '..............SS.wWWWWWWn.SS...........',
+    '..............SS.nWWWWWWn.SS...........',
+    '..............SS.nwwwwwwn.sS...........',
+    '..............Ss.nwwwwwwn.sS...........',
+    // Baggy jeans - waist
+    '..............Ss.PBBBBBBb.sS...........',
+    '..............Ss.BBPBBBBBbsS...........',
+    '..............SsBBBPPbBBPBsS...........',
+    '..............ssPBBBBBBBBBss...........',
+    // Baggy jeans - thighs (wide)
+    '...............BBPBPb.PBBBb............',
+    '...............BBBBPb.BBPBb............',
+    '...............PBBBb..BBBBP............',
+    '...............PBBPb..bPBBP............',
+];
+
+// ============================================================
+// ANIMATION SYSTEM - smooth real-time back leg rendering
+// ============================================================
+// Upper body + front leg + board: rendered from static string arrays
+// Back leg: rendered dynamically based on legPhase (0→1→0 = idle→push→ride)
+// Board: FIXED.
+// ============================================================
+
+// Fixed board block (6 rows)
+var boardRows = [
+    '..........dDDJJJDDDDDJJDDDDDDDDDDDDDDDd.....',
+    '.........dDDDJJDDDDDDJDDDDDDDDDDDDDDDDd.....',
+    '..........t..........................t.......',
+    '.........yYy........................yYy......',
+    '.........YYY........................YYY......',
+    '.........yYy........................yYy......',
+];
+
+// Front leg: bent at knee, FIXED. Baggy jeans — wide and loose.
+var frontLegRows = [
+    '......................bPBBP..........',
+    '......................BPBBb..........',
+    '......................BBPBb..........',
+    '.....................BBBPb...........',
+    '.....................PBBBb...........',
+    '......................PBBb...........',
+    '......................BBPPb..........',
+    '.....................BPBPb...........',
+    '.....................PBBBb...........',
+    '......................GFg............',
+    '......................GFGl...........',
+    '......................HHH............',
+];
+
+// Static sprite = upper body + front leg + board (no back leg)
+var skaterStatic = skaterUpperBody.concat(frontLegRows).concat(boardRows);
+
+// Upper body animation: whole block shifts forward during ride
+var bodyShiftRide = 1; // whole upper body shifts +1 pixel right when riding
+
+// Back leg: 3 key poses
+// t=0 idle (foot on ground) → t=0.5 push (foot at back wheel) → t=1 ride (foot on board)
+// Going UP (0→1): passes through push. Fast ~0.15s
+// Going DOWN (1→0): DIRECT ride→idle, no push detour. Fast ~0.15s
+var legT = 0;
+var legTargetT = 0;
+var legUpSpeed = 1 / 4;    // ~0.07s at 60fps for 0→1
+var legDownSpeed = 1 / 4;  // ~0.07s at 60fps for 1→0
+
+// 3 key poses for back leg (12 rows each)
+// idle: straight down col 17
+// push: knee bends at row 4-5, shin goes back to col 11-10 (near back wheel at col 9)
+// ride: angled col 17→15, shorter (9 rows)
+var backLegIdle = [17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17];
+var backLegPush = [17, 17, 17, 16, 15, 14, 13, 12, 11, 10, 10, 10];
+var backLegRide = [17, 17, 16, 16, 16, 16, 15, 15, 15, 15, 14, 14];
+
+// Board-overlay leg (6 rows)
+// idle: leg passes in front of board to reach ground
+// push: leg also in front of board going to back wheel
+// ride: no leg on board
+var backBoardIdle = [17, 17, 17, 17, 17, 16];
+var backBoardPush = [9,  9,  9,  9, -1, -1];
+var backBoardRide = [-1, -1, -1, -1, -1, -1];
+
+// Foot col: idle=16 (below board), push=8 (at back wheel), ride=14 (on deck)
+var backFootIdleCol = 16;
+var backFootPushCol = 8;
+var backFootRideCol = 14;
+
+// Scroll idle timer
+var idleTimer = null;
+
+var skaterColors = {
+    'R': {r: 195, g: 35, b: 35},    // Red cap
+    'r': {r: 155, g: 28, b: 28},    // Dark red
+    'C': {r: 170, g: 30, b: 30},    // Cap brim
+    'S': {r: 195, g: 150, b: 110},   // Skin
+    's': {r: 170, g: 125, b: 88},    // Skin shadow
+    'k': {r: 145, g: 105, b: 72},    // Skin dark
+    'W': {r: 245, g: 245, b: 248},  // White tee
+    'w': {r: 215, g: 215, b: 220},  // Tee shadow
+    'V': {r: 255, g: 255, b: 255},  // Tee highlight
+    'B': {r: 55, g: 75, b: 130},     // Denim blue
+    'b': {r: 75, g: 95, b: 150},     // Denim highlight
+    'G': {r: 240, g: 240, b: 242},  // White shoe
+    'g': {r: 200, g: 200, b: 205},  // Shoe shadow
+    'H': {r: 55, g: 55, b: 60},     // Sole
+    'D': {r: 60, g: 55, b: 50},      // Wood deck
+    'd': {r: 42, g: 38, b: 35},      // Dark deck edge
+    'Y': {r: 225, g: 195, b: 45},   // Yellow wheel
+    'y': {r: 180, g: 155, b: 35},   // Wheel shadow
+    'T': {r: 155, g: 160, b: 168},  // Truck silver
+    'e': {r: 220, g: 50, b: 45},   // Cap highlight
+    'f': {r: 115, g: 20, b: 18},   // Cap deep shadow
+    'L': {r: 215, g: 172, b: 132},  // Skin highlight
+    'E': {r: 230, g: 230, b: 235}, // Tee mid
+    'n': {r: 190, g: 190, b: 195}, // Tee deep shadow
+    'P': {r: 45, g: 62, b: 115},    // Denim shadow
+    'F': {r: 220, g: 220, b: 225}, // Shoe highlight
+    'l': {r: 165, g: 165, b: 170}, // Shoe dark
+    'J': {r: 78, g: 72, b: 65},    // Deck highlight
+    't': {r: 130, g: 135, b: 142}, // Truck shadow
+    'Q': {r: 15, g: 12, b: 10},   // Hair black
+    'q': {r: 30, g: 25, b: 20},   // Hair dark
+};
+
+// === VICTORIAN HOUSE (SF Painted Lady) - pixel art ===
+// 150 rows x 55 cols at scale 6 = 900px x 330px on desktop (~4x skater size)
+// Characters map to victorianColors (day) / victorianColorsNight (night)
+var victorianHouse = [
+    '..............................................AAA..............................................',
+    '.............................................RaaaR.............................................',
+    '............................................RAAAAAR............................................',
+    '...........................................RaaaaaaaR...........................................',
+    '..........................................RAAAAAAAAAR..........................................',
+    '.........................................RaaaaaaaaaaaR.........................................',
+    '........................................RAAAAAAAAAAAAAR........................................',
+    '.......................................RaaaaaaaaaaaaaaaR.......................................',
+    '......................................RAAAAAAAAAAAAAAAAAR......................................',
+    '.....................................RaaaaaaaaaaaaaaaaaaaR.....................................',
+    '....................................RAAAAAAAAAAAAAAAAAAAAAR....................................',
+    '...................................RaaaaaaaaaaaaaaaaaaaaaaaR...................................',
+    '..................................RAAAAAAAAAAAAAAAAAAAAAAAAAR..................................',
+    '.................................RaaaaaaaaaaaaaaaaaaaaaaaaaaaR.................................',
+    '.................................CCCCCCCCCCCCCCCCCCCCCCCCCCCCC.................................',
+    '.................................=ooooooooooooooooooooooooooo=.................................',
+    '.................................FdddddddddddddddddddddddddddF.................................',
+    '.................................FFh6GGG6hFFh6GGG6hFFh6GGG6hFF.................................',
+    '.................................FFhGGGGGhFFhGGGGGhFFhGGGGGhFF.................................',
+    '.................................FFhGGGGGhFFhGGGGGhFFhGGGGGhFF.................................',
+    '.................................FFhGGGGGhFFhGGGGGhFFhGGGGGhFF.................................',
+    '.................................FFhGGGGGhFFhGGGGGhFFhGGGGGhFF.................................',
+    '.................................FFhGGGGGhFFhGGGGGhFFhGGGGGhFF.................................',
+    '.................................FFhGGGGGhFFhGGGGGhFFhGGGGGhFF.................................',
+    '.................................FFhGGGGGhFFhGGGGGhFFhGGGGGhFF.................................',
+    '.................................FFhGGGGGhFFhGGGGGhFFhGGGGGhFF.................................',
+    '.................................FFhGGGGGhFFhGGGGGhFFhGGGGGhFF.................................',
+    '.................................FFhdddddhFFhdddddhFFhdddddhFF.................................',
+    '.................................FFFFFFFFFFFFFFFFFFFFFFFFFFFFF.................................',
+    '.................................ddddddddddddddddddddddddddddd.................................',
+    '.................................EEEEEEEEEEEEEEEEEEEEEEEEEEEEE.................................',
+    '.................................=============================.................................',
+    '........................RAARCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCRAAR........................',
+    '....................RaaaaaaRCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCRaaaaaaR....................',
+    '................RAAAAAAAAAARXEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEXRAAAAAAAAAAR................',
+    '............RaaaaaaaaaaaaaaRXEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEXRaaaaaaaaaaaaaaR............',
+    '........RAAAAAAAAAAAAAAAAAAR=======================================RAAAAAAAAAAAAAAAAAAR........',
+    '....RaaaaaaaaaaaaaaaaaaaaaaR=======================================RaaaaaaaaaaaaaaaaaaaaaaR....',
+    'CCCCCCCCCCCCCCCCCCCCCCCCCCCCFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFCCCCCCCCCCCCCCCCCCCCCCCCCCCC',
+    '===============================================================================================',
+    'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
+    'FFFh6GGGGG6hFFFFh6GGGGG6hFFFFhh6GGGGG6hhFFhh6GGGGG6hhFFhh6GGGGG6hhFFFFh6GGGGG6hFFFFh6GGGGG6hFFF',
+    'FFFhGGGGGGGhFFFFhGGGGGGGhFFFFhh5GGGGG5hhFFhh5GGGGG5hhFFhh5GGGGG5hhFFFFhGGGGGGGhFFFFhGGGGGGGhFFF',
+    'FFFhGGGGGGGhFFFFhGGGGGGGhFFFFhhGGGGGGGhhFFhhGGGGGGGhhFFhhGGGGGGGhhFFFFhGGGGGGGhFFFFhGGGGGGGhFFF',
+    'FFFhGGGGGGGhFFFFhGGGGGGGhFFFFhhGGGGGGGhhFFhhGGGGGGGhhFFhhGGGGGGGhhFFFFhGGGGGGGhFFFFhGGGGGGGhFFF',
+    'FFFhGGGGGGGhFFFFhGGGGGGGhFFFFhhGGGGGGGhhFFhhGGGGGGGhhFFhhGGGGGGGhhFFFFhGGGGGGGhFFFFhGGGGGGGhFFF',
+    'FFFhGGGGGGGhFFFFhGGGGGGGhFFFFhhGGGGGGGhhFFhhGGGGGGGhhFFhhGGGGGGGhhFFFFhGGGGGGGhFFFFhGGGGGGGhFFF',
+    'FFFhGGGGGGGhFFFFhGGGGGGGhFFFFhhGGGGGGGhhFFhhGGGGGGGhhFFhhGGGGGGGhhFFFFhGGGGGGGhFFFFhGGGGGGGhFFF',
+    'FFFhGGGGGGGhFFFFhGGGGGGGhFFFFhhGGGGGGGhhFFhhGGGGGGGhhFFhhGGGGGGGhhFFFFhGGGGGGGhFFFFhGGGGGGGhFFF',
+    'FFFhGGGGGGGhFFFFhGGGGGGGhFFFFhhGGGGGGGhhFFhhGGGGGGGhhFFhhGGGGGGGhhFFFFhGGGGGGGhFFFFhGGGGGGGhFFF',
+    'FFFhGGGGGGGhFFFFhGGGGGGGhFFFFhhGGGGGGGhhFFhhGGGGGGGhhFFhhGGGGGGGhhFFFFhGGGGGGGhFFFFhGGGGGGGhFFF',
+    'FFFhGGGGGGGhFFFFhGGGGGGGhFFFFhhGGGGGGGhhFFhhGGGGGGGhhFFhhGGGGGGGhhFFFFhGGGGGGGhFFFFhGGGGGGGhFFF',
+    'FFFhGGGGGGGhFFFFhGGGGGGGhFFFFhhGGGGGGGhhFFhhGGGGGGGhhFFhhGGGGGGGhhFFFFhGGGGGGGhFFFFhGGGGGGGhFFF',
+    'FFFhGGGGGGGhFFFFhGGGGGGGhFFFFhhGGGGGGGhhFFhhGGGGGGGhhFFhhGGGGGGGhhFFFFhGGGGGGGhFFFFhGGGGGGGhFFF',
+    'FFFhGGGGGGGhFFFFhGGGGGGGhFFFFhhGGGGGGGhhFFhhGGGGGGGhhFFhhGGGGGGGhhFFFFhGGGGGGGhFFFFhGGGGGGGhFFF',
+    'FFFhdddddddhdFFFFhdddddddhdFFhhdddddddhhFFhhdddddddhhFFhhdddddddhhFFFFhdddddddhdFFFFhdddddddhdF',
+    'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
+    'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
+    'ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd',
+    '===============================================================================================',
+    'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC',
+    'jCCCjjCCCjjCCCjjCCCjjCCCjjCCCjjCCCjjCCCjjCCCjjCCCjjCCCjjCCCjjCCCjjCCCjjCCCjjCCCjjCCCjjCCCjjCCCj',
+    '===============================================================================================',
+    '33333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333',
+    '44444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444',
+    'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC',
+    'FFFFFFFFFFFFFFFFFFFFFFFFFFKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKkkFFFFFFFFFFFFFFFFFFFFFFFFFF',
+    'FFFh6GGGG6hFFFFh6GGGG6hFFKKh6GGG6hKKKh6GGG6hKKKh6GGG6hKKKh6GGG6hKKkkFFFh6GGGG6hFFFFh6GGGG6hFF..',
+    'FFFhGGGGGGhFFFFhGGGGGGhFFKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKkkFFFhGGGGGGhFFFFhGGGGGGhFF..',
+    'FFFhGGGGGGhFFFFhGGGGGGhFFKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKkkFFFhGGGGGGhFFFFhGGGGGGhFF..',
+    'FFFhGGGGGGhFFFFhGGGGGGhFFKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKkkFFFhGGGGGGhFFFFhGGGGGGhFF..',
+    'FFFhGGGGGGhFFFFhGGGGGGhFFKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKkkFFFhGGGGGGhFFFFhGGGGGGhFF..',
+    'FFFhGGGGGGhFFFFhGGGGGGhFFKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKkkFFFhGGGGGGhFFFFhGGGGGGhFF..',
+    'FFFhGGGGGGhFFFFhGGGGGGhFFKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKkkFFFhGGGGGGhFFFFhGGGGGGhFF..',
+    'FFFhGGGGGGhFFFFhGGGGGGhFFKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKkkFFFhGGGGGGhFFFFhGGGGGGhFF..',
+    'FFFhGGGGGGhFFFFhGGGGGGhFFKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKkkFFFhGGGGGGhFFFFhGGGGGGhFF..',
+    'FFFhGGGGGGhFFFFhGGGGGGhFFKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKkkFFFhGGGGGGhFFFFhGGGGGGhFF..',
+    'FFFhGGGGGGhFFFFhGGGGGGhFFKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKkkFFFhGGGGGGhFFFFhGGGGGGhFF..',
+    'FFFhGGGGGGhFFFFhGGGGGGhFFKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKkkFFFhGGGGGGhFFFFhGGGGGGhFF..',
+    'FFFhGGGGGGhFFFFhGGGGGGhFFKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKKhGGGGGhKKkkFFFhGGGGGGhFFFFhGGGGGGhFF..',
+    'FFFhdddddddhFFFFhdddddddhFKKhdddddhhKKhdddddhhKKhdddddhhKKhdddddhhKKkFFFhdddddddhFFFFhdddddddhF',
+    'FFFFFFFFFFFFFFFFFFFFFFFFFFKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKkkFFFFFFFFFFFFFFFFFFFFFFFFFF',
+    'FFFFFFFFFFFFFFFFFFFFFFFFFFkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkFFFFFFFFFFFFFFFFFFFFFFFFFF',
+    'ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd',
+    '===============================================================================================',
+    'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC',
+    'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
+    'FFFh6GGGGG6hFFFFh6GGGGG6hFFFFFh6GGGGG6hFFFF7DDDDDDD7FFFFh6GGGGG6hFFFFFh6GGGGG6hFFFFh6GGGGG6hFFF',
+    'FFFhGGGGGGGhFFFFhGGGGGGGhFFFFFhGGGGGGGhFFFFmDDDDDDDmFFFFhGGGGGGGhFFFFFhGGGGGGGhFFFFhGGGGGGGhFFF',
+    'FFFhGGGGGGGhFFFFhGGGGGGGhFFFFFhGGGGGGGhFFFFmDDNNDDDmFFFFhGGGGGGGhFFFFFhGGGGGGGhFFFFhGGGGGGGhFFF',
+    'FFFhGGGGGGGhFFFFhGGGGGGGhFFFFFhGGGGGGGhFFFFmDDNNDDDmFFFFhGGGGGGGhFFFFFhGGGGGGGhFFFFhGGGGGGGhFFF',
+    'FFFhGGGGGGGhFFFFhGGGGGGGhFFFFFhGGGGGGGhFFFFmDDNNDDDmFFFFhGGGGGGGhFFFFFhGGGGGGGhFFFFhGGGGGGGhFFF',
+    'FFFhGGGGGGGhFFFFhGGGGGGGhFFFFFhGGGGGGGhFFFFmDDNNDDDmFFFFhGGGGGGGhFFFFFhGGGGGGGhFFFFhGGGGGGGhFFF',
+    'FFFhGGGGGGGhFFFFhGGGGGGGhFFFFFhGGGGGGGhFFFFmDDNNDDDmFFFFhGGGGGGGhFFFFFhGGGGGGGhFFFFhGGGGGGGhFFF',
+    'FFFhGGGGGGGhFFFFhGGGGGGGhFFFFFhGGGGGGGhFFFFmDDNNDDDmFFFFhGGGGGGGhFFFFFhGGGGGGGhFFFFhGGGGGGGhFFF',
+    'FFFhGGGGGGGhFFFFhGGGGGGGhFFFFFhGGGGGGGhFFFFmDDNNDDDmFFFFhGGGGGGGhFFFFFhGGGGGGGhFFFFhGGGGGGGhFFF',
+    'FFFhGGGGGGGhFFFFhGGGGGGGhFFFFFhGGGGGGGhFFFFmDDNNDDDmFFFFhGGGGGGGhFFFFFhGGGGGGGhFFFFhGGGGGGGhFFF',
+    'FFFhdddddddhdFFFFhdddddddhdFFFhdddddddhFFFFdddddddddFFFFhdddddddhFFFFFhdddddddhdFFFFhdddddddhdF',
+    'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
+    'nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn',
+    'nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn',
+    'ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd',
+    '===============================================================================================',
+    'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC',
+    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',
+    'PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP',
+    '...PllP...........l..............l.............l.............l..............l...........PllP...',
+    '...PllP...........l..............l.............l.............l..............l...........PllP...',
+    '...PllP...........l..............l.............l.............l..............l...........PllP...',
+    '...PllP...........l..............l.............l.............l..............l...........PllP...',
+    '...PllP...........l..............l.............l.............l..............l...........PllP...',
+    'eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+    'SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS',
+    'SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS',
+    'sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss',
+    'SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS',
+    'sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss',
+    'SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS',
+    'sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss',
+    'SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS',
+    'sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss',
+    'SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS',
+    'sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss'
+];
+
+var victorianColors = {
+    'u': {r: 62, g: 98, b: 48},
+
+    't': {r: 45, g: 75, b: 38},
+
+    'U': {r: 82, g: 120, b: 58},
+
+    'T': {r: 95, g: 65, b: 40},
+
+    '+': {r: 210, g: 205, b: 195},
+    '0': {r: 48, g: 45, b: 42},
+    '3': {r: 55, g: 52, b: 48},
+    '4': {r: 165, g: 158, b: 148},
+    '5': {r: 200, g: 195, b: 182},
+    '6': {r: 195, g: 188, b: 175},
+    '7': {r: 215, g: 208, b: 195},
+    '9': {r: 55, g: 52, b: 48},
+    '=': {r: 200, g: 195, b: 185},
+    'A': {r: 85, g: 70, b: 58},
+    'C': {r: 240, g: 235, b: 225},
+    'D': {r: 105, g: 68, b: 42},
+    'E': {r: 230, g: 225, b: 212},
+    'F': {r: 225, g: 215, b: 195},
+    'G': {r: 155, g: 195, b: 220},
+    'I': {r: 45, g: 42, b: 40},
+    'K': {r: 218, g: 210, b: 195},
+    'M': {r: 145, g: 105, b: 72},
+    'N': {r: 195, g: 170, b: 85},
+    'P': {r: 235, g: 230, b: 218},
+    'Q': {r: 75, g: 75, b: 80},
+    'R': {r: 70, g: 58, b: 48},
+    'S': {r: 175, g: 168, b: 155},
+    'V': {r: 55, g: 52, b: 48},
+    'X': {r: 195, g: 188, b: 175},
+    'a': {r: 105, g: 88, b: 72},
+    'd': {r: 165, g: 158, b: 145},
+    'e': {r: 180, g: 172, b: 158},
+    'f': {r: 195, g: 185, b: 168},
+    'g': {r: 120, g: 155, b: 180},
+    'h': {r: 235, g: 230, b: 218},
+    'i': {r: 65, g: 62, b: 58},
+    'j': {r: 210, g: 202, b: 188},
+    'k': {r: 175, g: 168, b: 155},
+    'l': {r: 232, g: 228, b: 218},
+    'm': {r: 125, g: 85, b: 55},
+    'n': {r: 155, g: 148, b: 138},
+    'o': {r: 200, g: 192, b: 178},
+    'q': {r: 60, g: 60, b: 65},
+    's': {r: 150, g: 142, b: 130},
+    'v': {r: 50, g: 48, b: 45},
+};
+
+// Night versions for lit windows
+var victorianColorsNight = {
+    '+': {r: 88, g: 86, b: 81},
+    '0': {r: 33, g: 30, b: 27},
+    '3': {r: 40, g: 37, b: 33},
+    '4': {r: 69, g: 66, b: 62},
+    '5': {r: 84, g: 81, b: 76},
+    '6': {r: 81, g: 78, b: 73},
+    '7': {r: 90, g: 87, b: 81},
+    '9': {r: 40, g: 37, b: 33},
+    '=': {r: 84, g: 81, b: 77},
+    'A': {r: 35, g: 29, b: 24},
+    'C': {r: 100, g: 98, b: 94},
+    'D': {r: 44, g: 28, b: 17},
+    'E': {r: 96, g: 94, b: 89},
+    'F': {r: 94, g: 90, b: 81},
+    'G': {r: 255, g: 210, b: 120},
+    'I': {r: 30, g: 27, b: 25},
+    'K': {r: 91, g: 88, b: 81},
+    'M': {r: 60, g: 44, b: 30},
+    'N': {r: 220, g: 185, b: 90},
+    'P': {r: 98, g: 96, b: 91},
+    'Q': {r: 60, g: 60, b: 65},
+    'R': {r: 29, g: 24, b: 20},
+    'S': {r: 73, g: 70, b: 65},
+    'V': {r: 40, g: 37, b: 33},
+    'X': {r: 81, g: 78, b: 73},
+    'a': {r: 44, g: 36, b: 30},
+    'd': {r: 69, g: 66, b: 60},
+    'e': {r: 75, g: 72, b: 66},
+    'f': {r: 81, g: 77, b: 70},
+    'g': {r: 50, g: 65, b: 75},
+    'h': {r: 98, g: 96, b: 91},
+    'i': {r: 50, g: 47, b: 43},
+    'j': {r: 88, g: 84, b: 78},
+    'k': {r: 73, g: 70, b: 65},
+    'l': {r: 97, g: 95, b: 91},
+    'm': {r: 52, g: 35, b: 23},
+    'n': {r: 65, g: 62, b: 57},
+    'o': {r: 84, g: 80, b: 74},
+    'q': {r: 45, g: 45, b: 50},
+    's': {r: 63, g: 59, b: 54},
+    'v': {r: 35, g: 33, b: 30},
+    'T': {r: 42, g: 28, b: 18},
+    'U': {r: 35, g: 52, b: 25},
+    't': {r: 18, g: 32, b: 15},
+    'u': {r: 25, g: 42, b: 20},
+};
+
+function getSkylineOpacity(x, y) {
+    // Apply scroll offset - x on screen maps to worldX in the scene
+    var worldX = x + scrollPos;
+    var isMobile = canvas.width < 768;
+    var h = canvas.height;
+
+    // Zones verticales - ajustées pour mobile
+    var roadY = h * (isMobile ? 0.95 : 0.88);
+    var sidewalkY = roadY - h * (isMobile ? 0.02 : 0.04);
+    var frontBuildingY = sidewalkY;
+
+    // === ROUTE ===
+    if (y >= roadY && y <= h) {
+        // Marquages beige
+        var markingY = roadY + h * 0.04;
+        var markingHeight = pixelSize * 2;
+
+        if (y >= markingY && y <= markingY + markingHeight) {
+            var markingWidth = 40;
+            var markingGap = 30;
+            var inMarking = (worldX % (markingWidth + markingGap)) < markingWidth;
+
+            if (inMarking) {
+                return isDay
+                    ? {r: 235, g: 228, b: 195, a: 0.95}
+                    : {r: 180, g: 175, b: 155, a: 0.85};
+            }
+        }
+
+        // Asphalte
+        return isDay
+            ? {r: 85, g: 75, b: 70, a: 0.95}
+            : {r: 35, g: 32, b: 30, a: 0.95};
+    }
+
+    // === TROTTOIR ===
+    if (y >= sidewalkY && y < roadY) {
+        if (y >= roadY - pixelSize * 2) {
+            return isDay
+                ? {r: 140, g: 135, b: 125, a: 0.9}
+                : {r: 70, g: 65, b: 60, a: 0.9};
+        }
+        return isDay
+            ? {r: 200, g: 190, b: 170, a: 0.9}
+            : {r: 55, g: 52, b: 48, a: 0.9};
+    }
+
+    // === GREEN ROAD SIGN (US Highway style) ===
+    if (cityBillboards.length > 0) {
+        var bb = cityBillboards[0];
+        var panelWidth = bb.width;
+        var panelHeight = h * bb.height;
+        var panelBottom = frontBuildingY - h * bb.poleHeight;
+        var panelTop = panelBottom - panelHeight;
+        var panelLeft = bb.x - scrollPos;
+        var panelRight = bb.x + panelWidth - scrollPos;
+        var panelCenterX = bb.x + panelWidth / 2;
+        // Two poles (left and right) — down to road level (on sidewalk)
+        var poleWidth = pixelSize * 2.5;
+        var poleInset = panelWidth * 0.15;
+        var leftPoleX = panelLeft + poleInset;
+        var rightPoleX = panelRight - poleInset;
+        if ((x >= leftPoleX - poleWidth && x <= leftPoleX + poleWidth) ||
+            (x >= rightPoleX - poleWidth && x <= rightPoleX + poleWidth)) {
+            if (y >= panelBottom && y < roadY) {
+                // Highlight edge for visibility
+                var nearEdgeL = Math.abs(x - (leftPoleX - poleWidth)) < pixelSize * 0.6 ||
+                                Math.abs(x - (leftPoleX + poleWidth)) < pixelSize * 0.6;
+                var nearEdgeR = Math.abs(x - (rightPoleX - poleWidth)) < pixelSize * 0.6 ||
+                                Math.abs(x - (rightPoleX + poleWidth)) < pixelSize * 0.6;
+                if (nearEdgeL || nearEdgeR) {
+                    return isDay
+                        ? {r: 110, g: 110, b: 115, a: 0.95}
+                        : {r: 55, g: 55, b: 60, a: 0.95};
+                }
+                return isDay
+                    ? {r: 80, g: 80, b: 88, a: 0.95}
+                    : {r: 40, g: 40, b: 48, a: 0.95};
+            }
+        }
+
+        // === SPOTLIGHTS on top of billboard (day & night) ===
+        var spot1X = panelLeft + panelWidth * 0.28;
+        var spot2X = panelLeft + panelWidth * 0.72;
+        var armH = pixelSize * 4;
+        var lampH = pixelSize * 2;
+        var lampW = pixelSize * 3;
+        var lampTop = panelTop - armH - lampH;
+        var lampBot = panelTop - armH;
+
+        // Thin mounting arms from panel top to lamp
+        var armW = pixelSize * 0.8;
+        if ((Math.abs(x - spot1X) < armW || Math.abs(x - spot2X) < armW) &&
+            y >= lampBot && y < panelTop) {
+            return isDay
+                ? {r: 90, g: 90, b: 95, a: 0.95}
+                : {r: 50, g: 50, b: 55, a: 0.95};
+        }
+
+        // Lamp fixtures — small pixel-art rectangles
+        var inLamp1 = (x >= spot1X - lampW && x <= spot1X + lampW && y >= lampTop && y < lampBot);
+        var inLamp2 = (x >= spot2X - lampW && x <= spot2X + lampW && y >= lampTop && y < lampBot);
+        if (inLamp1 || inLamp2) {
+            var lx = inLamp1 ? spot1X : spot2X;
+            var fromCenter = Math.abs(x - lx) / lampW;
+            var fromBottom = (lampBot - y) / lampH;
+            if (!isDay) {
+                // Night: bottom = bright warm lens
+                if (fromBottom < 0.4) {
+                    var glow = 1 - fromCenter * 0.3;
+                    return {r: Math.round(255 * glow), g: Math.round(230 * glow), b: Math.round(160 * glow), a: 0.95};
+                }
+                return {r: 55, g: 55, b: 60, a: 0.95};
+            } else {
+                // Day: lamp off — dark glass lens + metal housing
+                if (fromBottom < 0.4) {
+                    return {r: 60, g: 65, b: 70, a: 0.95};
+                }
+                return {r: 95, g: 95, b: 100, a: 0.95};
+            }
+        }
+
+        if (!isDay) {
+            // Warm glow halo around each lamp (night only)
+            for (var si = 0; si < 2; si++) {
+                var sx = si === 0 ? spot1X : spot2X;
+                var glowCY = lampBot;
+                var dx = x - sx;
+                var dy = y - glowCY;
+                var dist = Math.sqrt(dx * dx + dy * dy);
+                var glowR = pixelSize * 6;
+                if (dist < glowR) {
+                    var gi = Math.pow(1 - dist / glowR, 2) * 0.18;
+                    if (gi > 0.01) {
+                        return {r: 255, g: 240, b: 180, a: gi};
+                    }
+                }
+            }
+
+            // Light beams from lamps down onto the panel
+            if (y >= lampBot && y < panelBottom) {
+                var beamProgress = (y - lampBot) / (panelBottom - lampBot);
+                var beamHalfW = lampW + beamProgress * panelWidth * 0.18;
+
+                var bd1 = Math.abs(x - spot1X);
+                var bd2 = Math.abs(x - spot2X);
+                var inBeam1 = bd1 < beamHalfW;
+                var inBeam2 = bd2 < beamHalfW;
+
+                if (inBeam1 || inBeam2) {
+                    var bi1 = inBeam1 ? (1 - bd1 / beamHalfW) * (1 - beamProgress * 0.5) : 0;
+                    var bi2 = inBeam2 ? (1 - bd2 / beamHalfW) * (1 - beamProgress * 0.5) : 0;
+                    var beamI = Math.min(1, bi1 + bi2);
+
+                    // In the air — subtle warm light
+                    var airI = beamI * 0.12;
+                    if (airI > 0.01) {
+                        return {r: 255, g: 240, b: 180, a: airI};
+                    }
+                }
+            }
+
+        }
+    }
+
+    // === VICTORIAN HOUSE + GARDEN at end of scroll ===
+    var endZoneStart = maxScroll * 0.6; // parallax-adjusted start of last screen
+    // Last screen in world coords (parallax 0.6): endZoneStart to endZoneStart + canvas.width
+    // Center the house on the last screen
+    var housePixelScale = isMobile ? 3 : 6;
+    var houseRows = victorianHouse.length;
+    var houseCols = victorianHouse[0].length;
+    var houseWidthPx = houseCols * housePixelScale;
+    var houseHeightPx = houseRows * housePixelScale;
+    var houseBottom = roadY;
+    var houseTop = houseBottom - houseHeightPx;
+
+    // Center house: when scrolled to maxScroll, screen shows worldX from maxScroll to maxScroll+canvas.width
+    // With parallax 0.6, screen coords map to: screenX = worldX - scrollPos*0.6
+    // At maxScroll, the endZone center in screen space:
+    var endZoneScreenCenter = endZoneStart + canvas.width * 0.5;
+    var houseWorldX = endZoneScreenCenter - houseWidthPx / 2;
+    var houseScreenX = houseWorldX - scrollPos * 0.6;
+
+    // Garden zone: from endZoneStart to endZoneStart + canvas.width (entire last screen)
+    var gardenWorldLeft = endZoneStart;
+    var gardenWorldRight = endZoneStart + canvas.width;
+    var gardenScreenLeft = gardenWorldLeft - scrollPos * 0.6;
+    var gardenScreenRight = gardenWorldRight - scrollPos * 0.6;
+
+    // Grass colors (same as home page)
+    var grassWild = isDay
+        ? {r: 95, g: 125, b: 75, a: 0.8}
+        : {r: 35, g: 50, b: 30, a: 0.85};
+    var grassLight = isDay
+        ? {r: 130, g: 155, b: 95, a: 0.7}
+        : {r: 45, g: 60, b: 38, a: 0.75};
+    var treeDark = isDay
+        ? {r: 45, g: 75, b: 38, a: 0.9}
+        : {r: 18, g: 32, b: 15, a: 0.9};
+    var treeMid = isDay
+        ? {r: 62, g: 98, b: 48, a: 0.85}
+        : {r: 25, g: 42, b: 20, a: 0.85};
+    var treeLight = isDay
+        ? {r: 82, g: 120, b: 58, a: 0.8}
+        : {r: 35, g: 52, b: 25, a: 0.8};
+    var trunkColor = isDay
+        ? {r: 95, g: 65, b: 40, a: 0.9}
+        : {r: 42, g: 28, b: 18, a: 0.9};
+
+    // Render house (pixel art)
+    if (x >= houseScreenX && x < houseScreenX + houseWidthPx &&
+        y >= houseTop && y < houseBottom) {
+        var hCol = Math.floor((x - houseScreenX) / housePixelScale);
+        var hRow = Math.floor((y - houseTop) / housePixelScale);
+        if (hRow >= 0 && hRow < houseRows && hCol >= 0 && hCol < houseCols) {
+            var hCh = victorianHouse[hRow].charAt(hCol);
+            if (hCh !== '.') {
+                var hColorMap = isDay ? victorianColors : victorianColorsNight;
+                var hc = hColorMap[hCh];
+                if (hc) {
+                    return {r: hc.r, g: hc.g, b: hc.b, a: 0.95};
+                }
+            }
+        }
+    }
+
+    // Render garden + trees in the end zone (behind house - only where house is transparent)
+    if (x >= gardenScreenLeft && x < gardenScreenRight && y >= sidewalkY && y < roadY) {
+        // Garden ground (grass) on the sidewalk strip
+        var gardenSeed = Math.floor(x * 7.3 + y * 3.1);
+        if (seededRandom(gardenSeed) > 0.5) {
+            return grassWild;
+        }
+        return grassLight;
+    }
+
+    // Trees: procedural round canopies placed at fixed world positions in end zone
+    if (x >= gardenScreenLeft && x < gardenScreenRight && y < sidewalkY) {
+        // Define tree positions (world X, relative to endZoneStart)
+        var treePositions = [
+            {wx: 0.08, size: 0.12, h: 0.25},
+            {wx: 0.18, size: 0.09, h: 0.18},
+            {wx: 0.28, size: 0.11, h: 0.22},
+            {wx: 0.72, size: 0.11, h: 0.22},
+            {wx: 0.82, size: 0.09, h: 0.18},
+            {wx: 0.92, size: 0.12, h: 0.25},
+        ];
+        for (var ti = 0; ti < treePositions.length; ti++) {
+            var tp = treePositions[ti];
+            var treeWorldCX = endZoneStart + canvas.width * tp.wx;
+            var treeCX = treeWorldCX - scrollPos * 0.6;
+            var treeRadius = canvas.width * tp.size * 0.5;
+            var treeCY = sidewalkY - canvas.height * tp.h;
+
+            // Trunk
+            var trunkW = treeRadius * 0.25;
+            var trunkTop = treeCY + treeRadius * 0.5;
+            var trunkBot = sidewalkY;
+            if (x >= treeCX - trunkW && x < treeCX + trunkW &&
+                y >= trunkTop && y < trunkBot) {
+                return trunkColor;
+            }
+
+            // Canopy (circle)
+            var dx = x - treeCX;
+            var dy = y - treeCY;
+            var dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < treeRadius) {
+                // Shade variation based on position in canopy
+                var shade = seededRandom(ti * 100 + Math.floor(x / pixelSize) * 7 + Math.floor(y / pixelSize) * 13);
+                if (shade < 0.33) return treeDark;
+                if (shade < 0.66) return treeMid;
+                return treeLight;
+            }
+        }
+    }
+
+    return 0;
+}
+
+function getBridgeOpacity(x, y) {
+    // Pont désactivé - retourne toujours opacity 0
+    return {opacity: 0};
+}
+
+function getWaterOpacity(x, y) {
+    // Eau désactivée - terrain continu sans mer
+    return 0;
+}
+
+
+
+// Calculer si c'est le jour ou la nuit en Europe (Paris)
+function isDayInEurope() {
+    var now = new Date();
+    var europeTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Paris' }));
+    var hour = europeTime.getHours();
+    var month = europeTime.getMonth();
+
+    // Mode jour de 8h à 19h
+    return hour >= 8 && hour < 19;
+}
+
+// Mode initial basé sur l'heure de Paris
+var isDay = isDayInEurope();
+var userOverride = false;
+
+// Position du soleil/lune pour détecter les clics
+var sunClickArea = { x: 0, y: 0, radius: 0 };
+
+// Position aléatoire du soleil/lune dans le ciel (générée une seule fois)
+var sunRandomX = 0.15 + Math.random() * 0.7;  // Entre 15% et 85% horizontalement
+var sunRandomY = 0.1 + Math.random() * 0.4;   // Entre 10% et 50% dans la zone du ciel
+
+// Vérifier toutes les minutes si l'heure a changé
+setInterval(function() {
+    if (!userOverride) {
+        isDay = isDayInEurope();
+    }
+}, 60000);
+
+
+function draw() {
+    // Les nuages sont statiques, pas besoin de mise à jour chaque frame
+
+    // Couleurs selon le mode jour/nuit
+    var bgColor, dotColor, dotColorAlpha;
+
+    if (isDay) {
+        // Mode jour
+        bgColor = 'rgb(239, 236, 212)'; // Beige plus contrasté
+        dotColor = 'rgb(30, 30, 30)';
+        dotColorAlpha = 'rgba(30, 30, 30,';
+    } else {
+        // Mode nuit
+        bgColor = 'rgb(30, 30, 30)';
+        dotColor = 'rgb(255, 255, 255)';
+        dotColorAlpha = 'rgba(255, 255, 255,';
+    }
+
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Mettre à jour le body aussi
+    document.body.style.backgroundColor = bgColor;
+    document.getElementById('content').style.color = dotColor;
+    // header-bg stays transparent so dots pattern shows through
+
+    // Ajouter/retirer la classe night-mode pour le hover du bouton
+    if (isDay) {
+        document.body.classList.remove('night-mode');
+    } else {
+        document.body.classList.add('night-mode');
+    }
+
+    // Mettre à jour les couleurs du header selon le mode
+    var navLinks = document.querySelectorAll('#nav-menu a');
+    navLinks.forEach(function(link) {
+        link.style.color = dotColor;
+    });
+    var applyBtn = document.getElementById('apply-btn');
+    applyBtn.style.color = dotColor;
+    applyBtn.style.borderColor = dotColor;
+
+    // Soleil ou Lune - position aléatoire fixe dans le ciel
+    var sunRadius = Math.max(15, Math.min(canvas.width, canvas.height) * 0.03);
+    var sunX = sunRandomX * canvas.width;
+    var sunY = dotZone.y + sunRandomY * (canvas.height * 0.35);
+
+    // Mettre à jour la zone cliquable du soleil/lune
+    sunClickArea.x = sunX;
+    sunClickArea.y = sunY;
+    sunClickArea.radius = sunRadius * 2.5; // Zone un peu plus grande pour faciliter le clic
+
+    // Couleur du soleil/lune selon le mode
+    var sunR, sunG, sunB;
+    if (isDay) {
+        // Soleil - jaune doré
+        sunR = 255;
+        sunG = 200;
+        sunB = 50;
+    } else {
+        // Lune - blanc/gris
+        sunR = 200;
+        sunG = 200;
+        sunB = 200;
+    }
+    var sunColorAlpha = 'rgba(' + sunR + ',' + sunG + ',' + sunB + ',';
+
+    // Précalculer les bornes pour éviter les calculs dans la boucle
+    var startCol = Math.floor(dotZone.x / pixelSize);
+    var endCol = Math.ceil((dotZone.x + dotZone.width) / pixelSize);
+    var startRow = Math.floor(dotZone.y / pixelSize);
+    var endRow = Math.ceil((dotZone.y + dotZone.height) / pixelSize);
+
+    // Précalculer le temps pour les étoiles
+    var starTime = Date.now() * 0.001;
+
+    for (var row = startRow; row <= endRow; row++) {
+        var y = row * pixelSize + pixelSize / 2;
+
+        for (var col = startCol; col <= endCol; col++) {
+            var x = col * pixelSize + pixelSize / 2;
+
+            // Calcul prioritaire : pont d'abord (le plus important visuellement)
+            var bridgeResult = getBridgeOpacity(x, y);
+
+            // Si c'est le pont, dessiner avec la couleur appropriée
+            if (bridgeResult.opacity > 0.1) {
+                if (bridgeResult.color) {
+                    ctx.fillStyle = 'rgba(' + bridgeResult.color.r + ',' + bridgeResult.color.g + ',' + bridgeResult.color.b + ',' + bridgeResult.opacity + ')';
+                } else {
+                    ctx.fillStyle = 'rgba(228,53,53,' + bridgeResult.opacity + ')';
+                }
+                ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                continue;
+            }
+
+            // City (bâtiments, route, etc.)
+            var skylineOpacity = getSkylineOpacity(x, y);
+            if (skylineOpacity && typeof skylineOpacity === 'object') {
+                ctx.fillStyle = 'rgba(' + skylineOpacity.r + ',' + skylineOpacity.g + ',' + skylineOpacity.b + ',' + skylineOpacity.a + ')';
+                ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                continue;
+            }
+
+
+            // Soleil/Lune - dessiné en premier (passera DERRIÈRE les nuages)
+            var dx = x - sunX;
+            var dy = y - sunY;
+            var distToSunSq = dx * dx + dy * dy;
+            var sunRadiusSq = sunRadius * sunRadius;
+
+            // Dessiner le soleil/lune SANS continue pour permettre aux nuages de se superposer
+            if (distToSunSq < sunRadiusSq) {
+                ctx.fillStyle = sunColorAlpha + '1)';
+                ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                // Pas de continue - les nuages pourront se dessiner par-dessus
+            } else if (distToSunSq < sunRadiusSq * 4) {
+                var sunOpacity = Math.max(0, 1 - Math.sqrt(distToSunSq) / (sunRadius * 2)) * 0.5;
+                if (sunOpacity > 0.1) {
+                    ctx.fillStyle = sunColorAlpha + sunOpacity + ')';
+                    ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                    // Pas de continue - les nuages pourront se dessiner par-dessus
+                }
+            }
+
+            // Nuages (jour seulement) ou Étoiles (nuit)
+            if (isDay) {
+                // Mode jour : nuages
+                var cloudResult = getCloudOpacity(x, y, col, row);
+                if (cloudResult && cloudResult.opacity > 0.03) {
+                    var inSunZone = distToSunSq < sunRadiusSq * 4;
+                    if (inSunZone) {
+                        ctx.fillStyle = 'rgb(239, 236, 212)';
+                        ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                    }
+                    if (cloudResult.type === 'white') {
+                        ctx.fillStyle = 'rgba(30, 30, 30, ' + (cloudResult.opacity * 0.35) + ')';
+                    } else {
+                        ctx.fillStyle = 'rgba(30, 30, 30, ' + (cloudResult.opacity * 0.5) + ')';
+                    }
+                    ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                    continue;
+                }
+            } else {
+                // Mode nuit : étoiles random avec fade progressif
+                var starSeed = (col * 374761 + row * 668999) ^ (col * row * 97);
+                starSeed = ((starSeed >> 16) ^ starSeed) * 0x45d9f3b;
+                starSeed = (starSeed >> 16) ^ starSeed;
+
+                var skyRatio = y / canvas.height;
+                // Fade progressif : pleine intensité en haut, disparaît vers 80%
+                var fadeFactor = Math.max(0, 1 - (skyRatio / 0.8));
+
+                if (skyRatio < 0.8 && (Math.abs(starSeed) % 350) < 1) {
+                    var baseOpacity = 0.3 + (Math.abs(starSeed) % 50) / 70;
+                    var opacity = baseOpacity * fadeFactor;
+                    if (opacity > 0.1) {
+                        ctx.fillStyle = 'rgba(255, 255, 255, ' + opacity + ')';
+                        ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                    }
+                }
+            }
+
+            // Si on était dans le soleil/lune mais pas dans un nuage, on a déjà dessiné, on continue
+            if (distToSunSq < sunRadiusSq || (distToSunSq < sunRadiusSq * 4 && Math.max(0, 1 - Math.sqrt(distToSunSq) / (sunRadius * 2)) * 0.5 > 0.1)) {
+                continue;
+            }
+
+            // Eau
+            var waterOpacity = getWaterOpacity(x, y);
+            if (waterOpacity > 0.1) {
+                ctx.fillStyle = dotColorAlpha + waterOpacity + ')';
+                ctx.fillRect(col * pixelSize, row * pixelSize, pixelSize, pixelSize);
+                continue;
+            }
+
+            // Fond par défaut - transparent (même couleur que le background)
+            // Ne rien dessiner pour laisser le background apparaître
+        }
+    }
+
+    // Draw smooth green panel over the pixelated one
+    if (cityBillboards.length > 0) {
+        var bb = cityBillboards[0];
+        var isMob = canvas.width < 768;
+        var roadYSign = canvas.height * (isMob ? 0.95 : 0.88);
+        var sidewalkYSign = roadYSign - canvas.height * (isMob ? 0.02 : 0.04);
+        var signPanelHeight = canvas.height * bb.height;
+        var signPanelBottom = sidewalkYSign - canvas.height * bb.poleHeight;
+        var signPanelTop = signPanelBottom - signPanelHeight;
+        var signPanelLeft = bb.x - scrollPos;
+        var signPanelRight = signPanelLeft + bb.width;
+        var signW = signPanelRight - signPanelLeft;
+        var signH = signPanelBottom - signPanelTop;
+        var cR = Math.min(signW, signH) * 0.06;
+
+        // Draw smooth rounded rect
+        ctx.fillStyle = isDay ? 'rgb(0, 101, 67)' : 'rgb(0, 70, 46)';
+        ctx.beginPath();
+        ctx.moveTo(signPanelLeft + cR, signPanelTop);
+        ctx.lineTo(signPanelRight - cR, signPanelTop);
+        ctx.arc(signPanelRight - cR, signPanelTop + cR, cR, -Math.PI / 2, 0);
+        ctx.lineTo(signPanelRight, signPanelBottom - cR);
+        ctx.arc(signPanelRight - cR, signPanelBottom - cR, cR, 0, Math.PI / 2);
+        ctx.lineTo(signPanelLeft + cR, signPanelBottom);
+        ctx.arc(signPanelLeft + cR, signPanelBottom - cR, cR, Math.PI / 2, Math.PI);
+        ctx.lineTo(signPanelLeft, signPanelTop + cR);
+        ctx.arc(signPanelLeft + cR, signPanelTop + cR, cR, Math.PI, -Math.PI / 2);
+        ctx.closePath();
+        ctx.fill();
+
+        // Night spotlight beams on the panel — bitmap/pixel style
+        if (!isDay) {
+            ctx.save();
+            // Clip to panel shape
+            ctx.beginPath();
+            ctx.moveTo(signPanelLeft + cR, signPanelTop);
+            ctx.lineTo(signPanelRight - cR, signPanelTop);
+            ctx.arc(signPanelRight - cR, signPanelTop + cR, cR, -Math.PI / 2, 0);
+            ctx.lineTo(signPanelRight, signPanelBottom - cR);
+            ctx.arc(signPanelRight - cR, signPanelBottom - cR, cR, 0, Math.PI / 2);
+            ctx.lineTo(signPanelLeft + cR, signPanelBottom);
+            ctx.arc(signPanelLeft + cR, signPanelBottom - cR, cR, Math.PI / 2, Math.PI);
+            ctx.lineTo(signPanelLeft, signPanelTop + cR);
+            ctx.arc(signPanelLeft + cR, signPanelTop + cR, cR, Math.PI, -Math.PI / 2);
+            ctx.closePath();
+            ctx.clip();
+
+            var spot1X = signPanelLeft + signW * 0.28;
+            var spot2X = signPanelLeft + signW * 0.72;
+            var ps = pixelSize;
+
+            // Draw pixelated light cones — block by block
+            var cols = Math.ceil(signW / ps);
+            var rows = Math.ceil(signH / ps);
+            for (var row = 0; row < rows; row++) {
+                for (var col = 0; col < cols; col++) {
+                    var px = signPanelLeft + col * ps + ps / 2;
+                    var py = signPanelTop + row * ps + ps / 2;
+                    var beamProgress = (py - signPanelTop) / signH;
+
+                    // Cone width grows with distance from top
+                    var beamHalfW = ps * 3 + beamProgress * signW * 0.22;
+
+                    var bd1 = Math.abs(px - spot1X);
+                    var bd2 = Math.abs(px - spot2X);
+                    var inBeam1 = bd1 < beamHalfW;
+                    var inBeam2 = bd2 < beamHalfW;
+
+                    if (inBeam1 || inBeam2) {
+                        var bi1 = inBeam1 ? (1 - bd1 / beamHalfW) * (1 - beamProgress * 0.5) : 0;
+                        var bi2 = inBeam2 ? (1 - bd2 / beamHalfW) * (1 - beamProgress * 0.5) : 0;
+                        var intensity = Math.min(1, bi1 + bi2) * 0.5;
+
+                        if (intensity > 0.02) {
+                            ctx.fillStyle = 'rgba(255, 230, 160, ' + intensity + ')';
+                            ctx.fillRect(signPanelLeft + col * ps, signPanelTop + row * ps, ps, ps);
+                        }
+                    }
+                }
+            }
+            ctx.restore();
+        }
+    }
+
+    // Mettre à jour la position des sections
+    sections.forEach(function(section, i) {
+        var offset = i * canvas.width - scrollPos;
+        section.style.transform = 'translateX(' + offset + 'px)';
+    });
+
+    // Update HTML road sign position with scroll
+    if (cityBillboards.length > 0) {
+        var bb = cityBillboards[0];
+        var isMob = canvas.width < 768;
+        var roadYSign = canvas.height * (isMob ? 0.95 : 0.88);
+        var sidewalkYSign = roadYSign - canvas.height * (isMob ? 0.02 : 0.04);
+        var signPanelHeight = canvas.height * bb.height;
+        var signPanelBottom = sidewalkYSign - canvas.height * bb.poleHeight;
+        var signPanelTop = signPanelBottom - signPanelHeight;
+        var signEl = document.getElementById('road-sign');
+        signEl.style.display = 'flex';
+        signEl.style.left = (bb.x - scrollPos) + 'px';
+        signEl.style.top = signPanelTop + 'px';
+        signEl.style.width = bb.width + 'px';
+        signEl.style.height = signPanelHeight + 'px';
+        signEl.style.alignItems = 'center';
+        signEl.style.justifyContent = 'center';
+    }
+
+    // === Draw skateboarder on overlay canvas ===
+    skaterCtx.clearRect(0, 0, skaterCanvas.width, skaterCanvas.height);
+    var isMob = canvas.width < 768;
+    var skScale = (isMob ? 3 : 5) * 0.8 * 0.9;
+    var skSpriteW = skaterStatic[0].length;
+    var skW = skSpriteW * skScale;
+    var skRoadY = canvas.height * (isMob ? 0.95 : 0.88);
+    var skRoadMid = (skRoadY + canvas.height) / 2;
+    var skX = canvas.width * 0.5 - skW / 2;
+    // Board is always at upperBody.length + 12 (after 12 leg rows)
+    var boardRow = skaterUpperBody.length + 12;
+    var skY = skRoadMid - boardRow * skScale;
+
+    // Smooth transition: different speed up vs down
+    if (legT < legTargetT) {
+        legT = Math.min(legT + legUpSpeed, legTargetT);
+    } else if (legT > legTargetT) {
+        legT = Math.max(legT - legDownSpeed, legTargetT);
+    }
+    var t = legT; // 0=idle, 0.5=push, 1=ride
+    var goingDown = (legTargetT === 0 && t > 0); // ride→idle direction
+
+    // Helper: interpolate between poses
+    // Going UP (0→1): idle→push→ride (passes through push at back wheel)
+    // Going DOWN (1→0): ride→idle DIRECT (shortest path, no push detour)
+    function lerpCol(idle, push, ride) {
+        if (goingDown) {
+            // Direct: ride→idle linear
+            return ride + (idle - ride) * (1 - t);
+        }
+        // Going up: 0→0.5 idle→push, 0.5→1 push→ride
+        if (t <= 0.5) {
+            var p = t / 0.5;
+            return idle + (push - idle) * p;
+        } else {
+            var p2 = (t - 0.5) / 0.5;
+            return push + (ride - push) * p2;
+        }
+    }
+
+    // 1) Draw static sprite (upper body + front leg + board)
+    // Upper body rows lean forward as a whole block during ride
+    var ubLen = skaterUpperBody.length;
+    // Whole upper body shifts as one block during ride
+    var ubShift = bodyShiftRide * t;
+    for (var sr = 0; sr < skaterStatic.length; sr++) {
+        var spriteRow = skaterStatic[sr];
+        var rowShift = (sr < ubLen) ? ubShift : 0;
+
+        for (var sc = 0; sc < spriteRow.length; sc++) {
+            var ch = spriteRow[sc];
+            if (ch !== '.' && skaterColors[ch]) {
+                var c = skaterColors[ch];
+                skaterCtx.fillStyle = 'rgb(' + c.r + ',' + c.g + ',' + c.b + ')';
+                skaterCtx.fillRect(skX + (sc + rowShift) * skScale, skY + sr * skScale, skScale + 1, skScale + 1);
+            }
+        }
+    }
+
+    // 2) Draw back leg dynamically
+    var skinC = skaterColors['S'];
+    var skinS = skaterColors['s'];
+    var legStartRow = skaterUpperBody.length;
+    var boardStartRow = legStartRow + 12;
+
+    // Above-board leg rows (12 rows) — baggy jeans (wide: 4px)
+    var denimC = skaterColors['B'];
+    var denimH = skaterColors['b'];
+    var denimP = skaterColors['P'];
+    for (var lr = 0; lr < 12; lr++) {
+        var iC = backLegIdle[lr];
+        var pC = backLegPush[lr];
+        var rC = backLegRide[lr];
+        var col = Math.round(lerpCol(iC, pC, rC));
+        var py = skY + (legStartRow + lr) * skScale;
+        // 4 pixels wide: P B B b
+        skaterCtx.fillStyle = 'rgb(' + denimP.r + ',' + denimP.g + ',' + denimP.b + ')';
+        skaterCtx.fillRect(skX + (col - 1) * skScale, py, skScale + 1, skScale + 1);
+        skaterCtx.fillStyle = 'rgb(' + denimC.r + ',' + denimC.g + ',' + denimC.b + ')';
+        skaterCtx.fillRect(skX + col * skScale, py, skScale + 1, skScale + 1);
+        skaterCtx.fillStyle = 'rgb(' + denimC.r + ',' + denimC.g + ',' + denimC.b + ')';
+        skaterCtx.fillRect(skX + (col + 1) * skScale, py, skScale + 1, skScale + 1);
+        skaterCtx.fillStyle = 'rgb(' + denimH.r + ',' + denimH.g + ',' + denimH.b + ')';
+        skaterCtx.fillRect(skX + (col + 2) * skScale, py, skScale + 1, skScale + 1);
+    }
+
+    // Board-overlay leg rows (leg in front of board going to ground)
+    // Show when foot is NOT on board (leg passes through board zone to reach ground)
+    var showBoardLeg = goingDown ? (t < 0.4) : (t < 0.5);
+    if (showBoardLeg) {
+        for (var br = 0; br < 6; br++) {
+            var biC = backBoardIdle[br];
+            var bpC = backBoardPush[br];
+            var brC = backBoardRide[br];
+            // Interpolate position between poses
+            var bCol;
+            if (biC === -1 && bpC === -1) continue;
+            if (bpC === -1) { bCol = biC; }
+            else { bCol = Math.round(lerpCol(biC, bpC, brC === -1 ? bpC : brC)); }
+            var bpy = skY + (boardStartRow + br) * skScale;
+            // 4 pixels wide baggy
+            skaterCtx.fillStyle = 'rgb(' + denimP.r + ',' + denimP.g + ',' + denimP.b + ')';
+            skaterCtx.fillRect(skX + (bCol - 1) * skScale, bpy, skScale + 1, skScale + 1);
+            skaterCtx.fillStyle = 'rgb(' + denimC.r + ',' + denimC.g + ',' + denimC.b + ')';
+            skaterCtx.fillRect(skX + bCol * skScale, bpy, skScale + 1, skScale + 1);
+            skaterCtx.fillStyle = 'rgb(' + denimC.r + ',' + denimC.g + ',' + denimC.b + ')';
+            skaterCtx.fillRect(skX + (bCol + 1) * skScale, bpy, skScale + 1, skScale + 1);
+            skaterCtx.fillStyle = 'rgb(' + denimH.r + ',' + denimH.g + ',' + denimH.b + ')';
+            skaterCtx.fillRect(skX + (bCol + 2) * skScale, bpy, skScale + 1, skScale + 1);
+        }
+    }
+
+    // 3) Draw back foot
+    var shoeC = skaterColors['G'];
+    var shoeH = skaterColors['F'];
+    var shoeS = skaterColors['g'];
+    var shoeD = skaterColors['l'];
+    var soleC = skaterColors['H'];
+
+    // Foot on board when t > 0.6 (going up) or t > 0.5 (going down)
+    var footOnBoard = goingDown ? (t > 0.5) : (t > 0.6);
+
+    if (footOnBoard) {
+        // Foot on board (on deck row)
+        var fCol = Math.round(lerpCol(backFootIdleCol, backFootPushCol, backFootRideCol));
+        var deckY = skY + boardStartRow * skScale;
+        skaterCtx.fillStyle = 'rgb(' + shoeC.r + ',' + shoeC.g + ',' + shoeC.b + ')';
+        skaterCtx.fillRect(skX + fCol * skScale, deckY, skScale + 1, skScale + 1);
+        skaterCtx.fillStyle = 'rgb(' + shoeH.r + ',' + shoeH.g + ',' + shoeH.b + ')';
+        skaterCtx.fillRect(skX + (fCol + 1) * skScale, deckY, skScale + 1, skScale + 1);
+        skaterCtx.fillStyle = 'rgb(' + shoeS.r + ',' + shoeS.g + ',' + shoeS.b + ')';
+        skaterCtx.fillRect(skX + (fCol + 2) * skScale, deckY, skScale + 1, skScale + 1);
+    } else {
+        // Foot on ground — direct interpolation via lerpCol
+        var fCol2 = Math.round(lerpCol(backFootIdleCol, backFootPushCol, backFootRideCol));
+        var footY = skY + (boardStartRow + 6) * skScale;
+        // GFg
+        skaterCtx.fillStyle = 'rgb(' + shoeC.r + ',' + shoeC.g + ',' + shoeC.b + ')';
+        skaterCtx.fillRect(skX + fCol2 * skScale, footY, skScale + 1, skScale + 1);
+        skaterCtx.fillStyle = 'rgb(' + shoeH.r + ',' + shoeH.g + ',' + shoeH.b + ')';
+        skaterCtx.fillRect(skX + (fCol2 + 1) * skScale, footY, skScale + 1, skScale + 1);
+        skaterCtx.fillStyle = 'rgb(' + shoeS.r + ',' + shoeS.g + ',' + shoeS.b + ')';
+        skaterCtx.fillRect(skX + (fCol2 + 2) * skScale, footY, skScale + 1, skScale + 1);
+        // GFGl
+        footY += skScale;
+        skaterCtx.fillStyle = 'rgb(' + shoeC.r + ',' + shoeC.g + ',' + shoeC.b + ')';
+        skaterCtx.fillRect(skX + fCol2 * skScale, footY, skScale + 1, skScale + 1);
+        skaterCtx.fillStyle = 'rgb(' + shoeH.r + ',' + shoeH.g + ',' + shoeH.b + ')';
+        skaterCtx.fillRect(skX + (fCol2 + 1) * skScale, footY, skScale + 1, skScale + 1);
+        skaterCtx.fillStyle = 'rgb(' + shoeC.r + ',' + shoeC.g + ',' + shoeC.b + ')';
+        skaterCtx.fillRect(skX + (fCol2 + 2) * skScale, footY, skScale + 1, skScale + 1);
+        skaterCtx.fillStyle = 'rgb(' + shoeD.r + ',' + shoeD.g + ',' + shoeD.b + ')';
+        skaterCtx.fillRect(skX + (fCol2 + 3) * skScale, footY, skScale + 1, skScale + 1);
+        // HHH
+        footY += skScale;
+        skaterCtx.fillStyle = 'rgb(' + soleC.r + ',' + soleC.g + ',' + soleC.b + ')';
+        skaterCtx.fillRect(skX + fCol2 * skScale, footY, skScale + 1, skScale + 1);
+        skaterCtx.fillRect(skX + (fCol2 + 1) * skScale, footY, skScale + 1, skScale + 1);
+        skaterCtx.fillRect(skX + (fCol2 + 2) * skScale, footY, skScale + 1, skScale + 1);
+    }
+
+}
+
+function animate() {
+    draw();
+    requestAnimationFrame(animate);
+}
+
+// Scroll → ride (foot on board). Stop scroll → idle (foot on ground).
+function handleScroll(delta) {
+    scrollPos += delta;
+    scrollPos = Math.max(0, Math.min(maxScroll, scrollPos));
+
+    if (delta > 0) {
+        // Scroll started: transition to ride
+        legTargetT = 1;
+        // Reset idle timer on each scroll event
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(function() {
+            // Scroll stopped: transition back to idle
+            legTargetT = 0;
+        }, 300);
+    }
+}
+
+// Mouse wheel
+canvas.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    var delta = e.deltaY !== 0 ? e.deltaY : e.deltaX;
+    handleScroll(delta * 1.5);
+}, { passive: false });
+
+// Touch scroll
+var touchStartX = 0;
+var touchStartY = 0;
+canvas.addEventListener('touchstart', function(e) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+});
+canvas.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+    var dx = touchStartX - e.touches[0].clientX;
+    handleScroll(dx * 2);
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+}, { passive: false });
+
+// Keyboard arrows
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight') { handleScroll(80); e.preventDefault(); }
+    if (e.key === 'ArrowLeft') { handleScroll(-80); e.preventDefault(); }
+});
+
+// Clic sur le soleil/lune pour changer de thème
+canvas.addEventListener('click', function(e) {
+    var rect = canvas.getBoundingClientRect();
+    var clickX = e.clientX - rect.left;
+    var clickY = e.clientY - rect.top;
+
+    var dist = Math.sqrt(
+        (clickX - sunClickArea.x) * (clickX - sunClickArea.x) +
+        (clickY - sunClickArea.y) * (clickY - sunClickArea.y)
+    );
+
+    if (dist < sunClickArea.radius) {
+        isDay = !isDay;
+        userOverride = true;
+        // Reset après 1 heure pour revenir au mode automatique
+        setTimeout(function() { userOverride = false; }, 3600000);
+    }
+});
+
+// Changer le curseur quand on survole le soleil/lune
+canvas.addEventListener('mousemove', function(e) {
+    var rect = canvas.getBoundingClientRect();
+    var mouseX = e.clientX - rect.left;
+    var mouseY = e.clientY - rect.top;
+
+    var dist = Math.sqrt(
+        (mouseX - sunClickArea.x) * (mouseX - sunClickArea.x) +
+        (mouseY - sunClickArea.y) * (mouseY - sunClickArea.y)
+    );
+
+    canvas.style.cursor = dist < sunClickArea.radius ? 'pointer' : 'default';
+});
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+animate();
+
+// Mobile menu toggle
+var menuToggle = document.getElementById('menu-toggle');
+var mobileMenu = document.getElementById('mobile-menu');
+
+menuToggle.addEventListener('click', function() {
+    menuToggle.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+});
+
+
+</script>
+
+</body>
+</html>

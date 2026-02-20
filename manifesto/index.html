@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manifesto - The Bridge</title>
+    <!-- Vercel Analytics -->
+    <script defer ></script>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M4JZJVEZE9"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-M4JZJVEZE9');
+    </script>
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #E43535;
+            font-family: 'Courier New', monospace;
+            color: #FFFFFF;
+            min-height: 100vh;
+        }
+
+        /* Dot pattern background */
+        .dot-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        /* Header - identique à index.html */
+        #header {
+            position: fixed;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            pointer-events: auto;
+        }
+
+        /* Fade overlay - clips content approaching header */
+        #header-fade {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: linear-gradient(to bottom, #E43535 0%, #E43535 60px, transparent 80px);
+            z-index: 9;
+            pointer-events: none;
+        }
+
+        #header a {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        #logo {
+            height: 24px;
+            filter: brightness(0) invert(1);
+        }
+
+        #apply-btn {
+            font-family: 'Lora', serif;
+            font-size: clamp(10px, 1vw, 13px);
+            font-style: italic;
+            font-weight: 400;
+            color: #FFFFFF;
+            background-color: transparent;
+            border: 1px solid #FFFFFF;
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            padding: 8px 20px;
+            border-radius: 50px;
+            transition: all 0.2s ease;
+        }
+
+        #apply-btn:hover {
+            background-color: #FFFFFF;
+            color: #E43535;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: clamp(15px, 3vw, 40px);
+        }
+
+        #nav-menu {
+            display: flex;
+            gap: clamp(12px, 2.5vw, 30px);
+        }
+
+        #nav-menu a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(9px, 0.9vw, 12px);
+            color: #FFFFFF;
+            text-decoration: none;
+            letter-spacing: 0.05em;
+            transition: opacity 0.2s ease;
+        }
+
+        #nav-menu a:hover {
+            opacity: 0.6;
+        }
+
+        /* Mobile menu hamburger - dot matrix style */
+        #menu-toggle {
+            display: none;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            z-index: 101;
+            position: relative;
+        }
+
+        #menu-toggle .dot {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background-color: #FFFFFF;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        /* Grille 3x3 de points */
+        #menu-toggle .dot:nth-child(1) { top: 0; left: 0; }
+        #menu-toggle .dot:nth-child(2) { top: 0; left: 50%; transform: translateX(-50%); }
+        #menu-toggle .dot:nth-child(3) { top: 0; right: 0; }
+        #menu-toggle .dot:nth-child(4) { top: 50%; left: 0; transform: translateY(-50%); }
+        #menu-toggle .dot:nth-child(5) { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        #menu-toggle .dot:nth-child(6) { top: 50%; right: 0; transform: translateY(-50%); }
+        #menu-toggle .dot:nth-child(7) { bottom: 0; left: 0; }
+        #menu-toggle .dot:nth-child(8) { bottom: 0; left: 50%; transform: translateX(-50%); }
+        #menu-toggle .dot:nth-child(9) { bottom: 0; right: 0; }
+
+        /* Animation vers X */
+        #menu-toggle.open .dot:nth-child(1) { top: 50%; left: 50%; transform: translate(-50%, -50%) translate(-6px, -6px); }
+        #menu-toggle.open .dot:nth-child(2) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(3) { top: 50%; right: auto; left: 50%; transform: translate(-50%, -50%) translate(6px, -6px); }
+        #menu-toggle.open .dot:nth-child(4) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(5) { transform: translate(-50%, -50%); }
+        #menu-toggle.open .dot:nth-child(6) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(7) { bottom: auto; top: 50%; left: 50%; transform: translate(-50%, -50%) translate(-6px, 6px); }
+        #menu-toggle.open .dot:nth-child(8) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(9) { bottom: auto; top: 50%; right: auto; left: 50%; transform: translate(-50%, -50%) translate(6px, 6px); }
+
+        /* Mobile overlay menu - terminal style */
+        #mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #E43535;
+            z-index: 100;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 0 15%;
+            gap: 0;
+        }
+
+        #mobile-menu.open {
+            display: flex;
+        }
+
+        #mobile-menu a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            color: #FFFFFF;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            padding: 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        #mobile-menu a:first-child {
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        #mobile-menu a::before {
+            content: attr(data-index);
+            font-size: 10px;
+            opacity: 0.5;
+            min-width: 20px;
+        }
+
+        #mobile-menu a:hover {
+            padding-left: 10px;
+        }
+
+        @media (max-width: 600px) {
+            #nav-menu {
+                display: none;
+            }
+
+            #menu-toggle {
+                display: flex;
+            }
+        }
+
+        /* Content */
+        #content {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 0 8%;
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .hero h1 {
+            font-family: 'Lora', serif;
+            font-size: clamp(64px, 15vw, 160px);
+            font-weight: 400;
+            font-style: italic;
+            color: #FFFFFF;
+            letter-spacing: -0.03em;
+            line-height: 0.9;
+        }
+
+        /* Stories */
+        .stories {
+            padding-bottom: 100px;
+        }
+
+        .story {
+            margin-bottom: 80px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.7s ease;
+        }
+
+        .story.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .story p {
+            font-family: 'Lora', serif;
+            font-size: clamp(20px, 3vw, 32px);
+            font-weight: 400;
+            line-height: 1.6;
+            letter-spacing: -0.01em;
+        }
+
+        .story em {
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        /* Separator */
+        .separator {
+            padding: 80px 0;
+            opacity: 0.5;
+            font-size: 32px;
+            letter-spacing: 0.3em;
+        }
+
+        /* Conclusion */
+        .conclusion {
+            padding: 0 0 60px;
+        }
+
+        .conclusion p {
+            font-family: 'Lora', serif;
+            font-size: clamp(22px, 3.5vw, 36px);
+            font-weight: 400;
+            line-height: 1.5;
+            margin-bottom: 50px;
+            letter-spacing: -0.01em;
+        }
+
+        .conclusion .final {
+            font-size: clamp(28px, 5vw, 52px);
+            font-style: italic;
+            font-weight: 400;
+            margin-top: 60px;
+            line-height: 1.3;
+        }
+
+        /* CTA */
+        .cta {
+            padding: 60px 0 120px;
+        }
+
+        .cta a {
+            font-family: 'Lora', serif;
+            font-size: clamp(11px, 1.1vw, 14px);
+            font-style: italic;
+            font-weight: 400;
+            color: #E43535;
+            background-color: #FFFFFF;
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            padding: 16px 40px;
+            border-radius: 50px;
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+
+        .cta a:hover {
+            background-color: #1E1E1E;
+            color: #FFFFFF;
+        }
+
+        /* Back link */
+        .back-link {
+            position: fixed;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .back-link a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: #FFFFFF;
+            text-decoration: none;
+            letter-spacing: 2px;
+            transition: all 0.2s;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .back-link a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Dot pattern background -->
+<div class="dot-pattern"></div>
+
+<!-- Fade overlay -->
+<div id="header-fade"></div>
+
+<!-- Header -->
+<div id="header">
+    <a href="../"><img id="logo" src="../assets/logo.png" alt="The Bridge"></a>
+    <div class="header-right">
+        <nav id="nav-menu">
+            <a href="../faq">FAQ</a>
+            <a href="../meet-us">Meet Us</a>
+            <a href="../community">Community</a>
+            <a href="../residency">Residency</a>
+            <a href="../manifesto">Manifesto</a>
+        </nav>
+        <a id="apply-btn" href="../apply">Apply</a>
+        <div id="menu-toggle">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile menu overlay -->
+<div id="mobile-menu">
+    <a href="../" data-index="01">Home</a>
+    <a href="../residency" data-index="02">Residency</a>
+    <a href="../faq" data-index="03">FAQ</a>
+    <a href="../meet-us" data-index="04">Meet Us</a>
+    <a href="../manifesto" data-index="05">Manifesto</a>
+    <a href="../apply" data-index="06">Apply</a>
+</div>
+
+<div id="content">
+    <!-- Hero -->
+    <div class="hero">
+        <h1>Manifesto</h1>
+    </div>
+
+    <!-- Stories -->
+    <div class="stories">
+        <div class="story">
+            <p><em>Andy Grove</em> escapes Hungary in '56, arrives in Santa Clara, and helps turn Intel into the engine of the PC era.</p>
+        </div>
+
+        <div class="story">
+            <p>Two teenagers from Ireland, <em>Patrick and John Collison</em>, land in San Francisco. They hack a better way to move money online. Stripe becomes the internet's payment layer.</p>
+        </div>
+
+        <div class="story">
+            <p><em>Benoît Dageville, Thierry Cruanes, Marcin Zukowski</em> reimagine the data warehouse in San Mateo. Snowflake IPOs in 2020 and changes how data teams work.</p>
+        </div>
+
+        <div class="story">
+            <p><em>Jawed Karim</em> leaves Germany, lands in the PayPal pit in San Bruno, and co-founds YouTube. One clip at the zoo, then the way the world watches everything.</p>
+        </div>
+
+        <div class="story">
+            <p><em>Jan Koum</em> emigrates from Ukraine to Mountain View. He starts by cleaning grocery store floors. A big hustle later, he ships WhatsApp and rewrites how two billion people talk.</p>
+        </div>
+
+        <div class="story">
+            <p><em>Ion Stoica, Matei Zaharia, Ali Ghodsi</em>, a Berkeley lab team from Romania and Sweden, spin out Databricks. Spark graduates from paper to platform.</p>
+        </div>
+
+        <div class="story">
+            <p><em>Wojciech Zaremba</em> leaves Poland, arrives in San Francisco, and helps found OpenAI. And the rest is history.</p>
+        </div>
+    </div>
+
+    <div class="separator">...</div>
+
+    <!-- Conclusion -->
+    <div class="conclusion">
+        <p>Europe is a talent hub, but San Francisco is still the best place in the world to build a huge company.</p>
+
+        <p>That's where we come in. We run an 8-week residency in the Bay Area where you live, ideate, and build alongside other Europeans.</p>
+
+        <p class="final">We're here to remove the wall, so that your ability is all that matters.</p>
+    </div>
+
+</div>
+
+<div class="back-link">
+    <a href="../">BACK TO HOME</a>
+</div>
+
+<script>
+// Positionnement du header identique à index.html
+function positionHeader() {
+    var header = document.getElementById('header');
+    var baseSize = Math.min(window.innerWidth, window.innerHeight);
+    var dotSpacing = Math.max(8, baseSize * 0.01);
+    var marginSide = baseSize * 0.035;
+    var marginTop = Math.max(50, baseSize * 0.06);
+
+    // Calculer dotZone comme dans index.html
+    var cols = Math.ceil(window.innerWidth / dotSpacing) + 1;
+    var rows = Math.ceil(window.innerHeight / dotSpacing) + 1;
+
+    var firstDotX, lastDotX, firstDotY;
+    for (var c = 0; c < cols; c++) {
+        var px = c * dotSpacing + dotSpacing / 2;
+        if (px >= marginSide && firstDotX === undefined) firstDotX = px;
+        if (px <= window.innerWidth - marginSide) lastDotX = px;
+    }
+    for (var r = 0; r < rows; r++) {
+        var py = r * dotSpacing + dotSpacing / 2;
+        if (py >= marginTop && firstDotY === undefined) firstDotY = py;
+    }
+
+    var dotZoneX = firstDotX;
+    var dotZoneY = firstDotY;
+    var dotZoneWidth = lastDotX - firstDotX;
+
+    var headerTopMargin = marginSide * 0.5;
+    header.style.top = headerTopMargin + 'px';
+    header.style.height = (dotZoneY - headerTopMargin - 10) + 'px';
+    header.style.paddingLeft = dotZoneX + 'px';
+    header.style.paddingRight = (window.innerWidth - dotZoneX - dotZoneWidth) + 'px';
+
+    var logo = document.getElementById('logo');
+    logo.style.height = Math.max(18, baseSize * 0.03) + 'px';
+}
+
+// Intersection Observer pour les animations
+var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.story').forEach(function(story) {
+    observer.observe(story);
+});
+
+window.addEventListener('resize', positionHeader);
+positionHeader();
+
+// Mobile menu toggle
+var menuToggle = document.getElementById('menu-toggle');
+var mobileMenu = document.getElementById('mobile-menu');
+
+menuToggle.addEventListener('click', function() {
+    menuToggle.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+});
+</script>
+
+</body>
+</html>

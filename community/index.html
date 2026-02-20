@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community - The Bridge</title>
+    <!-- Vercel Analytics -->
+    <script defer ></script>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M4JZJVEZE9"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-M4JZJVEZE9');
+    </script>
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        body.night-mode {
+            background-color: #1E2021;
+            color: #FFFFFF;
+        }
+
+        body.day-mode {
+            background-color: #EFECD4;
+            color: #1E1E1E;
+        }
+
+        /* TV Wall — stacked piles */
+        #tv-wall {
+            position: relative;
+            width: 100vw;
+            z-index: 1;
+            filter: drop-shadow(0 0 2px rgba(0,0,0,0.8))
+                    drop-shadow(4px 4px 0 rgba(0,0,0,0.3));
+            padding-bottom: 60px;
+        }
+
+        /* CRT body — bitmap pixel art style */
+        .crt {
+            background: #2A2A2A;
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            padding: 8px 8px 0 8px;
+            overflow: hidden;
+            border-radius: 0;
+            border: 2px solid #111;
+            box-shadow: none;
+            image-rendering: pixelated;
+        }
+
+        /* Bezel — hard pixel border */
+        .crt-bezel {
+            position: relative;
+            width: 100%;
+            background: #181818;
+            border-radius: 0;
+            padding: 3px;
+            border: 2px solid #111;
+            box-shadow: none;
+        }
+
+        /* Screen */
+        .crt-screen {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #0a0a0a;
+            border-radius: 0;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+
+        /* Chunky scanlines — 3px pixel bands */
+        .crt-screen::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 3px,
+                rgba(0,0,0,0.12) 3px,
+                rgba(0,0,0,0.12) 4px
+            );
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        /* Hard pixel highlight — top edge only */
+        .crt-screen::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: rgba(255,255,255,0.06);
+            pointer-events: none;
+            z-index: 4;
+        }
+
+        .crt-screen video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            filter: contrast(1.2) brightness(0.9);
+        }
+
+        /* TV screen glow on hover — color driven by JS via custom properties */
+        .crt {
+            --glow-r: 180;
+            --glow-g: 200;
+            --glow-b: 255;
+        }
+        .crt .crt-screen {
+            transition: none;
+        }
+        .crt:hover .crt-screen {
+            box-shadow:
+                0 0 12px 4px rgba(var(--glow-r), var(--glow-g), var(--glow-b), 0.45),
+                0 0 30px 10px rgba(var(--glow-r), var(--glow-g), var(--glow-b), 0.25),
+                0 0 60px 20px rgba(var(--glow-r), var(--glow-g), var(--glow-b), 0.12),
+                0 0 100px 40px rgba(var(--glow-r), var(--glow-g), var(--glow-b), 0.06),
+                0 0 160px 60px rgba(var(--glow-r), var(--glow-g), var(--glow-b), 0.03);
+            border-color: rgba(var(--glow-r), var(--glow-g), var(--glow-b), 0.5);
+        }
+        .crt .crt-screen video {
+            transition: filter 0.4s ease;
+        }
+        .crt:hover .crt-screen video {
+            filter: contrast(1.1) brightness(1.1) saturate(1.1);
+        }
+
+        /* Bottom control panel — flat pixel strip */
+        .crt-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 6px 6px;
+            position: relative;
+        }
+
+        /* Speaker — pixel dot grid */
+        .crt-speaker {
+            flex-shrink: 0;
+            width: 22%;
+            height: 10px;
+            border-radius: 0;
+            background:
+                repeating-linear-gradient(0deg, #1e1e1e 0px, #1e1e1e 2px, #2e2e2e 2px, #2e2e2e 4px),
+                repeating-linear-gradient(90deg, #1e1e1e 0px, #1e1e1e 2px, #2e2e2e 2px, #2e2e2e 4px);
+            background-blend-mode: multiply;
+            border: 1px solid #111;
+            box-shadow: none;
+        }
+
+        .crt-spacer {
+            flex: 1;
+        }
+
+        /* Knobs — flat pixel squares */
+        .crt-knob {
+            width: 8px;
+            height: 8px;
+            border-radius: 0;
+            background: #444;
+            border: 1px solid #111;
+            box-shadow: none;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .crt-knob::after { display: none; }
+
+        /* LED — flat pixel square, no glow */
+        .crt-led {
+            width: 4px;
+            height: 4px;
+            border-radius: 0;
+            background: #ff0000;
+            border: 1px solid #990000;
+            box-shadow: none;
+            margin-right: 4px;
+            flex-shrink: 0;
+            animation: none;
+        }
+
+        /* Brand — hidden */
+        .crt-brand { display: none; }
+
+        /* Clickable screen cursor */
+        .crt-screen { cursor: pointer; }
+
+        /* ===== Media Player Overlay ===== */
+        #media-player {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.92);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #media-player.open { display: flex; }
+
+        #player-close {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            width: 32px;
+            height: 32px;
+            border: 2px solid #fff;
+            border-radius: 0;
+            background: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+        }
+        #player-close::before,
+        #player-close::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 2px;
+            background: #fff;
+        }
+        #player-close::before { transform: rotate(45deg); }
+        #player-close::after { transform: rotate(-45deg); }
+
+        #player-title {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13px;
+            color: #aaa;
+            letter-spacing: 0.05em;
+            padding-bottom: 10px;
+            width: 70vw;
+            max-width: 900px;
+        }
+
+        #player-video-wrap {
+            position: relative;
+            width: 70vw;
+            max-width: 900px;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border: 2px solid #333;
+        }
+
+        #player-video {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: contain;
+        }
+
+        /* Scanlines on player too */
+        #player-video-wrap::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 3px,
+                rgba(0,0,0,0.08) 3px,
+                rgba(0,0,0,0.08) 4px
+            );
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Controls bar */
+        #player-controls {
+            width: 70vw;
+            max-width: 900px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+        }
+
+        #player-play {
+            width: 28px;
+            height: 28px;
+            border: 2px solid #fff;
+            border-radius: 0;
+            background: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* Play triangle */
+        #player-play .play-icon {
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 6px 0 6px 10px;
+            border-color: transparent transparent transparent #fff;
+            margin-left: 2px;
+        }
+
+        /* Pause bars */
+        #player-play .pause-icon {
+            display: none;
+            width: 10px;
+            height: 12px;
+            border-left: 3px solid #fff;
+            border-right: 3px solid #fff;
+        }
+
+        #player-play.playing .play-icon { display: none; }
+        #player-play.playing .pause-icon { display: block; }
+
+        #player-time {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: #aaa;
+            min-width: 90px;
+            flex-shrink: 0;
+        }
+
+        #player-progress-wrap {
+            flex: 1;
+            height: 6px;
+            background: #333;
+            cursor: pointer;
+            position: relative;
+            border: 1px solid #555;
+        }
+
+        #player-progress {
+            height: 100%;
+            background: #fff;
+            width: 0%;
+            pointer-events: none;
+        }
+
+        #player-volume-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        #player-mute {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+        }
+        #player-mute svg { width: 18px; height: 18px; }
+        #player-mute .vol-on { display: block; }
+        #player-mute .vol-off { display: none; }
+        #player-mute.muted .vol-on { display: none; }
+        #player-mute.muted .vol-off { display: block; }
+
+        #player-volume {
+            width: 60px;
+            height: 4px;
+            background: #333;
+            cursor: pointer;
+            position: relative;
+            border: 1px solid #555;
+        }
+
+        #player-volume-fill {
+            height: 100%;
+            background: #aaa;
+            width: 80%;
+            pointer-events: none;
+        }
+
+        /* Dot pattern background */
+        .dot-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+            transition: background-image 0.5s ease;
+            background-size: 24px 24px;
+        }
+
+        body.night-mode .dot-pattern {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+        }
+
+        body.day-mode .dot-pattern {
+            background-image: radial-gradient(rgba(30, 30, 30, 0.1) 1px, transparent 1px);
+        }
+
+
+        #header-fade {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            z-index: 9;
+            pointer-events: none;
+            transition: background 0.5s ease;
+        }
+
+        body.night-mode #header-fade {
+            background: linear-gradient(to bottom, #1E2021 60px, transparent 80px);
+        }
+
+        body.day-mode #header-fade {
+            background: linear-gradient(to bottom, #EFECD4 60px, transparent 80px);
+        }
+
+        #header-fade::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            background-size: 24px 24px;
+        }
+
+        body.night-mode #header-fade::after {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+        }
+
+        body.day-mode #header-fade::after {
+            background-image: radial-gradient(rgba(30, 30, 30, 0.1) 1px, transparent 1px);
+        }
+
+/* Header */
+        #header {
+            position: fixed;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            pointer-events: auto;
+        }
+
+
+        #header > a {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        #logo {
+            height: 24px;
+            filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(2041%) hue-rotate(344deg) brightness(91%) contrast(93%);
+        }
+
+        #apply-btn {
+            font-family: 'Lora', serif;
+            font-size: clamp(10px, 1vw, 13px);
+            font-style: italic;
+            font-weight: 400;
+            background-color: transparent;
+            text-decoration: none;
+            letter-spacing: 0.02em;
+            padding: 8px 20px;
+            border-radius: 50px;
+            transition: all 0.2s ease;
+        }
+
+        body.night-mode #apply-btn {
+            color: #FFFFFF;
+            border: 1px solid #FFFFFF;
+        }
+        body.night-mode #apply-btn:hover {
+            background-color: #FFFFFF;
+            color: #1E1E1E;
+        }
+
+        body.day-mode #apply-btn {
+            color: #1E1E1E;
+            border: 1px solid #1E1E1E;
+        }
+        body.day-mode #apply-btn:hover {
+            background-color: #1E1E1E;
+            color: #EFECD4;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: clamp(15px, 3vw, 40px);
+        }
+
+        #nav-menu {
+            display: flex;
+            gap: clamp(12px, 2.5vw, 30px);
+        }
+
+        #nav-menu a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: clamp(9px, 0.9vw, 12px);
+            text-decoration: none;
+            letter-spacing: 0.05em;
+            transition: opacity 0.2s ease, color 0.5s ease;
+        }
+
+        body.night-mode #nav-menu a { color: #FFFFFF; }
+        body.day-mode #nav-menu a { color: #1E1E1E; }
+
+        #nav-menu a:hover {
+            opacity: 0.6;
+        }
+
+        #menu-toggle {
+            display: none;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            z-index: 101;
+            position: relative;
+        }
+
+        #menu-toggle .dot {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        body.night-mode #menu-toggle .dot { background-color: #FFFFFF; }
+        body.day-mode #menu-toggle .dot { background-color: #1E1E1E; }
+
+        #menu-toggle .dot:nth-child(1) { top: 0; left: 0; }
+        #menu-toggle .dot:nth-child(2) { top: 0; left: 50%; transform: translateX(-50%); }
+        #menu-toggle .dot:nth-child(3) { top: 0; right: 0; }
+        #menu-toggle .dot:nth-child(4) { top: 50%; left: 0; transform: translateY(-50%); }
+        #menu-toggle .dot:nth-child(5) { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        #menu-toggle .dot:nth-child(6) { top: 50%; right: 0; transform: translateY(-50%); }
+        #menu-toggle .dot:nth-child(7) { bottom: 0; left: 0; }
+        #menu-toggle .dot:nth-child(8) { bottom: 0; left: 50%; transform: translateX(-50%); }
+        #menu-toggle .dot:nth-child(9) { bottom: 0; right: 0; }
+
+        #menu-toggle.open .dot:nth-child(1) { top: 50%; left: 50%; transform: translate(-50%, -50%) translate(-6px, -6px); }
+        #menu-toggle.open .dot:nth-child(2) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(3) { top: 50%; right: auto; left: 50%; transform: translate(-50%, -50%) translate(6px, -6px); }
+        #menu-toggle.open .dot:nth-child(4) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(5) { transform: translate(-50%, -50%); }
+        #menu-toggle.open .dot:nth-child(6) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(7) { bottom: auto; top: 50%; left: 50%; transform: translate(-50%, -50%) translate(-6px, 6px); }
+        #menu-toggle.open .dot:nth-child(8) { opacity: 0; }
+        #menu-toggle.open .dot:nth-child(9) { bottom: auto; top: 50%; right: auto; left: 50%; transform: translate(-50%, -50%) translate(6px, 6px); }
+
+        #mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 100;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 0 15%;
+            gap: 0;
+        }
+
+        body.night-mode #mobile-menu { background-color: #1E1E1E; }
+        body.day-mode #mobile-menu { background-color: #EFECD4; }
+
+        #mobile-menu.open { display: flex; }
+
+        #mobile-menu a {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            padding: 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+        }
+
+        body.night-mode #mobile-menu a {
+            color: #FFFFFF;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        body.night-mode #mobile-menu a:first-child { border-top: 1px solid rgba(255, 255, 255, 0.1); }
+
+        body.day-mode #mobile-menu a {
+            color: #1E1E1E;
+            border-bottom: 1px solid rgba(30, 30, 30, 0.1);
+        }
+        body.day-mode #mobile-menu a:first-child { border-top: 1px solid rgba(30, 30, 30, 0.1); }
+        #mobile-menu a::before { content: attr(data-index); font-size: 10px; opacity: 0.4; min-width: 20px; }
+        #mobile-menu a:hover { padding-left: 10px; }
+
+        @media (max-width: 600px) {
+            #nav-menu { display: none; }
+            #menu-toggle { display: flex; }
+
+            #player-video-wrap,
+            #player-controls,
+            #player-title {
+                width: 94vw;
+            }
+
+            #player-close {
+                top: 12px;
+                right: 12px;
+                width: 28px;
+                height: 28px;
+            }
+
+            #player-time { min-width: 70px; font-size: 10px; }
+            #player-volume-wrap { display: none; }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="dot-pattern"></div>
+
+
+<div id="tv-wall"></div>
+
+<div id="header-fade"></div>
+<div id="header">
+    <a href="../"><img id="logo" src="../assets/logo.png" alt="The Bridge"></a>
+    <div class="header-right">
+        <nav id="nav-menu">
+            <a href="../faq">FAQ</a>
+            <a href="../meet-us">Meet Us</a>
+            <a href="../community">Community</a>
+            <a href="../residency">Residency</a>
+        </nav>
+        <a id="apply-btn" href="../apply">Apply</a>
+        <div id="menu-toggle">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        </div>
+    </div>
+</div>
+
+<div id="mobile-menu">
+    <a href="../" data-index="01">Home</a>
+    <a href="../residency" data-index="02">Residency</a>
+    <a href="../community" data-index="03">Community</a>
+    <a href="../faq" data-index="04">FAQ</a>
+    <a href="../meet-us" data-index="05">Meet Us</a>
+    <a href="../apply" data-index="06">Apply</a>
+</div>
+
+<!-- Media Player Overlay -->
+<div id="media-player">
+    <button id="player-close"></button>
+    <div id="player-title"></div>
+    <div id="player-video-wrap">
+        <video id="player-video"></video>
+    </div>
+    <div id="player-controls">
+        <button id="player-play">
+            <span class="play-icon"></span>
+            <span class="pause-icon"></span>
+        </button>
+        <div id="player-progress-wrap">
+            <div id="player-progress"></div>
+        </div>
+        <span id="player-time">0:00 / 0:00</span>
+        <div id="player-volume-wrap">
+            <button id="player-mute">
+                <svg class="vol-on" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                <svg class="vol-off" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+            </button>
+            <div id="player-volume">
+                <div id="player-volume-fill"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Day/Night mode based on Paris time
+function isDayInEurope() {
+    var now = new Date();
+    var europeTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Paris' }));
+    var hour = europeTime.getHours();
+    return hour >= 8 && hour < 19;
+}
+
+function applyTheme() {
+    var isDay = isDayInEurope();
+    document.body.classList.toggle('day-mode', isDay);
+    document.body.classList.toggle('night-mode', !isDay);
+}
+
+applyTheme();
+setInterval(applyTheme, 60000);
+
+// Header positioning
+function positionHeader() {
+    var header = document.getElementById('header');
+    var baseSize = Math.min(window.innerWidth, window.innerHeight);
+    var dotSpacing = Math.max(8, baseSize * 0.01);
+    var marginSide = baseSize * 0.035;
+    var marginTop = Math.max(50, baseSize * 0.06);
+    var cols = Math.ceil(window.innerWidth / dotSpacing) + 1;
+    var rows = Math.ceil(window.innerHeight / dotSpacing) + 1;
+    var firstDotX, lastDotX, firstDotY;
+    for (var c = 0; c < cols; c++) {
+        var px = c * dotSpacing + dotSpacing / 2;
+        if (px >= marginSide && firstDotX === undefined) firstDotX = px;
+        if (px <= window.innerWidth - marginSide) lastDotX = px;
+    }
+    for (var r = 0; r < rows; r++) {
+        var py = r * dotSpacing + dotSpacing / 2;
+        if (py >= marginTop && firstDotY === undefined) firstDotY = py;
+    }
+    var dotZoneX = firstDotX;
+    var dotZoneY = firstDotY;
+    var dotZoneWidth = lastDotX - firstDotX;
+    var headerTopMargin = marginSide * 0.5;
+    header.style.top = headerTopMargin + 'px';
+    header.style.height = (dotZoneY - headerTopMargin - 10) + 'px';
+    header.style.paddingLeft = dotZoneX + 'px';
+    header.style.paddingRight = (window.innerWidth - dotZoneX - dotZoneWidth) + 'px';
+    var logo = document.getElementById('logo');
+    logo.style.height = Math.max(18, baseSize * 0.03) + 'px';
+}
+window.addEventListener('resize', positionHeader);
+positionHeader();
+
+// Mobile menu toggle
+var menuToggle = document.getElementById('menu-toggle');
+var mobileMenu = document.getElementById('mobile-menu');
+menuToggle.addEventListener('click', function() {
+    menuToggle.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+});
+
+// ============================================================
+// TV WALL — Real physics stacking: TVs sit on each other
+// ============================================================
+(function() {
+    // Full quality — used in media player on click
+    var videoSrcs = [
+        '../assets/TheBridge_Billboard.mp4',
+        '../assets/A003C726_260202FK.mp4',
+        '../assets/790842780.732633_15211769149983.MP4',
+        '../assets/A001C029_260122EP.MP4',
+        '../assets/IMG_8878.MOV',
+        '../assets/A003C775_260202OO.MP4',
+        '../assets/A003C781_260202QX.MP4',
+        '../assets/A003C782_260202MY.MP4',
+        '../assets/A003C784_260202IT.MP4',
+        '../assets/A003C807_260202AE.MP4',
+        '../assets/A003C815_260202DF.MP4',
+        '../assets/C1173.mp4'
+    ];
+
+    // Video titles
+    var videoTitles = [
+        'The Bridge — Billboard',
+        'Session A003C726',
+        'Archive 790842780',
+        'Session A001C029',
+        'IMG 8878',
+        'Session A003C775',
+        'Session A003C781',
+        'Session A003C782',
+        'Session A003C784',
+        'Session A003C807',
+        'Session A003C815',
+        'C1173'
+    ];
+
+    // Low quality previews — displayed on TVs (tiny files)
+    var videoSrcsPreview = [
+        '../assets/previews/TheBridge_Billboard.mp4',
+        '../assets/previews/A003C726_260202FK.mp4',
+        '../assets/previews/790842780.732633_15211769149983.mp4',
+        '../assets/previews/A001C029_260122EP.mp4',
+        '../assets/previews/IMG_8878.mp4',
+        '../assets/previews/A003C775_260202OO.mp4',
+        '../assets/previews/A003C781_260202QX.mp4',
+        '../assets/previews/A003C782_260202MY.mp4',
+        '../assets/previews/A003C784_260202IT.mp4',
+        '../assets/previews/A003C807_260202AE.mp4',
+        '../assets/previews/A003C815_260202DF.mp4',
+        '../assets/previews/C1173.mp4'
+    ];
+
+    var wall = document.getElementById('tv-wall');
+    var oldGrid = document.getElementById('tv-grid');
+    if (oldGrid) oldGrid.remove();
+
+    // Seeded random
+    var seed = 42;
+    function rand() {
+        seed = (seed * 16807 + 0) % 2147483647;
+        return (seed - 1) / 2147483646;
+    }
+
+    // Responsive columns: 2 on mobile, 3 on desktop
+    var totalVideos = 12;
+    function getPilesConfig() {
+        var isMobile = window.innerWidth <= 600;
+        var cols = isMobile ? 2 : 3;
+        var widthVw = isMobile ? 45 : 20;
+        var perPile = Math.ceil(totalVideos / cols);
+        var config = [];
+        var remaining = totalVideos;
+        for (var c = 0; c < cols; c++) {
+            var count = Math.min(perPile, remaining);
+            config.push({ tvs: count, widthVw: widthVw });
+            remaining -= count;
+        }
+        return config;
+    }
+    var piles = getPilesConfig();
+
+    // No rotation, no jitter — straight and clean
+    var tvRandoms = [];
+    var totalTvs = 0;
+    piles.forEach(function(p) {
+        for (var i = 0; i < p.tvs; i++) {
+            tvRandoms.push({
+                rotation: 0,
+                xJitter: 0
+            });
+            totalTvs++;
+        }
+    });
+
+    // TV body colors — organized by category: grey, black, brown
+    // Each sub-array is a category; each row picks one from each category
+    var tvColorGroups = [
+        // Silvers
+        [
+            { body: '#8A8A8A', bezel: '#6A6A6A', border: '#555555' },  // silver
+            { body: '#9A9A9A', bezel: '#787878', border: '#606060' },  // light silver
+            { body: '#7A7A7A', bezel: '#5E5E5E', border: '#4A4A4A' },  // dark silver
+            { body: '#A0A0A0', bezel: '#808080', border: '#666666' }   // bright silver
+        ],
+        // Blacks
+        [
+            { body: '#2E2E2E', bezel: '#1A1A1A', border: '#0A0A0A' },  // near black
+            { body: '#1E1E1E', bezel: '#111111', border: '#080808' }    // black
+        ],
+        // Browns
+        [
+            { body: '#4A3A2A', bezel: '#2A1A0A', border: '#1A0A00' },  // dark brown
+            { body: '#3D2E1E', bezel: '#2A1C0E', border: '#1A0E00' },  // brown
+            { body: '#352A1E', bezel: '#251A0E', border: '#150A00' }    // warm brown
+        ]
+    ];
+
+    var videoIdx = 0;
+
+    // Apply color to a CRT based on category
+    function applyCRTColor(crt, colorObj) {
+        crt.style.background = colorObj.body;
+        crt.style.borderColor = colorObj.border;
+        var bezel = crt.querySelector('.crt-bezel');
+        if (bezel) {
+            bezel.style.background = colorObj.bezel;
+            bezel.style.borderColor = colorObj.border;
+        }
+    }
+
+    function buildCRT(idx) {
+        var crt = document.createElement('div');
+        crt.className = 'crt';
+
+        var bezel = document.createElement('div');
+        bezel.className = 'crt-bezel';
+
+        var screen = document.createElement('div');
+        screen.className = 'crt-screen';
+
+        var video = document.createElement('video');
+        video.src = videoSrcsPreview[idx % videoSrcsPreview.length];
+        video.setAttribute('data-src-hq', videoSrcs[idx % videoSrcs.length]);
+        video.setAttribute('data-title', videoTitles[idx % videoTitles.length]);
+        video.muted = true;
+        video.loop = true;
+        video.playsInline = true;
+        video.preload = 'auto';
+        video.setAttribute('playsinline', '');
+
+        screen.appendChild(video);
+        bezel.appendChild(screen);
+
+        var controls = document.createElement('div');
+        controls.className = 'crt-controls';
+        var speaker = document.createElement('div');
+        speaker.className = 'crt-speaker';
+        controls.appendChild(speaker);
+        var spacer = document.createElement('div');
+        spacer.className = 'crt-spacer';
+        controls.appendChild(spacer);
+        var led = document.createElement('div');
+        led.className = 'crt-led';
+        led.style.animationDelay = (idx * 0.4) + 's';
+        controls.appendChild(led);
+        var knob1 = document.createElement('div');
+        knob1.className = 'crt-knob';
+        var knob2 = document.createElement('div');
+        knob2.className = 'crt-knob';
+        controls.appendChild(knob1);
+        controls.appendChild(knob2);
+        var brand = document.createElement('div');
+        brand.className = 'crt-brand';
+        controls.appendChild(brand);
+
+        crt.appendChild(bezel);
+        crt.appendChild(controls);
+
+        (function(v) {
+            v.addEventListener('canplay', function() { v.play().catch(function() {}); });
+            v.play().catch(function() {});
+        })(video);
+
+        return crt;
+    }
+
+    // Sample dominant color from a video frame and set CSS glow vars on parent .crt
+    var glowCanvas = document.createElement('canvas');
+    var glowCtx = glowCanvas.getContext('2d', { willReadFrequently: true });
+    glowCanvas.width = 16;
+    glowCanvas.height = 9;
+
+    function sampleVideoColor(video) {
+        var crt = video.closest('.crt');
+        if (!crt) return;
+        try {
+            glowCtx.drawImage(video, 0, 0, 16, 9);
+            var data = glowCtx.getImageData(0, 0, 16, 9).data;
+            var r = 0, g = 0, b = 0, count = 0;
+            for (var i = 0; i < data.length; i += 4) {
+                r += data[i];
+                g += data[i + 1];
+                b += data[i + 2];
+                count++;
+            }
+            r = Math.round(r / count);
+            g = Math.round(g / count);
+            b = Math.round(b / count);
+            // Boost saturation so the glow is vivid
+            var max = Math.max(r, g, b);
+            var min = Math.min(r, g, b);
+            if (max > 30) { // not too dark
+                var boost = 1.4;
+                var avg = (r + g + b) / 3;
+                r = Math.min(255, Math.round(avg + (r - avg) * boost));
+                g = Math.min(255, Math.round(avg + (g - avg) * boost));
+                b = Math.min(255, Math.round(avg + (b - avg) * boost));
+                // Brighten a bit so glow is visible
+                var brightness = 1.3;
+                r = Math.min(255, Math.round(r * brightness));
+                g = Math.min(255, Math.round(g * brightness));
+                b = Math.min(255, Math.round(b * brightness));
+            }
+            crt.style.setProperty('--glow-r', r);
+            crt.style.setProperty('--glow-g', g);
+            crt.style.setProperty('--glow-b', b);
+        } catch (e) {}
+    }
+
+    // Build all 18 TVs as flat array
+    var allCrts = [];
+    for (var i = 0; i < totalVideos; i++) {
+        var crt = buildCRT(i);
+        wall.appendChild(crt);
+        allCrts.push(crt);
+    }
+
+    // Real-time glow: sample hovered TV every frame via requestAnimationFrame
+    var hoveredCrt = null;
+    var glowRafId = null;
+
+    function glowLoop() {
+        if (hoveredCrt) {
+            var v = hoveredCrt.querySelector('video');
+            if (v && v.readyState >= 2) sampleVideoColor(v);
+        }
+        glowRafId = requestAnimationFrame(glowLoop);
+    }
+
+    wall.addEventListener('mouseenter', function(e) {
+        var crt = e.target.closest('.crt');
+        if (crt) {
+            hoveredCrt = crt;
+            // Sample immediately on enter
+            var v = crt.querySelector('video');
+            if (v && v.readyState >= 2) sampleVideoColor(v);
+            if (!glowRafId) glowRafId = requestAnimationFrame(glowLoop);
+        }
+    }, true);
+
+    wall.addEventListener('mouseover', function(e) {
+        var crt = e.target.closest('.crt');
+        if (crt && crt !== hoveredCrt) {
+            hoveredCrt = crt;
+            var v = crt.querySelector('video');
+            if (v && v.readyState >= 2) sampleVideoColor(v);
+            if (!glowRafId) glowRafId = requestAnimationFrame(glowLoop);
+        }
+    });
+
+    wall.addEventListener('mouseleave', function(e) {
+        hoveredCrt = null;
+        if (glowRafId) {
+            cancelAnimationFrame(glowRafId);
+            glowRafId = null;
+        }
+    });
+
+    // Layout: recompute piles config, distribute TVs, measure + stack
+    function layoutPiles() {
+        var vw = window.innerWidth;
+        piles = getPilesConfig();
+
+        var widthVw = piles[0].widthVw;
+        var widthPx = (widthVw / 100) * vw;
+
+        // PASS 1: Set all widths
+        allCrts.forEach(function(el) {
+            el.style.width = widthPx + 'px';
+            el.style.top = '0px';
+            el.style.left = '0px';
+            el.style.bottom = 'auto';
+            el.style.transform = 'none';
+        });
+
+        // Force reflow
+        wall.offsetHeight;
+
+        // Distribute TVs into piles
+        var cols = piles.length;
+        var perPile = Math.ceil(totalVideos / cols);
+
+        // Compute total wall width
+        var totalW = cols * widthPx;
+        var startX = (vw - totalW) / 2;
+
+        // PASS 2: Measure real heights, stack top-down, and assign colors per row
+        var curX = startX;
+        var maxPileH = 0;
+
+        // Build a grid map: grid[row][col] = tvIndex
+        var grid = [];
+        for (var c = 0; c < cols; c++) {
+            var startIdx = c * perPile;
+            var endIdx = Math.min(startIdx + perPile, totalVideos);
+            for (var row = 0; row < endIdx - startIdx; row++) {
+                if (!grid[row]) grid[row] = [];
+                grid[row][c] = startIdx + row;
+            }
+        }
+
+        // Assign colors: each row gets one color from each category (grey, black, brown)
+        // The category order shifts per row so adjacent rows look varied
+        var numGroups = tvColorGroups.length; // 3 categories
+        for (var r = 0; r < grid.length; r++) {
+            for (var gc = 0; gc < grid[r].length; gc++) {
+                var tvIdx = grid[r][gc];
+                if (tvIdx === undefined) continue;
+                // Pick category: rotate by row so each column in a row gets a different category
+                var catIdx = (gc + r) % numGroups;
+                var group = tvColorGroups[catIdx];
+                // Pick a specific shade within the category, varying by row
+                var shadeIdx = r % group.length;
+                applyCRTColor(allCrts[tvIdx], group[shadeIdx]);
+            }
+        }
+
+        // Measure pile heights first
+        var pileHeights = [];
+        for (var c = 0; c < cols; c++) {
+            var pileH = 0;
+            var startIdx = c * perPile;
+            var endIdx = Math.min(startIdx + perPile, totalVideos);
+            for (var t = startIdx; t < endIdx; t++) {
+                pileH += allCrts[t].getBoundingClientRect().height;
+            }
+            pileHeights.push(pileH);
+        }
+        var tallestPile = Math.max.apply(null, pileHeights);
+
+        // Position TVs at bottom of viewport (stack top-down from a bottom anchor)
+        var bottomAnchor = Math.max(window.innerHeight, tallestPile + 60);
+
+        for (var c = 0; c < cols; c++) {
+            var startIdx = c * perPile;
+            var endIdx = Math.min(startIdx + perPile, totalVideos);
+            var curTop = bottomAnchor - pileHeights[c];
+
+            for (var t = startIdx; t < endIdx; t++) {
+                var el = allCrts[t];
+                var realH = el.getBoundingClientRect().height;
+                el.style.left = curX + 'px';
+                el.style.top = curTop + 'px';
+                el.style.zIndex = (t - startIdx) + 1;
+                curTop += realH;
+            }
+
+            curX += widthPx;
+        }
+
+        // Set wall height
+        wall.style.height = bottomAnchor + 'px';
+    }
+
+    // Layout after first paint
+    requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+            layoutPiles();
+        });
+    });
+    window.addEventListener('resize', layoutPiles);
+})();
+
+// ============================================================
+// MEDIA PLAYER — click a TV screen to open fullscreen player
+// ============================================================
+(function() {
+    var overlay = document.getElementById('media-player');
+    var playerTitle = document.getElementById('player-title');
+    var playerVideo = document.getElementById('player-video');
+    var closeBtn = document.getElementById('player-close');
+    var playBtn = document.getElementById('player-play');
+    var progressWrap = document.getElementById('player-progress-wrap');
+    var progressBar = document.getElementById('player-progress');
+    var timeLabel = document.getElementById('player-time');
+    var muteBtn = document.getElementById('player-mute');
+    var volumeWrap = document.getElementById('player-volume');
+    var volumeFill = document.getElementById('player-volume-fill');
+    var originVideo = null;
+    var isSeeking = false;
+
+    function fmt(s) {
+        if (isNaN(s) || !isFinite(s)) return '0:00';
+        var m = Math.floor(s / 60);
+        var sec = Math.floor(s % 60);
+        return m + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+
+    // Use timeupdate for reliable progress
+    playerVideo.addEventListener('timeupdate', function() {
+        if (isSeeking) return;
+        if (playerVideo.duration) {
+            progressBar.style.width = (playerVideo.currentTime / playerVideo.duration * 100) + '%';
+            timeLabel.textContent = fmt(playerVideo.currentTime) + ' / ' + fmt(playerVideo.duration);
+        }
+    });
+
+    playerVideo.addEventListener('loadedmetadata', function() {
+        timeLabel.textContent = '0:00 / ' + fmt(playerVideo.duration);
+        progressBar.style.width = '0%';
+    });
+
+    function openPlayer(videoSrc, tvVideo, title) {
+        originVideo = tvVideo;
+        if (originVideo) originVideo.pause();
+
+        playerTitle.textContent = title || '';
+        playerVideo.src = videoSrc;
+        playerVideo.volume = 0.8;
+        playerVideo.muted = false;
+        playerVideo.loop = true;
+        overlay.classList.add('open');
+
+        muteBtn.classList.remove('muted');
+        volumeFill.style.width = '80%';
+        progressBar.style.width = '0%';
+        timeLabel.textContent = '0:00 / 0:00';
+
+        playerVideo.play().catch(function() {});
+        playBtn.classList.add('playing');
+    }
+
+    function closePlayer() {
+        overlay.classList.remove('open');
+        playerVideo.pause();
+        playerVideo.removeAttribute('src');
+        playerVideo.load();
+
+        if (originVideo) {
+            originVideo.play().catch(function() {});
+            originVideo = null;
+        }
+    }
+
+    closeBtn.addEventListener('click', closePlayer);
+
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) closePlayer();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (!overlay.classList.contains('open')) return;
+        if (e.key === 'Escape') closePlayer();
+        if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+    });
+
+    function togglePlay() {
+        if (playerVideo.paused) {
+            playerVideo.play().catch(function() {});
+        } else {
+            playerVideo.pause();
+        }
+    }
+
+    playBtn.addEventListener('click', togglePlay);
+    playerVideo.addEventListener('click', togglePlay);
+
+    playerVideo.addEventListener('play', function() { playBtn.classList.add('playing'); });
+    playerVideo.addEventListener('pause', function() { playBtn.classList.remove('playing'); });
+
+    // Progress seek — mousedown + mousemove + mouseup for smooth dragging
+    function seekFromEvent(e) {
+        var rect = progressWrap.getBoundingClientRect();
+        var pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        progressBar.style.width = (pct * 100) + '%';
+        if (playerVideo.duration) {
+            playerVideo.currentTime = pct * playerVideo.duration;
+            timeLabel.textContent = fmt(playerVideo.currentTime) + ' / ' + fmt(playerVideo.duration);
+        }
+    }
+
+    progressWrap.addEventListener('mousedown', function(e) {
+        isSeeking = true;
+        seekFromEvent(e);
+        function onMove(e) { seekFromEvent(e); }
+        function onUp() {
+            isSeeking = false;
+            document.removeEventListener('mousemove', onMove);
+            document.removeEventListener('mouseup', onUp);
+        }
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+    });
+
+    // Mute
+    muteBtn.addEventListener('click', function() {
+        playerVideo.muted = !playerVideo.muted;
+        muteBtn.classList.toggle('muted', playerVideo.muted);
+        volumeFill.style.width = playerVideo.muted ? '0%' : (playerVideo.volume * 100) + '%';
+    });
+
+    // Volume
+    volumeWrap.addEventListener('click', function(e) {
+        var rect = volumeWrap.getBoundingClientRect();
+        var pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        playerVideo.volume = pct;
+        playerVideo.muted = (pct === 0);
+        muteBtn.classList.toggle('muted', pct === 0);
+        volumeFill.style.width = (pct * 100) + '%';
+    });
+
+    // Click delegation on TV wall — open HQ version in player
+    document.getElementById('tv-wall').addEventListener('click', function(e) {
+        var screen = e.target.closest('.crt-screen');
+        if (!screen) return;
+        var video = screen.querySelector('video');
+        if (video) {
+            var hqSrc = video.getAttribute('data-src-hq') || video.src;
+            var title = video.getAttribute('data-title') || '';
+            openPlayer(hqSrc, video, title);
+        }
+    });
+})();
+</script>
+
+</body>
+</html>
